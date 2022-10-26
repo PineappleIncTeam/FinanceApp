@@ -82,7 +82,7 @@
   padding-left: 10px;
 }
 .main_field_string_input {
-  width: 264px;
+  width: 254px;
   height: 60px;
   border: 1px solid #B7B7B7;
   border-radius: 8px;
@@ -90,9 +90,11 @@
   font-weight: 400;
   font-size: 24px;
   margin-top: 40px;
+  padding-left: 10px;
   
 }
 .main_field_string_button {
+  cursor: pointer;
   width: 264px;
   height: 60px;
   border: 1px solid #125B50;

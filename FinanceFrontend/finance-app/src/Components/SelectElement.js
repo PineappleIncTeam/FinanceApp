@@ -1,18 +1,26 @@
-function SelectElement(type) {
-  const oneTime = ['Подработка', 'Наследство', 'Добавить категорию']
-    const permanent = [
-    'Постоянные',
-    'Зарплата',
-    'Подработка',
-    'Планируемые',
-    'Добавить категорию',
-  ];
+function SelectElement(props) {
+  //   const oneTime = [
+  //     'Временные',
+  //     'Подработка',
+  //     'Наследство',
+  //     'Добавить категорию',
+  //   ];
+  //   const permanent = [
+  //     'Постоянные',
+  //     'Зарплата',
+  //     'Подработка',
+  //     'Планируемые',
+  //     'Добавить категорию',
+  //   ];
   return (
     <select className="select_element">
-      {permanent.map((text, index) => {
-        return <option className="option_list" key={index}>{text}</option>
+      {props.type.map((text, index) => {
+        return (
+          <option className="option_list" key={index}>
+            {text}
+          </option>
+        );
       })}
-      
     </select>
   );
 }
