@@ -1,0 +1,32 @@
+http://127.0.0.1:8000/api/registration/ - POST запрос регистрация пользователя
+JSON:
+{
+    "username": "",
+    "password": ""
+}
+
+http://127.0.0.1:8000/api/drf-auth/login/ - POST запрос вход пользователя
+{
+    "username": "admin",
+    "password": "111"
+}
+
+http://127.0.0.1:8000/api/drf-auth/logout/ - выход пользователя
+
+
+http://127.0.0.1:8000/api/get-users/ - GET запрос возвращает список всех пользователей
+JSON:
+{
+        "first_name": "User1Fname",
+        "last_name": "User1Lname",
+        "email": "",
+        "date_joined": "2022-10-14T05:34:33Z"
+}
+
+http://127.0.0.1:8000/api/categories/ - GET запрос возвращает список всех категорий.
+Здесь будет и создание категорий через POST запросза
+JSON:
+    {
+        "categoryName": "Название категории"
+    }
+
