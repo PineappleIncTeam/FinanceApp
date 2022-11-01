@@ -18,12 +18,14 @@ class Categories(models.Model):
         return self.categoryName
 
 
+
 class AbstractCash(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     reg_sum = models.IntegerField(verbose_name='Постоянная сумма')
     var_sum = models.IntegerField(verbose_name='Переменная сумма')
     categories = models.ForeignKey(Categories, on_delete=models.CASCADE, verbose_name='Категория')
     date = models.DateTimeField(auto_now_add=True, verbose_name='Дата')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+
 
 
 class OutcomeCash(AbstractCash):
