@@ -6,7 +6,7 @@ from api.models import User, Categories, OutcomeCash, IncomeCash, MoneyBox
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'date_joined']
+        fields = ['username','first_name', 'last_name', 'email', 'date_joined']
 
 class CreateUserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
@@ -18,9 +18,15 @@ class CreateUserSerializer(serializers.ModelSerializer):
         fields = ('username', 'password')
 
 class CategorySerializer(serializers.ModelSerializer):
+
+    def create(self, validated_data):
+        cat_name = validated_data.__getitem__('categoryName')
+        user_id = self.context.get('request').user.pk
+        category = Categories.objects.create(user_id=user_id, categoryName=cat_name)
+        return category
     class Meta:
         model = Categories
-        fields = ['categoryName', ]
+        fields = ['categoryName', 'user_id' ]
 
 
 class OutcomeCashSerializer(serializers.ModelSerializer):

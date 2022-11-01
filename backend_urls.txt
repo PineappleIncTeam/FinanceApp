@@ -17,10 +17,11 @@ http://127.0.0.1:8000/api/drf-auth/logout/ - выход пользователя
 http://127.0.0.1:8000/api/get-users/ - GET запрос возвращает список всех пользователей
 JSON:
 {
-        "first_name": "User1Fname",
-        "last_name": "User1Lname",
+        "username": "admin",
+        "first_name": "",
+        "last_name": "",
         "email": "",
-        "date_joined": "2022-10-14T05:34:33Z"
+        "date_joined": "2022-11-01T19:07:34.732153Z"
 }
 
 http://127.0.0.1:8000/api/categories/ - GET запрос возвращает список всех категорий.
