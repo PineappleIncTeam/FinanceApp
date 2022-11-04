@@ -1,11 +1,9 @@
-from django.shortcuts import render
-from rest_framework.generics import ListCreateAPIView, ListAPIView, CreateAPIView
-from rest_framework.permissions import IsAuthenticated
 from .serializers import CategorySerializer, UserSerializer, CreateUserSerializer
 from .models import Categories, User
 
+from rest_framework.generics import ListCreateAPIView, ListAPIView, CreateAPIView
+from rest_framework.permissions import IsAuthenticated
 
-# Create your views here.
 
 class GetCreateCategoryAPIView(ListCreateAPIView):
     """
@@ -24,13 +22,13 @@ class GetCreateCategoryAPIView(ListCreateAPIView):
         user_id = self.request.user.pk
         return Categories.objects.filter(user_id=user_id)
 
+
 class CreateUser(CreateAPIView):
     serializer_class = CreateUserSerializer
     queryset = User.objects.all()
 
     def perform_create(self, serializer):
         serializer.save()
-
 
 
 class GetUsers(ListAPIView):
