@@ -11,4 +11,3 @@ admin.site.register(
         OutcomeCash,
         MoneyBox,)
 )
-

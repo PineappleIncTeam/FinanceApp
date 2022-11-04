@@ -1,12 +1,13 @@
-from rest_framework import serializers
-
 from api.models import User, Categories, OutcomeCash, IncomeCash, MoneyBox
+
+from rest_framework import serializers
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username','first_name', 'last_name', 'email', 'date_joined']
+
 
 class CreateUserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
@@ -16,6 +17,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'password')
+
 
 class CategorySerializer(serializers.ModelSerializer):
 
