@@ -1,1 +1,1 @@
-web: gunicorn FinanceBackend.wsgi --log-file
+web: gunicorn FinanceBackend.wsgi --log-file -
