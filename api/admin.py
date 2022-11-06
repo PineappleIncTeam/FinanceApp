@@ -5,7 +5,6 @@ from .models import User, AbstractCash, Categories, IncomeCash, OutcomeCash, Mon
 admin.site.register(
     (
         User,
-        AbstractCash,
         Categories,
         IncomeCash,
         OutcomeCash,
