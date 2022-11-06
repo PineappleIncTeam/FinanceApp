@@ -6,7 +6,7 @@ from rest_framework import serializers
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username','first_name', 'last_name', 'email', 'date_joined']
+        fields = ['username', 'first_name', 'last_name', 'email', 'date_joined']
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
@@ -26,6 +26,7 @@ class CategorySerializer(serializers.ModelSerializer):
         user_id = self.context.get('request').user.pk
         category = Categories.objects.create(user_id=user_id, categoryName=cat_name)
         return category
+
     class Meta:
         model = Categories
         fields = ['categoryName', 'user_id' ]
