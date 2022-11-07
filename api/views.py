@@ -1,4 +1,4 @@
-from .serializers import CategorySerializer, UserSerializer, CreateUserSerializer
+from .serializers import CategorySerializer, UserSerializer
 from .models import Categories, User
 
 from rest_framework.generics import ListCreateAPIView, ListAPIView, CreateAPIView
@@ -23,12 +23,12 @@ class GetCreateCategoryAPIView(ListCreateAPIView):
         return Categories.objects.filter(user_id=user_id)
 
 
-class CreateUser(CreateAPIView):
-    serializer_class = CreateUserSerializer
-    queryset = User.objects.all()
-
-    def perform_create(self, serializer):
-        serializer.save()
+# class CreateUser(CreateAPIView):
+#     serializer_class = CreateUserSerializer
+#     queryset = User.objects.all()
+#
+#     def perform_create(self, serializer):
+#         serializer.save()
 
 
 class GetUsers(ListAPIView):
