@@ -169,4 +169,4 @@ CSRF_TRUSTED_ORIGINS = [
 
 LOGIN_REDIRECT_URL = '/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, '/tmp/build_17d3eacc/staticfiles')

@@ -10,7 +10,7 @@ router = DefaultRouter()
 urlpatterns = [
     path('api/', include(router.urls)),
     # path('api/registration/', CreateUser.as_view(), name='create-user'),
-    path('api/drf-auth/', include('rest_framework.urls')),
+    # path('api/drf-auth/', include('rest_framework.urls')),
     path('api/categories/', GetCreateCategoryAPIView.as_view(), name='categories'),
     path('api/get-users/', GetUsers.as_view(), name='get-users'),
     path('api/auth/', include('djoser.urls')),          # new
