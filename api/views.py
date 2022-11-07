@@ -1,14 +1,15 @@
 from .serializers import CategorySerializer, UserSerializer
 from .models import Categories, User
 
-from rest_framework.generics import ListCreateAPIView, ListAPIView, CreateAPIView
+from rest_framework.generics import ListCreateAPIView, ListAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 
 
 class GetCreateCategoryAPIView(ListCreateAPIView):
     """
-    Представление возвращает список всех категорий
-    НУЖНО ПРОТЕСТИТЬ СОЗДАНИЕ КАТЕГОИЙ!!!
+    Представление возвращает список всех категорий (GET)
+    и создает новые категории (POST)
+
     """
 
     serializer_class = CategorySerializer
@@ -23,12 +24,21 @@ class GetCreateCategoryAPIView(ListCreateAPIView):
         return Categories.objects.filter(user_id=user_id)
 
 
-# class CreateUser(CreateAPIView):
-#     serializer_class = CreateUserSerializer
-#     queryset = User.objects.all()
-#
-#     def perform_create(self, serializer):
-#         serializer.save()
+class DeleteCategory(DestroyAPIView):
+    """
+    Удаление категории (DELETE)
+    """
+    serializer_class = CategorySerializer
+    queryset = Categories.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+class UpdateCategory(UpdateAPIView):
+    """
+    Изменение категории (PUT)
+    """
+    serializer_class = CategorySerializer
+    queryset = Categories.objects.all()
+    permission_classes = (IsAuthenticated, )
 
 
 class GetUsers(ListAPIView):

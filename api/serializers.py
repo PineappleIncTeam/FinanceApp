@@ -29,7 +29,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Categories
-        fields = ['categoryName', 'user_id' ]
+        fields = ['categoryName', 'pk' , 'user_id' ]
 
 
 class OutcomeCashSerializer(serializers.ModelSerializer):

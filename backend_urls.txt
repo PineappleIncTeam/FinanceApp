@@ -31,3 +31,11 @@ JSON:
         "categoryName": "Название категории"
     }
 
+http://127.0.0.1:8000/api/update-category/{id категории} - PUT запрос изменение категории
+JSON:
+    {
+        "categoryName": "Название категории"
+    }
+
+http://127.0.0.1:8000/api/del-category/{id категории} - DELETE запрос удаление категории
+
