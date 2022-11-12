@@ -11,11 +11,12 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        Categories.objects.create(categoryName='Зарплата', user=self, category_type='CC')
-        Categories.objects.create(categoryName='Подработка', user=self, category_type='CC')
-        Categories.objects.create(categoryName='Пассивный доход', user=self, category_type='CC')
-        Categories.objects.create(categoryName='Подработка', user=self, category_type='OC')
-        Categories.objects.create(categoryName='Наследство', user=self, category_type='OC')
+        if not self.last_login:
+            Categories.objects.create(categoryName='Зарплата', user=self, category_type='CC')
+            Categories.objects.create(categoryName='Подработка', user=self, category_type='CC')
+            Categories.objects.create(categoryName='Пассивный доход', user=self, category_type='CC')
+            Categories.objects.create(categoryName='Подработка', user=self, category_type='OC')
+            Categories.objects.create(categoryName='Наследство', user=self, category_type='OC')
         if self._password is not None:
             password_validation.password_changed(self._password, self)
             self._password = None
