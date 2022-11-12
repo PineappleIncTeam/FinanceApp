@@ -1,4 +1,4 @@
-from .serializers import CategorySerializer, UserSerializer
+from .serializers import CategorySerializer
 from .models import Categories, User
 
 from rest_framework.generics import ListCreateAPIView, ListAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
@@ -41,9 +41,9 @@ class UpdateCategory(UpdateAPIView):
     permission_classes = (IsAuthenticated, )
 
 
-class GetUsers(ListAPIView):
-    """
-    Представление возвращает список всех пользователей
-    """
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
+# class GetUsers(ListAPIView):
+#     """
+#     Представление возвращает список всех пользователей
+#     """
+#     serializer_class = UserSerializer
+#     queryset = User.objects.all()
