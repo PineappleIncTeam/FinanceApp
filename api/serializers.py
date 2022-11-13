@@ -20,6 +20,7 @@ from rest_framework import serializers
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    category_id = serializers.IntegerField(source='pk', required=False)
 
     def create(self, validated_data):
         cat_name = validated_data.__getitem__('categoryName')
@@ -29,7 +30,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Categories
-        fields = ['categoryName', 'pk' , 'user_id' ]
+        fields = ['categoryName', 'category_id', 'category_type', 'user_id' ]
 
 
 class OutcomeCashSerializer(serializers.ModelSerializer):
