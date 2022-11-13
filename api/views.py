@@ -9,6 +9,9 @@ class GetCreateCategoryAPIView(ListCreateAPIView):
     """
     Представление возвращает список всех категорий (GET)
     и создает новые категории (POST)
+    Виды категорий (category_type):
+        constant - постоянная
+        once - разовая
 
     """
 
