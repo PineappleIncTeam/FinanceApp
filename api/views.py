@@ -1,5 +1,5 @@
-from .serializers import CategorySerializer
-from .models import Categories, User
+from .serializers import CategorySerializer, IncomeCashSerializer
+from .models import Categories, User, IncomeCash
 
 from rest_framework.generics import ListCreateAPIView, ListAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -43,10 +43,15 @@ class UpdateCategory(UpdateAPIView):
     queryset = Categories.objects.all()
     permission_classes = (IsAuthenticated, )
 
+class AddIncomeCash(ListCreateAPIView):
+    serializer_class = IncomeCashSerializer
+    queryset = IncomeCash.objects.all()
+    permission_classes = (IsAuthenticated, )
 
-# class GetUsers(ListAPIView):
-#     """
-#     Представление возвращает список всех пользователей
-#     """
-#     serializer_class = UserSerializer
-#     queryset = User.objects.all()
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        category_id = self.request.data.get('category_id')
+        return IncomeCash.objects.filter(user_id=user_id, categories_id=category_id)
+
+    def perform_create(self, serializer):
+        serializer.save()

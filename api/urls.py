@@ -1,6 +1,6 @@
 from django.urls import path, include, re_path
 from rest_framework.routers import DefaultRouter
-from .views import GetCreateCategoryAPIView, DeleteCategory, UpdateCategory
+from .views import GetCreateCategoryAPIView, DeleteCategory, UpdateCategory, AddIncomeCash
 
 
 router = DefaultRouter()
@@ -14,6 +14,7 @@ urlpatterns = [
     path('categories/', GetCreateCategoryAPIView.as_view(), name='categories'),
     path('update-category/<int:pk>', UpdateCategory.as_view(), name='update-category'),
     path('del-category/<int:pk>', DeleteCategory.as_view(), name='del-category'),
+    path('incomecash/', AddIncomeCash.as_view(), name='incomecash'),
     # path('api/get-users/', GetUsers.as_view(), name='get-users'),
     path('auth/', include('djoser.urls')),          # new
     re_path(r'^auth/', include('djoser.urls.authtoken')),  # new

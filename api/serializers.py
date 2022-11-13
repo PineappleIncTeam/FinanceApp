@@ -49,3 +49,20 @@ class MoneyBoxSerializer(serializers.ModelSerializer):
     class Meta:
         model = MoneyBox
         fields = ['box_name', 'box_sum', 'user']
+
+class IncomeCashSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(required=False)
+    category_id = serializers.IntegerField(source='categories_id')
+    reg_sum = serializers.IntegerField(required=False)
+    var_sum = serializers.IntegerField(required=False)
+    class Meta:
+        model = IncomeCash
+        fields = ('user', 'category_id', 'reg_sum', 'var_sum', 'date')
+    def create(self, validated_data):
+        user_id = self.context.get('request').user.pk
+        category_id = validated_data.__getitem__('categories_id')
+        reg_sum = validated_data.__getitem__('reg_sum')
+        var_sum = validated_data.__getitem__('var_sum')
+
+        incomecash = IncomeCash.objects.create(user_id=user_id, categories_id=category_id, reg_sum=reg_sum, var_sum=var_sum)
+        return incomecash
