@@ -65,3 +65,18 @@ JSON:
     "var_sum": 500,
     "date": "2022-11-13T17:45:13.086903Z"
 }
+
+
+http://127.0.0.1:8000/api/last-5-incomecash/ - GET запрос возвращает последние 5 записей доходов пользователя
+В ответ получаем JSON:
+[
+    {
+        "user": "user1",
+        "category_id": 75,
+        "categoryName": "Подработка",
+        "category_type": "constant",
+        "reg_sum": 0,
+        "var_sum": 500,
+        "date": "2022-11-13T17:45:13.086903Z"
+    },
+]

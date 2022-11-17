@@ -28,7 +28,7 @@ class CategorySerializer(serializers.ModelSerializer):
         user_id = self.context.get('request').user.pk
         category = Categories.objects.create(
             user_id=user_id,
-            categoryName=cat_name, 
+            categoryName=cat_name,
             category_type=category_type)
         return category
 
@@ -43,10 +43,10 @@ class OutcomeCashSerializer(serializers.ModelSerializer):
         fields = ['reg_sum', 'var_sum', 'categories', 'date', 'user']
 
 
-class IncomeCashSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = IncomeCash
-        fields = ['reg_sum', 'var_sum', 'categories', 'date', 'user']
+# class IncomeCashSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = IncomeCash
+#         fields = ['reg_sum', 'var_sum', 'categories', 'date', 'user']
 
 
 class MoneyBoxSerializer(serializers.ModelSerializer):
@@ -57,11 +57,13 @@ class MoneyBoxSerializer(serializers.ModelSerializer):
 class IncomeCashSerializer(serializers.ModelSerializer):
     user = serializers.CharField(required=False)
     category_id = serializers.IntegerField(source='categories_id')
+    categoryName = serializers.CharField(source='categories.categoryName', required=False)
+    category_type = serializers.CharField(source='categories.category_type', required=False)
     reg_sum = serializers.IntegerField(required=False)
     var_sum = serializers.IntegerField(required=False)
     class Meta:
         model = IncomeCash
-        fields = ('user', 'category_id', 'reg_sum', 'var_sum', 'date')
+        fields = ('user', 'category_id', 'categoryName', 'category_type', 'reg_sum', 'var_sum', 'date')
     def create(self, validated_data):
         user_id = self.context.get('request').user.pk
         category_id = validated_data.__getitem__('categories_id')
