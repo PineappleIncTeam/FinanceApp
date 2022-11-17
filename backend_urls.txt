@@ -46,3 +46,22 @@ JSON:
 
 http://127.0.0.1:8000/api/del-category/{id категории} - DELETE запрос удаление категории
 
+http://127.0.0.1:8000/api/incomecash/ - POST запрос на добавление суммы доходов
+JSON:
+#    reg_sum - сумма постоянных доходов
+#    var_sum - сумма разовых доходов
+#    category_id - id категории, к которой относится сумма
+{
+    "reg_sum": 0,
+    "var_sum": 500,
+    "category_id": 75
+}
+В ответ получаем JSON:
+
+{
+    "user": "user1",
+    "category_id": 75,
+    "reg_sum": 0,
+    "var_sum": 500,
+    "date": "2022-11-13T17:45:13.086903Z"
+}
