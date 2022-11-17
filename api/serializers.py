@@ -24,8 +24,12 @@ class CategorySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         cat_name = validated_data.__getitem__('categoryName')
+        category_type = validated_data.__getitem__('category_type')
         user_id = self.context.get('request').user.pk
-        category = Categories.objects.create(user_id=user_id, categoryName=cat_name)
+        category = Categories.objects.create(
+            user_id=user_id,
+            categoryName=cat_name, 
+            category_type=category_type)
         return category
 
     class Meta:
@@ -64,5 +68,9 @@ class IncomeCashSerializer(serializers.ModelSerializer):
         reg_sum = validated_data.__getitem__('reg_sum')
         var_sum = validated_data.__getitem__('var_sum')
 
-        incomecash = IncomeCash.objects.create(user_id=user_id, categories_id=category_id, reg_sum=reg_sum, var_sum=var_sum)
+        incomecash = IncomeCash.objects.create(
+            user_id=user_id,
+            categories_id=category_id,
+            reg_sum=reg_sum,
+            var_sum=var_sum)
         return incomecash
