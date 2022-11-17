@@ -55,3 +55,12 @@ class AddIncomeCash(ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save()
+
+class Last5IncomeCash(ListAPIView):
+    serializer_class = IncomeCashSerializer
+    queryset = IncomeCash.objects.all()
+    permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        return IncomeCash.objects.filter(user_id=user_id).order_by('-date')[:5]
