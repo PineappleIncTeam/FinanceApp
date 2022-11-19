@@ -52,18 +52,20 @@ JSON:
 #    var_sum - сумма разовых доходов
 #    category_id - id категории, к которой относится сумма
 {
-    "reg_sum": 0,
-    "var_sum": 500,
+    "constant_sum": 0,
+    "once_sum": 500,
     "category_id": 75
 }
 В ответ получаем JSON:
 
 {
-    "user": "user1",
-    "category_id": 75,
-    "reg_sum": 0,
-    "var_sum": 500,
-    "date": "2022-11-13T17:45:13.086903Z"
+    "user": "user2",
+    "category_id": 85,
+    "categoryName": "Наследство",
+    "category_type": "once",
+    "constant_sum": 3000,
+    "once_sum": 0,
+    "date": "2022-11-17T15:17:01.359683Z"
 }
 
 
@@ -75,8 +77,18 @@ http://127.0.0.1:8000/api/last-5-incomecash/ - GET запрос возвраща
         "category_id": 75,
         "categoryName": "Подработка",
         "category_type": "constant",
-        "reg_sum": 0,
-        "var_sum": 500,
+        "constant_sum": 0,
+        "once_sum": 500,
         "date": "2022-11-13T17:45:13.086903Z"
     },
+]
+
+http://127.0.0.1:8000/api/sum-incomecash/ - GET сумму всех доходов пользователя
+В ответ получаем JSON:
+[
+    {
+        "user_id": 15,
+        "SUM_Constant_sum": 24003.3, #сумма постоянных доходов
+        "SUM_Once_sum": 13000.06    #сумма переменных доходов
+    }
 ]

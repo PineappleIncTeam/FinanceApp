@@ -42,8 +42,8 @@ class AbstractCash(models.Model):
         abstract = True
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-    reg_sum = models.IntegerField(verbose_name='Постоянная сумма')
-    var_sum = models.IntegerField(verbose_name='Разовая сумма')
+    constant_sum = models.DecimalField(max_digits=19, decimal_places=2,verbose_name='Постоянная сумма')
+    once_sum = models.DecimalField(max_digits=19, decimal_places=2, verbose_name='Разовая сумма')
     categories = models.ForeignKey(Categories, on_delete=models.CASCADE, verbose_name='Категория', null=True)
     date = models.DateTimeField(auto_now_add=True, verbose_name='Дата')
 
