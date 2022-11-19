@@ -4,7 +4,8 @@ from .views import (GetCreateCategoryAPIView,
                     DeleteCategory,
                     UpdateCategory,
                     AddIncomeCash,
-                    Last5IncomeCash)
+                    Last5IncomeCash,
+                    SumIncomeCash,)
 
 
 router = DefaultRouter()
@@ -20,6 +21,7 @@ urlpatterns = [
     path('del-category/<int:pk>', DeleteCategory.as_view(), name='del-category'),
     path('incomecash/', AddIncomeCash.as_view(), name='incomecash'),
     path('last-5-incomecash/', Last5IncomeCash.as_view(), name='last-5-incomecash'),
+    path('sum-incomecash/', SumIncomeCash.as_view(), name='sum-incomecash'),
     # path('api/get-users/', GetUsers.as_view(), name='get-users'),
     path('auth/', include('djoser.urls')),          # new
     re_path(r'^auth/', include('djoser.urls.authtoken')),  # new
