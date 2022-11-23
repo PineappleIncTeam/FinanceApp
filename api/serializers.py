@@ -1,7 +1,7 @@
 from django.db.models.aggregates import Sum
 from rest_framework import serializers
 from .models import User, Categories, OutcomeCash, IncomeCash, MoneyBox
-
+from django.http import JsonResponse
 
 
 
@@ -61,48 +61,47 @@ class IncomeCashSerializer(serializers.ModelSerializer):
     category_id = serializers.IntegerField(source='categories_id')
     categoryName = serializers.CharField(source='categories.categoryName', required=False)
     category_type = serializers.CharField(source='categories.category_type', required=False)
-    constant_sum = serializers.DecimalField(max_digits=19, decimal_places=2 ,required=False, default=0)
-    once_sum = serializers.DecimalField(max_digits=19, decimal_places=2, required=False, default=0)
+    # constant_sum = serializers.DecimalField(max_digits=19, decimal_places=2 ,required=False, default=0)
+    # once_sum = serializers.DecimalField(max_digits=19, decimal_places=2, required=False, default=0)
+    sum = serializers.DecimalField(max_digits=19, decimal_places=2, required=False, default=0)
+    date = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False)
     class Meta:
         model = IncomeCash
-        fields = ('user', 'category_id', 'categoryName', 'category_type', 'constant_sum', 'once_sum', 'date')
+        # fields = ('user', 'category_id', 'categoryName', 'category_type', 'constant_sum', 'once_sum', 'date')
+        fields = ('user', 'category_id', 'categoryName', 'category_type', 'sum', 'date')
     def create(self, validated_data):
         user_id = self.context.get('request').user.pk
         category_id = validated_data.__getitem__('categories_id')
+        # category_type = Categories.objects.get(id=category_id).category_type
+        sum = self.validated_data.__getitem__('sum')
 
-        if validated_data.__getitem__('constant_sum'):
-            constant_sum = validated_data.__getitem__('constant_sum')
-        else:
-            constant_sum = 0
+        try:
+            Categories.objects.get(user_id=user_id, id = category_id)
 
-        if validated_data.__getitem__('once_sum'):
-            once_sum = validated_data.__getitem__('once_sum')
-        else:
-            once_sum = 0
-
-        incomecash = IncomeCash.objects.create(
-            user_id=user_id,
-            categories_id=category_id,
-            constant_sum=constant_sum,
-            once_sum=once_sum)
-        return incomecash
+            incomecash = IncomeCash.objects.create(
+                user_id=user_id,
+                categories_id=category_id,
+                sum=sum,)
+            return incomecash
+        except:
+            raise ValueError(f"У пользователя с id {user_id} нет категории с id {category_id}")
 
 class SumIncomeCashSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(source='user')
-    sum_constant_sum = serializers.SerializerMethodField()
-    sum_once_sum = serializers.SerializerMethodField()
+    constant_sum = serializers.SerializerMethodField()
+    once_sum = serializers.SerializerMethodField()
 
-    def get_sum_constant_sum(self,validated_data):
+    def get_constant_sum(self,validated_data):
         user_id = self.context.get('request').user.pk
-        SUM_Constant_sum = IncomeCash.objects.filter(user_id=user_id).aggregate(Sum('constant_sum')).get('constant_sum__sum', 0.00)
-        return SUM_Constant_sum
+        constant_sum = IncomeCash.objects.filter(user_id=user_id, categories__category_type='constant').aggregate(Sum('sum')).get('sum__sum', 0.00)
+        return constant_sum
 
-    def get_sum_once_sum(self,validated_data):
+    def get_once_sum(self,validated_data):
         user_id = self.context.get('request').user.pk
-        SUM_Once_sum = IncomeCash.objects.filter(user_id=user_id).aggregate(Sum('once_sum')).get('once_sum__sum',0.00)
-        return SUM_Once_sum
+        once_sum = IncomeCash.objects.filter(user_id=user_id, categories__category_type='once').aggregate(Sum('sum')).get('sum__sum',0.00)
+        return once_sum
 
     class Meta:
         model = IncomeCash
-        fields = ('user_id','sum_constant_sum', 'sum_once_sum')
+        fields = ('user_id','constant_sum', 'once_sum')
 
