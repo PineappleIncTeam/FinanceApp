@@ -161,6 +161,7 @@ ALLOWED_HOSTS = [
     "http://localhost:3000",
     "127.0.0.1",
     "pineappleinc.herokuapp.com",
+    "92.255.79.239",
 ]
 
 CORS_ORIGIN_WHITELIST = [
