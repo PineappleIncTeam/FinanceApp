@@ -7,10 +7,13 @@ from rest_framework.generics import (ListCreateAPIView,
 from rest_framework.permissions import IsAuthenticated
 from .serializers import (CategorySerializer,
                           IncomeCashSerializer,
-                          SumIncomeCashSerializer)
+                          OutcomeCashSerializer,
+                          SumIncomeCashSerializer,
+                          SumOutcomeCashSerializer)
 from .models import (Categories,
                      User,
-                     IncomeCash)
+                     IncomeCash,
+                     OutcomeCash)
 
 
 class GetCreateCategoryAPIView(ListCreateAPIView):
@@ -54,6 +57,9 @@ class UpdateCategory(UpdateAPIView):
 
 
 class AddIncomeCash(ListCreateAPIView):
+    """
+    Представление добавляет сумму дохода в категорию
+    """
     serializer_class = IncomeCashSerializer
     queryset = IncomeCash.objects.all()
     permission_classes = (IsAuthenticated,)
@@ -68,6 +74,9 @@ class AddIncomeCash(ListCreateAPIView):
 
 
 class Last5IncomeCash(ListAPIView):
+    """
+    Представление возвращает 5 последних записей доходов
+    """
     serializer_class = IncomeCashSerializer
     queryset = IncomeCash.objects.all()
     permission_classes = (IsAuthenticated,)
@@ -78,6 +87,9 @@ class Last5IncomeCash(ListAPIView):
 
 
 class SumIncomeCash(ListAPIView):
+    """
+    Представление возвращает сумму всех доходов по всем категориям
+    """
     serializer_class = SumIncomeCashSerializer
     queryset = IncomeCash.objects.all()
     permission_classes = (IsAuthenticated,)
@@ -85,11 +97,44 @@ class SumIncomeCash(ListAPIView):
     def get_queryset(self):
         user_id = self.request.user.pk
         return IncomeCash.objects.filter(user_id=user_id).values('user').distinct()
-    #     SUM_Constant_sum = int(
-    #         IncomeCash.objects.filter(user_id=user_id).aggregate(Sum('constant_sum')).get('constant_sum__sum'))
-    #     SUM_Once_sum = int(IncomeCash.objects.filter(user_id=user_id).aggregate(Sum('once_sum')).get('once_sum__sum'))
-    #     sum_income_cash = IncomeCash.objects.filter(
-    #         user_id=user_id,
-    #         SUM_Constant_sum=SUM_Constant_sum,
-    #         SUM_Once_sum=SUM_Once_sum)
-    #     return sum_income_cash
+
+
+class AddOutcomeCash(ListCreateAPIView):
+    """
+    Представление добавляет сумму расхода в категорию
+    """
+    serializer_class = OutcomeCashSerializer
+    queryset = OutcomeCash.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        category_id = self.request.data.get('category_id')
+        return OutcomeCash.objects.filter(user_id=user_id, categories_id=category_id)
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+class SumOutcomeCash(ListAPIView):
+    """
+    Представление возвращает сумму всех  расходов по всем категориям
+    """
+    serializer_class = SumOutcomeCashSerializer
+    queryset = OutcomeCash.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        return OutcomeCash.objects.filter(user_id=user_id).values('user').distinct()
+
+class Last5OutcomeCash(ListAPIView):
+    """
+    Представление возвращает 5 последних записей расходов
+    """
+    serializer_class = OutcomeCashSerializer
+    queryset = OutcomeCash.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        return OutcomeCash.objects.filter(user_id=user_id).order_by('-date')[:5]

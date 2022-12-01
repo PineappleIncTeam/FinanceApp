@@ -5,3 +5,4 @@ __pycache__/
 staticfiles
 
 Cache_files/*
+db.sqlite3
