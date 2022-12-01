@@ -27,16 +27,18 @@ class CategorySerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         cat_name = validated_data.__getitem__('categoryName')
         category_type = validated_data.__getitem__('category_type')
+        income_outcome = validated_data.__getitem__('income_outcome')
         user_id = self.context.get('request').user.pk
         category = Categories.objects.create(
             user_id=user_id,
             categoryName=cat_name,
-            category_type=category_type)
+            category_type=category_type,
+            income_outcome=income_outcome)
         return category
 
     class Meta:
         model = Categories
-        fields = ['categoryName', 'category_id', 'category_type', 'user_id']
+        fields = ['categoryName', 'category_id', 'category_type', 'income_outcome', 'user_id']
 
 
 # class OutcomeCashSerializer(serializers.ModelSerializer):

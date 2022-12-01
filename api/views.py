@@ -37,6 +37,31 @@ class GetCreateCategoryAPIView(ListCreateAPIView):
         user_id = self.request.user.pk
         return Categories.objects.filter(user_id=user_id)
 
+class GetIncomeCategories(ListAPIView):
+    """
+    Представление возвращает список категорий доходов
+    """
+    serializer_class = CategorySerializer
+    queryset = Categories.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        return Categories.objects.filter(user_id=user_id,
+                                         income_outcome='income')
+
+class GetOutcomeCategories(ListAPIView):
+    """
+    Представление возвращает список категорий расходов
+    """
+    serializer_class = CategorySerializer
+    queryset = Categories.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        return Categories.objects.filter(user_id=user_id,
+                                         income_outcome='outcome')
 
 class DeleteCategory(DestroyAPIView):
     """
