@@ -1,15 +1,18 @@
 from django.db.models.aggregates import Sum, Count
+from django.http import JsonResponse
 from rest_framework.generics import (ListCreateAPIView,
                                      ListAPIView,
                                      CreateAPIView,
                                      DestroyAPIView,
                                      UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+
 from .serializers import (CategorySerializer,
                           IncomeCashSerializer,
                           OutcomeCashSerializer,
                           SumIncomeCashSerializer,
-                          SumOutcomeCashSerializer)
+                          SumOutcomeCashSerializer, )
 from .models import (Categories,
                      User,
                      IncomeCash,
@@ -37,6 +40,7 @@ class GetCreateCategoryAPIView(ListCreateAPIView):
         user_id = self.request.user.pk
         return Categories.objects.filter(user_id=user_id)
 
+
 class GetIncomeCategories(ListAPIView):
     """
     Представление возвращает список категорий доходов
@@ -50,6 +54,7 @@ class GetIncomeCategories(ListAPIView):
         return Categories.objects.filter(user_id=user_id,
                                          income_outcome='income')
 
+
 class GetOutcomeCategories(ListAPIView):
     """
     Представление возвращает список категорий расходов
@@ -62,6 +67,7 @@ class GetOutcomeCategories(ListAPIView):
         user_id = self.request.user.pk
         return Categories.objects.filter(user_id=user_id,
                                          income_outcome='outcome')
+
 
 class DeleteCategory(DestroyAPIView):
     """
@@ -97,6 +103,23 @@ class AddIncomeCash(ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save()
 
+
+class UpdateIncomeCash(UpdateAPIView):
+    """
+    Представление изменяет сумму дохода в категории
+    """
+    serializer_class = IncomeCashSerializer
+    queryset = IncomeCash.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+
+class DeleteIncomeCash(DeleteCategory):
+    """
+    Представление удаляет сумму дохода в категории
+    """
+    serializer_class = IncomeCashSerializer
+    queryset = IncomeCash.objects.all()
+    permission_classes = (IsAuthenticated,)
 
 class Last5IncomeCash(ListAPIView):
     """
@@ -140,6 +163,23 @@ class AddOutcomeCash(ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save()
 
+
+class UpdateOutcomeCash(UpdateAPIView):
+    """
+    Представление изменяет сумму расхода в категории
+    """
+    serializer_class = OutcomeCashSerializer
+    queryset = OutcomeCash.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+class DeleteOutcomeCash(DestroyAPIView):
+    """
+    Представление удаляет сумму расхода в категории
+    """
+    serializer_class = OutcomeCashSerializer
+    queryset = OutcomeCash.objects.all()
+    permission_classes = (IsAuthenticated,)
+
 class SumOutcomeCash(ListAPIView):
     """
     Представление возвращает сумму всех  расходов по всем категориям
@@ -152,6 +192,7 @@ class SumOutcomeCash(ListAPIView):
         user_id = self.request.user.pk
         return OutcomeCash.objects.filter(user_id=user_id).values('user').distinct()
 
+
 class Last5OutcomeCash(ListAPIView):
     """
     Представление возвращает 5 последних записей расходов
@@ -163,3 +204,19 @@ class Last5OutcomeCash(ListAPIView):
     def get_queryset(self):
         user_id = self.request.user.pk
         return OutcomeCash.objects.filter(user_id=user_id).order_by('-date')[:5]
+
+
+class BalanceAPIView(APIView):
+    """
+    Представление возвращает баланс пользователя
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user_id = request.user.pk
+        income_sum = IncomeCash.objects.filter(user_id=user_id).aggregate(
+            Sum('sum')).get('sum__sum', 0.00)
+        outcome_sum = OutcomeCash.objects.filter(user_id=user_id).aggregate(
+            Sum('sum')).get('sum__sum', 0.00)
+        balance = round(income_sum - outcome_sum,2)
+        return JsonResponse({'sum_balance': balance})

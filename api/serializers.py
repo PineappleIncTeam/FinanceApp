@@ -47,7 +47,6 @@ class CategorySerializer(serializers.ModelSerializer):
 #         fields = ['constant_sum', 'once_sum', 'categories', 'date', 'user']
 
 
-
 class MoneyBoxSerializer(serializers.ModelSerializer):
     class Meta:
         model = MoneyBox
@@ -65,7 +64,7 @@ class IncomeCashSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IncomeCash
-        fields = ('user', 'category_id', 'categoryName', 'category_type', 'sum', 'date')
+        fields = ('id', 'user', 'category_id', 'categoryName', 'category_type', 'sum', 'date')
 
     def create(self, validated_data):
         user_id = self.context.get('request').user.pk
@@ -126,7 +125,7 @@ class OutcomeCashSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OutcomeCash
-        fields = ('user', 'category_id', 'categoryName', 'category_type', 'sum', 'date')
+        fields = ('id', 'user', 'category_id', 'categoryName', 'category_type', 'sum', 'date')
 
     def create(self, validated_data):
         user_id = self.context.get('request').user.pk
@@ -174,3 +173,5 @@ class SumOutcomeCashSerializer(serializers.ModelSerializer):
     class Meta:
         model = OutcomeCash
         fields = ('user_id', 'constant_sum', 'once_sum')
+
+
