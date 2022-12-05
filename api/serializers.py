@@ -47,7 +47,6 @@ class CategorySerializer(serializers.ModelSerializer):
 #         fields = ['constant_sum', 'once_sum', 'categories', 'date', 'user']
 
 
-
 class MoneyBoxSerializer(serializers.ModelSerializer):
     class Meta:
         model = MoneyBox
@@ -174,3 +173,9 @@ class SumOutcomeCashSerializer(serializers.ModelSerializer):
     class Meta:
         model = OutcomeCash
         fields = ('user_id', 'constant_sum', 'once_sum')
+
+
+class GetBalanceSerializer(serializers.Serializer):
+    sum_balance = serializers.IntegerField()
+
+    # def get_sum_balance(self):

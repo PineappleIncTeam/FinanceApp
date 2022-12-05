@@ -9,7 +9,8 @@ from .serializers import (CategorySerializer,
                           IncomeCashSerializer,
                           OutcomeCashSerializer,
                           SumIncomeCashSerializer,
-                          SumOutcomeCashSerializer)
+                          SumOutcomeCashSerializer,
+                          GetBalanceSerializer, )
 from .models import (Categories,
                      User,
                      IncomeCash,
@@ -37,6 +38,7 @@ class GetCreateCategoryAPIView(ListCreateAPIView):
         user_id = self.request.user.pk
         return Categories.objects.filter(user_id=user_id)
 
+
 class GetIncomeCategories(ListAPIView):
     """
     Представление возвращает список категорий доходов
@@ -50,6 +52,7 @@ class GetIncomeCategories(ListAPIView):
         return Categories.objects.filter(user_id=user_id,
                                          income_outcome='income')
 
+
 class GetOutcomeCategories(ListAPIView):
     """
     Представление возвращает список категорий расходов
@@ -62,6 +65,7 @@ class GetOutcomeCategories(ListAPIView):
         user_id = self.request.user.pk
         return Categories.objects.filter(user_id=user_id,
                                          income_outcome='outcome')
+
 
 class DeleteCategory(DestroyAPIView):
     """
@@ -140,6 +144,7 @@ class AddOutcomeCash(ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save()
 
+
 class SumOutcomeCash(ListAPIView):
     """
     Представление возвращает сумму всех  расходов по всем категориям
@@ -152,6 +157,7 @@ class SumOutcomeCash(ListAPIView):
         user_id = self.request.user.pk
         return OutcomeCash.objects.filter(user_id=user_id).values('user').distinct()
 
+
 class Last5OutcomeCash(ListAPIView):
     """
     Представление возвращает 5 последних записей расходов
@@ -163,3 +169,18 @@ class Last5OutcomeCash(ListAPIView):
     def get_queryset(self):
         user_id = self.request.user.pk
         return OutcomeCash.objects.filter(user_id=user_id).order_by('-date')[:5]
+
+
+class BalanceListView(ListAPIView):
+    """
+    Представление возвращает баланс пользователя
+    """
+    serializer_class = GetBalanceSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        sum_income = IncomeCash.objects.filter(user_id=user_id).values('user').distinct()
+        sum_outcome = OutcomeCash.objects.filter(user_id=user_id).values('user').distinct()
+        sum_balance = sum_income - sum_outcome
+        return sum_balance
