@@ -64,7 +64,7 @@ class IncomeCashSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IncomeCash
-        fields = ('user', 'category_id', 'categoryName', 'category_type', 'sum', 'date')
+        fields = ('id', 'user', 'category_id', 'categoryName', 'category_type', 'sum', 'date')
 
     def create(self, validated_data):
         user_id = self.context.get('request').user.pk
@@ -125,7 +125,7 @@ class OutcomeCashSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OutcomeCash
-        fields = ('user', 'category_id', 'categoryName', 'category_type', 'sum', 'date')
+        fields = ('id', 'user', 'category_id', 'categoryName', 'category_type', 'sum', 'date')
 
     def create(self, validated_data):
         user_id = self.context.get('request').user.pk
@@ -175,7 +175,3 @@ class SumOutcomeCashSerializer(serializers.ModelSerializer):
         fields = ('user_id', 'constant_sum', 'once_sum')
 
 
-class GetBalanceSerializer(serializers.Serializer):
-    sum_balance = serializers.IntegerField()
-
-    # def get_sum_balance(self):

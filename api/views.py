@@ -1,16 +1,18 @@
 from django.db.models.aggregates import Sum, Count
+from django.http import JsonResponse
 from rest_framework.generics import (ListCreateAPIView,
                                      ListAPIView,
                                      CreateAPIView,
                                      DestroyAPIView,
                                      UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+
 from .serializers import (CategorySerializer,
                           IncomeCashSerializer,
                           OutcomeCashSerializer,
                           SumIncomeCashSerializer,
-                          SumOutcomeCashSerializer,
-                          GetBalanceSerializer, )
+                          SumOutcomeCashSerializer, )
 from .models import (Categories,
                      User,
                      IncomeCash,
@@ -102,6 +104,23 @@ class AddIncomeCash(ListCreateAPIView):
         serializer.save()
 
 
+class UpdateIncomeCash(UpdateAPIView):
+    """
+    Представление изменяет сумму дохода в категории
+    """
+    serializer_class = IncomeCashSerializer
+    queryset = IncomeCash.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+
+class DeleteIncomeCash(DeleteCategory):
+    """
+    Представление удаляет сумму дохода в категории
+    """
+    serializer_class = IncomeCashSerializer
+    queryset = IncomeCash.objects.all()
+    permission_classes = (IsAuthenticated,)
+
 class Last5IncomeCash(ListAPIView):
     """
     Представление возвращает 5 последних записей доходов
@@ -145,6 +164,22 @@ class AddOutcomeCash(ListCreateAPIView):
         serializer.save()
 
 
+class UpdateOutcomeCash(UpdateAPIView):
+    """
+    Представление изменяет сумму расхода в категории
+    """
+    serializer_class = OutcomeCashSerializer
+    queryset = OutcomeCash.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+class DeleteOutcomeCash(DestroyAPIView):
+    """
+    Представление удаляет сумму расхода в категории
+    """
+    serializer_class = OutcomeCashSerializer
+    queryset = OutcomeCash.objects.all()
+    permission_classes = (IsAuthenticated,)
+
 class SumOutcomeCash(ListAPIView):
     """
     Представление возвращает сумму всех  расходов по всем категориям
@@ -171,16 +206,17 @@ class Last5OutcomeCash(ListAPIView):
         return OutcomeCash.objects.filter(user_id=user_id).order_by('-date')[:5]
 
 
-class BalanceListView(ListAPIView):
+class BalanceAPIView(APIView):
     """
     Представление возвращает баланс пользователя
     """
-    serializer_class = GetBalanceSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
 
-    def get_queryset(self):
-        user_id = self.request.user.pk
-        sum_income = IncomeCash.objects.filter(user_id=user_id).values('user').distinct()
-        sum_outcome = OutcomeCash.objects.filter(user_id=user_id).values('user').distinct()
-        sum_balance = sum_income - sum_outcome
-        return sum_balance
+    def get(self, request):
+        user_id = request.user.pk
+        income_sum = IncomeCash.objects.filter(user_id=user_id).aggregate(
+            Sum('sum')).get('sum__sum', 0.00)
+        outcome_sum = OutcomeCash.objects.filter(user_id=user_id).aggregate(
+            Sum('sum')).get('sum__sum', 0.00)
+        balance = round(income_sum - outcome_sum,2)
+        return JsonResponse({'sum_balance': balance})
