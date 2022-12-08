@@ -216,7 +216,12 @@ class BalanceAPIView(APIView):
         user_id = request.user.pk
         income_sum = IncomeCash.objects.filter(user_id=user_id).aggregate(
             Sum('sum')).get('sum__sum', 0.00)
+        if not income_sum:
+            income_sum = 0
         outcome_sum = OutcomeCash.objects.filter(user_id=user_id).aggregate(
             Sum('sum')).get('sum__sum', 0.00)
+        if not outcome_sum:
+            outcome_sum = 0
         balance = round(income_sum - outcome_sum,2)
         return JsonResponse({'sum_balance': balance})
+
