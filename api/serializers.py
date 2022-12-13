@@ -88,7 +88,7 @@ class IncomeCashSerializer(serializers.ModelSerializer):
         days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
         monthes = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября",
                    "Ноября", "Декабря"]
-        today = datetime.strptime(validated_data.date, '%Y-%m-%d %H:%M:%S')
+        today = datetime.strptime(validated_data.date, '%Y-%m-%d')
         num_week_day = datetime.weekday(today)
         num_month = int(datetime.strftime(today, '%m')) - 1
         return datetime.strftime(today, f'%d {monthes[num_month]} %Y, {days[num_week_day]}')
@@ -149,7 +149,7 @@ class OutcomeCashSerializer(serializers.ModelSerializer):
         days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
         monthes = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября",
                    "Ноября", "Декабря"]
-        today = datetime.strptime(validated_data.date, '%Y-%m-%d %H:%M:%S')
+        today = datetime.strptime(validated_data.date, '%Y-%m-%d')
         num_week_day = datetime.weekday(today)
         num_month = int(datetime.strftime(today, '%m')) - 1
         return datetime.strftime(today, f'%d {monthes[num_month]} %Y, {days[num_week_day]}')
