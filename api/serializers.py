@@ -60,7 +60,7 @@ class IncomeCashSerializer(serializers.ModelSerializer):
     category_type = serializers.CharField(source='categories.category_type', required=False)
     sum = serializers.DecimalField(max_digits=19, decimal_places=2, required=False, default=0)
     # date = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S, %a', required=False)
-    date = serializers.SerializerMethodField(required=False)
+    date = serializers.SerializerMethodField()
 
     class Meta:
         model = IncomeCash
@@ -70,23 +70,25 @@ class IncomeCashSerializer(serializers.ModelSerializer):
         user_id = self.context.get('request').user.pk
         category_id = validated_data.__getitem__('categories_id')
         sum = self.validated_data.__getitem__('sum')
+        date = self.initial_data.get('date')
 
-        try:
-            Categories.objects.get(user_id=user_id, id=category_id)
+        # try:
+        Categories.objects.get(user_id=user_id, id=category_id)
 
-            incomecash = IncomeCash.objects.create(
-                user_id=user_id,
-                categories_id=category_id,
-                sum=sum, )
-            return incomecash
-        except:
-            raise ValueError(f"У пользователя с id {user_id} нет категории с id {category_id}")
+        incomecash = IncomeCash.objects.create(
+            user_id=user_id,
+            categories_id=category_id,
+            sum=sum,
+            date=date)
+        return incomecash
+        # except:
+        #     raise ValueError(f"У пользователя с id {user_id} нет категории с id {category_id}")
 
     def get_date(self, validated_data):
         days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
         monthes = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября",
                    "Ноября", "Декабря"]
-        today = validated_data.date
+        today = datetime.strptime(validated_data.date, '%Y-%m-%d %H:%M:%S')
         num_week_day = datetime.weekday(today)
         num_month = int(datetime.strftime(today, '%m')) - 1
         return datetime.strftime(today, f'%d {monthes[num_month]} %Y, {days[num_week_day]}')
@@ -121,7 +123,7 @@ class OutcomeCashSerializer(serializers.ModelSerializer):
     category_type = serializers.CharField(source='categories.category_type', required=False)
     sum = serializers.DecimalField(max_digits=19, decimal_places=2, required=False, default=0)
     # date = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S, %a', required=False)
-    date = serializers.SerializerMethodField(required=False)
+    date = serializers.SerializerMethodField()
 
     class Meta:
         model = OutcomeCash
@@ -131,23 +133,23 @@ class OutcomeCashSerializer(serializers.ModelSerializer):
         user_id = self.context.get('request').user.pk
         category_id = validated_data.__getitem__('categories_id')
         sum = self.validated_data.__getitem__('sum')
+        date = self.initial_data.get('date')
 
-        try:
-            Categories.objects.get(user_id=user_id, id=category_id)
+        Categories.objects.get(user_id=user_id, id=category_id)
 
-            outcomecash = OutcomeCash.objects.create(
-                user_id=user_id,
-                categories_id=category_id,
-                sum=sum, )
-            return outcomecash
-        except:
-            raise ValueError(f"У пользователя с id {user_id} нет категории с id {category_id}")
+        outcomecash = OutcomeCash.objects.create(
+            user_id=user_id,
+            categories_id=category_id,
+            sum=sum,
+            date=date)
+        return outcomecash
+
 
     def get_date(self, validated_data):
         days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
         monthes = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября",
                    "Ноября", "Декабря"]
-        today = validated_data.date
+        today = datetime.strptime(validated_data.date, '%Y-%m-%d %H:%M:%S')
         num_week_day = datetime.weekday(today)
         num_month = int(datetime.strftime(today, '%m')) - 1
         return datetime.strftime(today, f'%d {monthes[num_month]} %Y, {days[num_week_day]}')

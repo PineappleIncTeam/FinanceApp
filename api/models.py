@@ -73,7 +73,7 @@ class AbstractCash(models.Model):
     # once_sum = models.DecimalField(max_digits=19, decimal_places=2, verbose_name='Разовая сумма')
     sum = models.DecimalField(max_digits=19, decimal_places=2, verbose_name='Сумма')
     categories = models.ForeignKey(Categories, on_delete=models.CASCADE, verbose_name='Категория', null=True)
-    date = models.DateTimeField(auto_now_add=True, verbose_name='Дата')
+    date = models.DateTimeField(verbose_name='Дата')
 
     def __str__(self):
         return str(self.categories) + str(self.date)
