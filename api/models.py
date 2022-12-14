@@ -1,6 +1,8 @@
 from django.contrib.auth import password_validation
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from datetime import datetime
+
 
 """
     Используем встроенную модель User
@@ -73,7 +75,8 @@ class AbstractCash(models.Model):
     # once_sum = models.DecimalField(max_digits=19, decimal_places=2, verbose_name='Разовая сумма')
     sum = models.DecimalField(max_digits=19, decimal_places=2, verbose_name='Сумма')
     categories = models.ForeignKey(Categories, on_delete=models.CASCADE, verbose_name='Категория', null=True)
-    date = models.DateTimeField(verbose_name='Дата')
+    date = models.DateField(verbose_name='Дата записи')
+    date_record = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания записи')
 
     def __str__(self):
         return str(self.categories) + str(self.date)
