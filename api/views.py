@@ -1,5 +1,6 @@
 from django.db.models.aggregates import Sum, Count
 from django.http import JsonResponse
+from datetime import datetime, date
 from rest_framework.generics import (ListCreateAPIView,
                                      ListAPIView,
                                      CreateAPIView,
@@ -12,7 +13,9 @@ from .serializers import (CategorySerializer,
                           IncomeCashSerializer,
                           OutcomeCashSerializer,
                           SumIncomeCashSerializer,
-                          SumOutcomeCashSerializer, )
+                          SumOutcomeCashSerializer,
+                          SumIncomeGroupCashSerializer,
+                          SumOutcomeGroupCashSerializer)
 from .models import (Categories,
                      User,
                      IncomeCash,
@@ -131,7 +134,7 @@ class Last5IncomeCash(ListAPIView):
 
     def get_queryset(self):
         user_id = self.request.user.pk
-        return IncomeCash.objects.filter(user_id=user_id).order_by('-date')[:5]
+        return IncomeCash.objects.filter(user_id=user_id).order_by('-date_record')[:5]
 
 
 class SumIncomeCash(ListAPIView):
@@ -146,6 +149,17 @@ class SumIncomeCash(ListAPIView):
         user_id = self.request.user.pk
         return IncomeCash.objects.filter(user_id=user_id).values('user').distinct()
 
+class SumIncomeCashGroup(ListAPIView):
+    """
+    Представление возвращает сумму всех доходов в разрезе категорий
+    """
+    serializer_class = SumIncomeGroupCashSerializer
+    queryset = IncomeCash.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        return IncomeCash.objects.filter(user_id=user_id).values('user').distinct()
 
 class AddOutcomeCash(ListCreateAPIView):
     """
@@ -193,6 +207,19 @@ class SumOutcomeCash(ListAPIView):
         return OutcomeCash.objects.filter(user_id=user_id).values('user').distinct()
 
 
+class SumOutcomeCashGroup(ListAPIView):
+    """
+    Представление возвращает сумму всех  расходов в разрезе категорий
+    """
+    serializer_class = SumOutcomeGroupCashSerializer
+    queryset = OutcomeCash.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        return OutcomeCash.objects.filter(user_id=user_id).values('user').distinct()
+
+
 class Last5OutcomeCash(ListAPIView):
     """
     Представление возвращает 5 последних записей расходов
@@ -214,11 +241,22 @@ class BalanceAPIView(APIView):
 
     def get(self, request):
         user_id = request.user.pk
-        income_sum = IncomeCash.objects.filter(user_id=user_id).aggregate(
+        try:
+            date_start = datetime.strptime(self.request.query_params.get('date_start'), '%Y-%m-%d').date()
+            date_end = datetime.strptime(self.request.query_params.get('date_end'), '%Y-%m-%d').date()
+        except:
+            d_start_outcome = OutcomeCash.objects.all().order_by('date').values('date')[0].get('date')
+            d_end_outcome = OutcomeCash.objects.all().order_by('-date').values('date')[0].get('date')
+            d_start_income = IncomeCash.objects.all().order_by('date').values('date')[0].get('date')
+            d_end_income = IncomeCash.objects.all().order_by('-date').values('date')[0].get('date')
+            date_start = min(d_start_outcome, d_start_income)
+            date_end = max(d_end_outcome, d_end_income)
+
+        income_sum = IncomeCash.objects.filter(user_id=user_id, date__range=(date_start, date_end)).aggregate(
             Sum('sum')).get('sum__sum', 0.00)
         if not income_sum:
             income_sum = 0
-        outcome_sum = OutcomeCash.objects.filter(user_id=user_id).aggregate(
+        outcome_sum = OutcomeCash.objects.filter(user_id=user_id, date__range=(date_start, date_end)).aggregate(
             Sum('sum')).get('sum__sum', 0.00)
         if not outcome_sum:
             outcome_sum = 0

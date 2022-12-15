@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.db.models.aggregates import Sum
 from rest_framework import serializers
 from .models import User, Categories, OutcomeCash, IncomeCash, MoneyBox
@@ -60,7 +61,7 @@ class IncomeCashSerializer(serializers.ModelSerializer):
     category_type = serializers.CharField(source='categories.category_type', required=False)
     sum = serializers.DecimalField(max_digits=19, decimal_places=2, required=False, default=0)
     # date = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S, %a', required=False)
-    date = serializers.SerializerMethodField(required=False)
+    date = serializers.SerializerMethodField()
 
     class Meta:
         model = IncomeCash
@@ -70,23 +71,28 @@ class IncomeCashSerializer(serializers.ModelSerializer):
         user_id = self.context.get('request').user.pk
         category_id = validated_data.__getitem__('categories_id')
         sum = self.validated_data.__getitem__('sum')
+        date = self.initial_data.get('date')
 
-        try:
-            Categories.objects.get(user_id=user_id, id=category_id)
+        # try:
+        Categories.objects.get(user_id=user_id, id=category_id)
 
-            incomecash = IncomeCash.objects.create(
-                user_id=user_id,
-                categories_id=category_id,
-                sum=sum, )
-            return incomecash
-        except:
-            raise ValueError(f"У пользователя с id {user_id} нет категории с id {category_id}")
+        incomecash = IncomeCash.objects.create(
+            user_id=user_id,
+            categories_id=category_id,
+            sum=sum,
+            date=date)
+        return incomecash
+        # except:
+        #     raise ValueError(f"У пользователя с id {user_id} нет категории с id {category_id}")
 
     def get_date(self, validated_data):
         days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
         monthes = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября",
                    "Ноября", "Декабря"]
-        today = validated_data.date
+        try:
+            today = datetime.strptime(validated_data.date, '%Y-%m-%d')
+        except:
+            today = validated_data.date
         num_week_day = datetime.weekday(today)
         num_month = int(datetime.strftime(today, '%m')) - 1
         return datetime.strftime(today, f'%d {monthes[num_month]} %Y, {days[num_week_day]}')
@@ -99,13 +105,34 @@ class SumIncomeCashSerializer(serializers.ModelSerializer):
 
     def get_constant_sum(self, validated_data):
         user_id = self.context.get('request').user.pk
-        constant_sum = IncomeCash.objects.filter(user_id=user_id, categories__category_type='constant').aggregate(
+        try:
+            date_start = datetime.strptime(self.context.get('request').query_params.get('date_start'), '%Y-%m-%d').date()
+            date_end = datetime.strptime(self.context.get('request').query_params.get('date_end'), '%Y-%m-%d').date()
+        except:
+            date_start = IncomeCash.objects.all().order_by('date').values('date')[0].get('date')
+            date_end = IncomeCash.objects.all().order_by('-date').values('date')[0].get('date')
+
+
+        constant_sum = IncomeCash.objects.filter(
+            user_id=user_id,
+            categories__category_type='constant',
+            date__range=(date_start, date_end)).aggregate(
             Sum('sum')).get('sum__sum', 0.00)
         return constant_sum
 
     def get_once_sum(self, validated_data):
         user_id = self.context.get('request').user.pk
-        once_sum = IncomeCash.objects.filter(user_id=user_id, categories__category_type='once').aggregate(
+        try:
+            date_start = datetime.strptime(self.context.get('request').query_params.get('date_start'), '%Y-%m-%d').date()
+            date_end = datetime.strptime(self.context.get('request').query_params.get('date_end'), '%Y-%m-%d').date()
+        except:
+            date_start = IncomeCash.objects.all().order_by('date').values('date')[0].get('date')
+            date_end = IncomeCash.objects.all().order_by('-date').values('date')[0].get('date')
+
+        once_sum = IncomeCash.objects.filter(
+            user_id=user_id,
+            categories__category_type='once',
+            date__range=(date_start, date_end)).aggregate(
             Sum('sum')).get('sum__sum', 0.00)
         return once_sum
 
@@ -114,6 +141,29 @@ class SumIncomeCashSerializer(serializers.ModelSerializer):
         fields = ('user_id', 'constant_sum', 'once_sum')
 
 
+class SumIncomeGroupCashSerializer(serializers.ModelSerializer):
+    sum = serializers.SerializerMethodField()
+
+    def get_sum(self, validated_data):
+        user_id = self.context.get('request').user.pk
+        try:
+            date_start = datetime.strptime(self.context.get('request').query_params.get('date_start'), '%Y-%m-%d').date()
+            date_end = datetime.strptime(self.context.get('request').query_params.get('date_end'), '%Y-%m-%d').date()
+        except:
+            date_start = IncomeCash.objects.all().order_by('date').values('date')[0].get('date')
+            date_end = IncomeCash.objects.all().order_by('-date').values('date')[0].get('date')
+
+        once_sum = IncomeCash.objects.filter(
+            Q(categories__category_type='once')|Q(categories__category_type='constant'),
+            user_id=user_id,
+            date__range=(date_start, date_end)).values('categories__categoryName').annotate(
+            result_sum=Sum('sum'))
+        return once_sum
+
+    class Meta:
+        model = IncomeCash
+        fields = ('sum',)
+
 class OutcomeCashSerializer(serializers.ModelSerializer):
     user = serializers.CharField(required=False)
     category_id = serializers.IntegerField(source='categories_id')
@@ -121,7 +171,7 @@ class OutcomeCashSerializer(serializers.ModelSerializer):
     category_type = serializers.CharField(source='categories.category_type', required=False)
     sum = serializers.DecimalField(max_digits=19, decimal_places=2, required=False, default=0)
     # date = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S, %a', required=False)
-    date = serializers.SerializerMethodField(required=False)
+    date = serializers.SerializerMethodField()
 
     class Meta:
         model = OutcomeCash
@@ -131,23 +181,26 @@ class OutcomeCashSerializer(serializers.ModelSerializer):
         user_id = self.context.get('request').user.pk
         category_id = validated_data.__getitem__('categories_id')
         sum = self.validated_data.__getitem__('sum')
+        date = self.initial_data.get('date')
 
-        try:
-            Categories.objects.get(user_id=user_id, id=category_id)
+        Categories.objects.get(user_id=user_id, id=category_id)
 
-            outcomecash = OutcomeCash.objects.create(
-                user_id=user_id,
-                categories_id=category_id,
-                sum=sum, )
-            return outcomecash
-        except:
-            raise ValueError(f"У пользователя с id {user_id} нет категории с id {category_id}")
+        outcomecash = OutcomeCash.objects.create(
+            user_id=user_id,
+            categories_id=category_id,
+            sum=sum,
+            date=date)
+        return outcomecash
+
 
     def get_date(self, validated_data):
         days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
         monthes = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября",
                    "Ноября", "Декабря"]
-        today = validated_data.date
+        try:
+            today = datetime.strptime(str(validated_data.date), '%Y-%m-%d')
+        except:
+            today = validated_data.date
         num_week_day = datetime.weekday(today)
         num_month = int(datetime.strftime(today, '%m')) - 1
         return datetime.strftime(today, f'%d {monthes[num_month]} %Y, {days[num_week_day]}')
@@ -160,13 +213,33 @@ class SumOutcomeCashSerializer(serializers.ModelSerializer):
 
     def get_constant_sum(self, validated_data):
         user_id = self.context.get('request').user.pk
-        constant_sum = OutcomeCash.objects.filter(user_id=user_id, categories__category_type='constant').aggregate(
+        try:
+            date_start = datetime.strptime(self.context.get('request').query_params.get('date_start'), '%Y-%m-%d').date()
+            date_end = datetime.strptime(self.context.get('request').query_params.get('date_end'), '%Y-%m-%d').date()
+        except:
+            date_start = OutcomeCash.objects.all().order_by('date').values('date')[0].get('date')
+            date_end = OutcomeCash.objects.all().order_by('-date').values('date')[0].get('date')
+
+        constant_sum = OutcomeCash.objects.filter(
+            user_id=user_id,
+            categories__category_type='constant',
+            date__range=(date_start, date_end)).aggregate(
             Sum('sum')).get('sum__sum', 0.00)
         return constant_sum
 
     def get_once_sum(self, validated_data):
         user_id = self.context.get('request').user.pk
-        once_sum = OutcomeCash.objects.filter(user_id=user_id, categories__category_type='once').aggregate(
+        try:
+            date_start = datetime.strptime(self.context.get('request').query_params.get('date_start'), '%Y-%m-%d').date()
+            date_end = datetime.strptime(self.context.get('request').query_params.get('date_end'), '%Y-%m-%d').date()
+        except:
+            date_start = OutcomeCash.objects.all().order_by('date').values('date')[0].get('date')
+            date_end = OutcomeCash.objects.all().order_by('-date').values('date')[0].get('date')
+
+        once_sum = OutcomeCash.objects.filter(
+            user_id=user_id,
+            categories__category_type='once',
+            date__range=(date_start, date_end)).aggregate(
             Sum('sum')).get('sum__sum', 0.00)
         return once_sum
 
@@ -174,4 +247,26 @@ class SumOutcomeCashSerializer(serializers.ModelSerializer):
         model = OutcomeCash
         fields = ('user_id', 'constant_sum', 'once_sum')
 
+class SumOutcomeGroupCashSerializer(serializers.ModelSerializer):
+    sum = serializers.SerializerMethodField()
+
+    def get_sum(self, validated_data):
+        user_id = self.context.get('request').user.pk
+        try:
+            date_start = datetime.strptime(self.context.get('request').query_params.get('date_start'), '%Y-%m-%d').date()
+            date_end = datetime.strptime(self.context.get('request').query_params.get('date_end'), '%Y-%m-%d').date()
+        except:
+            date_start = OutcomeCash.objects.all().order_by('date').values('date')[0].get('date')
+            date_end = OutcomeCash.objects.all().order_by('-date').values('date')[0].get('date')
+
+        once_sum = OutcomeCash.objects.filter(
+            Q(categories__category_type='once')|Q(categories__category_type='constant'),
+            user_id=user_id,
+            date__range=(date_start, date_end)).values('categories__categoryName').annotate(
+            result_sum=Sum('sum'))
+        return once_sum
+
+    class Meta:
+        model = OutcomeCash
+        fields = ('sum',)
 
