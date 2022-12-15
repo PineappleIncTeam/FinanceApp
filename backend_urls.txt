@@ -161,7 +161,7 @@ http://92.255.79.239:8000/api/last-5-outcomecash/- GET запрос возвра
 ]
 
 
-http://127.0.0.1:8000/api/balance/?date_start=2022-08-10&date_end=2022-12-31 - GET запрос возвращает баланс пользователя
+http://92.255.79.239:8000/api/balance/?date_start=2022-08-10&date_end=2022-12-31 - GET запрос возвращает баланс пользователя
 Если указать без периода, то вернет все суммы за все периоды
 В ответ получаем JSON:
 
@@ -169,7 +169,7 @@ http://127.0.0.1:8000/api/balance/?date_start=2022-08-10&date_end=2022-12-31 - G
     "sum_balance": "167850.03"
 }
 
-http://127.0.0.1:8000/api/update-incomecash/{id записи дохода} PUT запрос изменение записи дохода.
+http://92.255.79.239:8000/api/update-incomecash/{id записи дохода} PUT запрос изменение записи дохода.
 Можно менять категорию и сумму
 JSON:
 {
@@ -177,7 +177,7 @@ JSON:
     "sum": "40000.00"
 }
 
-http://127.0.0.1:8000/api/update-outcomecash/{id записи расхода} PUT запрос изменение записи расхода.
+http://92.255.79.239:8000/api/update-outcomecash/{id записи расхода} PUT запрос изменение записи расхода.
 Можно менять категорию и сумму
 JSON:
 {
@@ -185,13 +185,46 @@ JSON:
     "sum": "9900.00"
 }
 
-http://127.0.0.1:8000/api/delete-incomecash/{id записи дохода} - DELETE запрос удаление записи дохода
-http://127.0.0.1:8000/api/delete-outcomecash/{id записи расхода} - DELETE запрос удаление записи расхода
+http://92.255.79.239:8000/api/delete-incomecash/{id записи дохода} - DELETE запрос удаление записи дохода
+http://92.255.79.239:8000/api/delete-outcomecash/{id записи расхода} - DELETE запрос удаление записи расхода
 
 
 
-http://127.0.0.1:8000/api/sum-incomecash-group/?date_start=2022-08-10&date_end=2022-12-31 - GET сумму всех доходов пользователя в разрезе категорий.
+http://92.255.79.239:8000/api/sum-incomecash-group/?date_start=2022-08-10&date_end=2022-12-31 - GET сумму всех доходов пользователя в разрезе категорий.
 Если указать без периода, то вернет все суммы за все периоды
+В ответ получаем JSON:
+[
+    {
+        "sum": [
+            {
+                "categories__categoryName": "Зарплата",
+                "result_sum": 1000.0
+            },
+            {
+                "categories__categoryName": "Наследство",
+                "result_sum": 1000.0
+            },
+            {
+                "categories__categoryName": "Подработка",
+                "result_sum": 500.0
+            }
+        ]
+    }
+]
 
-http://127.0.0.1:8000/api/sum-outcomecash-group/?date_start=2022-08-10&date_end=2022-12-31 - GET сумму всех расходов пользователя в разрезе категорий
+http://92.255.79.239:8000/api/sum-outcomecash-group/?date_start=2022-08-10&date_end=2022-12-31 - GET сумму всех расходов пользователя в разрезе категорий
 Если указать без периода, то вернет все суммы за все периоды
+[
+    {
+        "sum": [
+            {
+                "categories__categoryName": "Внезапная покупка",
+                "result_sum": 6700.0
+            },
+            {
+                "categories__categoryName": "Еда",
+                "result_sum": 6000.0
+            }
+        ]
+    }
+]
