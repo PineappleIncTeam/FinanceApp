@@ -13,7 +13,9 @@ from .serializers import (CategorySerializer,
                           IncomeCashSerializer,
                           OutcomeCashSerializer,
                           SumIncomeCashSerializer,
-                          SumOutcomeCashSerializer, )
+                          SumOutcomeCashSerializer,
+                          SumIncomeGroupCashSerializer,
+                          SumOutcomeGroupCashSerializer)
 from .models import (Categories,
                      User,
                      IncomeCash,
@@ -147,6 +149,17 @@ class SumIncomeCash(ListAPIView):
         user_id = self.request.user.pk
         return IncomeCash.objects.filter(user_id=user_id).values('user').distinct()
 
+class SumIncomeCashGroup(ListAPIView):
+    """
+    Представление возвращает сумму всех доходов в разрезе категорий
+    """
+    serializer_class = SumIncomeGroupCashSerializer
+    queryset = IncomeCash.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        return IncomeCash.objects.filter(user_id=user_id).values('user').distinct()
 
 class AddOutcomeCash(ListCreateAPIView):
     """
@@ -186,6 +199,19 @@ class SumOutcomeCash(ListAPIView):
     Представление возвращает сумму всех  расходов по всем категориям
     """
     serializer_class = SumOutcomeCashSerializer
+    queryset = OutcomeCash.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        return OutcomeCash.objects.filter(user_id=user_id).values('user').distinct()
+
+
+class SumOutcomeCashGroup(ListAPIView):
+    """
+    Представление возвращает сумму всех  расходов в разрезе категорий
+    """
+    serializer_class = SumOutcomeGroupCashSerializer
     queryset = OutcomeCash.objects.all()
     permission_classes = (IsAuthenticated,)
 
