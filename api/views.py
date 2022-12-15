@@ -230,7 +230,7 @@ class Last5OutcomeCash(ListAPIView):
 
     def get_queryset(self):
         user_id = self.request.user.pk
-        return OutcomeCash.objects.filter(user_id=user_id).order_by('-date')[:5]
+        return OutcomeCash.objects.filter(user_id=user_id).order_by('-date_record')[:5]
 
 
 class BalanceAPIView(APIView):
