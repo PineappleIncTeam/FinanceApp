@@ -124,6 +124,7 @@ class DeleteIncomeCash(DeleteCategory):
     queryset = IncomeCash.objects.all()
     permission_classes = (IsAuthenticated,)
 
+
 class Last5IncomeCash(ListAPIView):
     """
     Представление возвращает 5 последних записей доходов
@@ -149,6 +150,7 @@ class SumIncomeCash(ListAPIView):
         user_id = self.request.user.pk
         return IncomeCash.objects.filter(user_id=user_id).values('user').distinct()
 
+
 class SumIncomeCashGroup(ListAPIView):
     """
     Представление возвращает сумму всех доходов в разрезе категорий
@@ -160,6 +162,7 @@ class SumIncomeCashGroup(ListAPIView):
     def get_queryset(self):
         user_id = self.request.user.pk
         return IncomeCash.objects.filter(user_id=user_id).values('user').distinct()
+
 
 class AddOutcomeCash(ListCreateAPIView):
     """
@@ -186,6 +189,7 @@ class UpdateOutcomeCash(UpdateAPIView):
     queryset = OutcomeCash.objects.all()
     permission_classes = (IsAuthenticated,)
 
+
 class DeleteOutcomeCash(DestroyAPIView):
     """
     Представление удаляет сумму расхода в категории
@@ -194,9 +198,10 @@ class DeleteOutcomeCash(DestroyAPIView):
     queryset = OutcomeCash.objects.all()
     permission_classes = (IsAuthenticated,)
 
+
 class SumOutcomeCash(ListAPIView):
     """
-    Представление возвращает сумму всех  расходов по всем категориям
+    Представление возвращает сумму всех расходов по всем категориям
     """
     serializer_class = SumOutcomeCashSerializer
     queryset = OutcomeCash.objects.all()
@@ -209,7 +214,7 @@ class SumOutcomeCash(ListAPIView):
 
 class SumOutcomeCashGroup(ListAPIView):
     """
-    Представление возвращает сумму всех  расходов в разрезе категорий
+    Представление возвращает сумму всех расходов в разрезе категорий
     """
     serializer_class = SumOutcomeGroupCashSerializer
     queryset = OutcomeCash.objects.all()
@@ -260,6 +265,5 @@ class BalanceAPIView(APIView):
             Sum('sum')).get('sum__sum', 0.00)
         if not outcome_sum:
             outcome_sum = 0
-        balance = round(income_sum - outcome_sum,2)
+        balance = round(income_sum - outcome_sum, 2)
         return JsonResponse({'sum_balance': balance})
-
