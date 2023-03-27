@@ -1,5 +1,6 @@
 from django.db.models import Q
 from django.db.models.aggregates import Sum
+from django.db.models.functions import TruncMonth
 from rest_framework import serializers
 from .models import User, Categories, OutcomeCash, IncomeCash, MoneyBox
 from django.http import JsonResponse
@@ -102,6 +103,7 @@ class SumIncomeCashSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(source='user')
     constant_sum = serializers.SerializerMethodField()
     once_sum = serializers.SerializerMethodField()
+    monthly_sum = serializers.SerializerMethodField()
 
     def get_constant_sum(self, validated_data):
         user_id = self.context.get('request').user.pk
@@ -137,9 +139,18 @@ class SumIncomeCashSerializer(serializers.ModelSerializer):
             Sum('sum')).get('sum__sum', 0.00)
         return once_sum
 
+    def get_monthly_sum(self, validated_data):
+        user_id = self.context.get('request').user.pk
+
+        monthly_sum = IncomeCash.objects.filter(
+            user_id=user_id,
+        ).annotate(month=TruncMonth('date')).values('month').annotate(sum=Sum('sum')).order_by('month')
+
+        return monthly_sum
+
     class Meta:
         model = IncomeCash
-        fields = ('user_id', 'constant_sum', 'once_sum')
+        fields = ('user_id', 'constant_sum', 'once_sum', 'monthly_sum')
 
 
 class SumIncomeGroupCashSerializer(serializers.ModelSerializer):
@@ -212,6 +223,7 @@ class SumOutcomeCashSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(source='user')
     constant_sum = serializers.SerializerMethodField()
     once_sum = serializers.SerializerMethodField()
+    monthly_sum = serializers.SerializerMethodField()
 
     def get_constant_sum(self, validated_data):
         user_id = self.context.get('request').user.pk
@@ -247,9 +259,19 @@ class SumOutcomeCashSerializer(serializers.ModelSerializer):
             Sum('sum')).get('sum__sum', 0.00)
         return once_sum
 
+    def get_monthly_sum(self, validated_dataj):
+        user_id = self.context.get('request').user.pk
+
+        monthly_sum = OutcomeCash.objects.filter(
+            user_id=user_id,
+            date__isnull=False
+        ).annotate(month=TruncMonth('date')).values('month').annotate(sum=Sum('sum')).order_by('month')
+
+        return monthly_sum
+
     class Meta:
         model = OutcomeCash
-        fields = ('user_id', 'constant_sum', 'once_sum')
+        fields = ('user_id', 'constant_sum', 'once_sum', 'monthly_sum')
 
 
 class SumOutcomeGroupCashSerializer(serializers.ModelSerializer):
