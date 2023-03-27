@@ -259,7 +259,7 @@ class SumOutcomeCashSerializer(serializers.ModelSerializer):
             Sum('sum')).get('sum__sum', 0.00)
         return once_sum
 
-    def get_monthly_sum(self, validated_dataj):
+    def get_monthly_sum(self, validated_data):
         user_id = self.context.get('request').user.pk
 
         monthly_sum = OutcomeCash.objects.filter(
