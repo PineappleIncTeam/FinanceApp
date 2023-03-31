@@ -1,12 +1,16 @@
 from django.db.models.aggregates import Sum, Count
+from django.db.models.functions import TruncMonth
 from django.http import JsonResponse
 from datetime import datetime, date
+
+from rest_framework import status
 from rest_framework.generics import (ListCreateAPIView,
                                      ListAPIView,
                                      CreateAPIView,
                                      DestroyAPIView,
                                      UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .serializers import (CategorySerializer,
@@ -15,7 +19,9 @@ from .serializers import (CategorySerializer,
                           SumIncomeCashSerializer,
                           SumOutcomeCashSerializer,
                           SumIncomeGroupCashSerializer,
-                          SumOutcomeGroupCashSerializer)
+                          SumOutcomeGroupCashSerializer,
+                          MonthlySumIncomeGroupCashSerializer,
+                          MonthlySumOutcomeGroupCashSerializer)
 from .models import (Categories,
                      User,
                      IncomeCash,
@@ -124,6 +130,7 @@ class DeleteIncomeCash(DeleteCategory):
     queryset = IncomeCash.objects.all()
     permission_classes = (IsAuthenticated,)
 
+
 class Last5IncomeCash(ListAPIView):
     """
     Представление возвращает 5 последних записей доходов
@@ -149,6 +156,7 @@ class SumIncomeCash(ListAPIView):
         user_id = self.request.user.pk
         return IncomeCash.objects.filter(user_id=user_id).values('user').distinct()
 
+
 class SumIncomeCashGroup(ListAPIView):
     """
     Представление возвращает сумму всех доходов в разрезе категорий
@@ -160,6 +168,7 @@ class SumIncomeCashGroup(ListAPIView):
     def get_queryset(self):
         user_id = self.request.user.pk
         return IncomeCash.objects.filter(user_id=user_id).values('user').distinct()
+
 
 class AddOutcomeCash(ListCreateAPIView):
     """
@@ -186,6 +195,7 @@ class UpdateOutcomeCash(UpdateAPIView):
     queryset = OutcomeCash.objects.all()
     permission_classes = (IsAuthenticated,)
 
+
 class DeleteOutcomeCash(DestroyAPIView):
     """
     Представление удаляет сумму расхода в категории
@@ -193,6 +203,7 @@ class DeleteOutcomeCash(DestroyAPIView):
     serializer_class = OutcomeCashSerializer
     queryset = OutcomeCash.objects.all()
     permission_classes = (IsAuthenticated,)
+
 
 class SumOutcomeCash(ListAPIView):
     """
@@ -209,7 +220,7 @@ class SumOutcomeCash(ListAPIView):
 
 class SumOutcomeCashGroup(ListAPIView):
     """
-    Представление возвращает сумму всех  расходов в разрезе категорий
+    Представление возвращает сумму всех расходов в разрезе категорий
     """
     serializer_class = SumOutcomeGroupCashSerializer
     queryset = OutcomeCash.objects.all()
@@ -260,6 +271,24 @@ class BalanceAPIView(APIView):
             Sum('sum')).get('sum__sum', 0.00)
         if not outcome_sum:
             outcome_sum = 0
-        balance = round(income_sum - outcome_sum,2)
+        balance = round(income_sum - outcome_sum, 2)
         return JsonResponse({'sum_balance': balance})
 
+
+class SumMonthlyIncomeView(ListAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        serializer = MonthlySumIncomeGroupCashSerializer(IncomeCash.objects.all(), many=True,
+                                                         context={'request': request})
+        return Response(serializer.data[0]['sum'])
+
+
+class SumMonthlyOutcomeView(ListAPIView):
+    queryset = OutcomeCash.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        serializer = MonthlySumOutcomeGroupCashSerializer(OutcomeCash.objects.all(), many=True,
+                                                          context={'request': request})
+        return Response(serializer.data[0]['sum'])

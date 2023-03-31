@@ -228,3 +228,63 @@ http://92.255.79.239:8000/api/sum-outcomecash-group/?date_start=2022-08-10&date_
         ]
     }
 ]
+
+http://127.0.0.1:8000/api/sum-monthly-income/?date_start=2023-01-01&date_end=2023-12-31 - GET сумму всех доходов пользователя в разрезе категорий
+с разделением по месяцам.
+JSON:
+[
+  {
+    "February": [
+      {
+        "categories__categoryName": "Зарплата",
+        "result_sum": 50000
+      },
+      {
+        "categories__categoryName": "Подработка",
+        "result_sum": 4000
+      }
+    ]
+  },
+  {
+    "March": [
+      {
+        "categories__categoryName": "Подработка",
+        "result_sum": 60000
+      },
+      {
+        "categories__categoryName": "Пассивный доход",
+        "result_sum": 60000
+      }
+    ]
+  }
+]
+
+http://127.0.0.1:8000/api/sum-monthly-outcome/?date_start=2023-01-01&date_end=2023-12-20 - GET сумму всех расходов пользователя в разрезе категорий
+с разделением по месяцам.
+JSON:
+[
+    {
+        "February": [
+            {
+                "categories__categoryName": "Еда",
+                "result_sum": 5000.0
+            },
+            {
+                "categories__categoryName": "Одежда",
+                "result_sum": 300.0
+            }
+        ]
+    },
+    {
+        "March": [
+            {
+                "categories__categoryName": "Развлечения",
+                "result_sum": 500.0
+            },
+            {
+                "categories__categoryName": "ЖКХ",
+                "result_sum": 7000.0
+            }
+        ]
+    }
+]

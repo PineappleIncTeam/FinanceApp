@@ -3,7 +3,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from datetime import datetime
 
-
 """
     Используем встроенную модель User
 """
@@ -41,9 +40,10 @@ class User(AbstractUser):
             password_validation.password_changed(self._password, self)
             self._password = None
 
+
 class Categories(models.Model):
-    constant_cat = 'constant'   # постоянные
-    once_cat = 'once'           # разовые
+    constant_cat = 'constant'  # постоянные
+    once_cat = 'once'  # разовые
     CAT_TYPES = [
         (constant_cat, 'Постоянные'),
         (once_cat, 'Разовые'),
@@ -80,6 +80,7 @@ class AbstractCash(models.Model):
 
     def __str__(self):
         return str(self.categories) + str(self.date)
+
 
 class OutcomeCash(AbstractCash):
     pass
