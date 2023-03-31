@@ -169,6 +169,7 @@ CORS_ORIGIN_WHITELIST = [
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:8000",
+    "https://back.freenance.online/"
 ]
 
 LOGIN_REDIRECT_URL = '/'

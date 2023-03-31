@@ -1,12 +1,9 @@
-from django.db.models.aggregates import Sum, Count
-from django.db.models.functions import TruncMonth
+from django.db.models.aggregates import Sum
 from django.http import JsonResponse
-from datetime import datetime, date
+from datetime import datetime
 
-from rest_framework import status
 from rest_framework.generics import (ListCreateAPIView,
                                      ListAPIView,
-                                     CreateAPIView,
                                      DestroyAPIView,
                                      UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
@@ -23,7 +20,6 @@ from .serializers import (CategorySerializer,
                           MonthlySumIncomeGroupCashSerializer,
                           MonthlySumOutcomeGroupCashSerializer)
 from .models import (Categories,
-                     User,
                      IncomeCash,
                      OutcomeCash)
 
@@ -207,7 +203,7 @@ class DeleteOutcomeCash(DestroyAPIView):
 
 class SumOutcomeCash(ListAPIView):
     """
-    Представление возвращает сумму всех  расходов по всем категориям
+    Представление возвращает сумму всех расходов по всем категориям
     """
     serializer_class = SumOutcomeCashSerializer
     queryset = OutcomeCash.objects.all()
