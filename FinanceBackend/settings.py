@@ -155,6 +155,8 @@ ALLOWED_HOSTS = [
     "http://localhost:3000",
     "127.0.0.1",
     "92.255.79.239",
+    "freenance.online",
+    "back.freenance.online"
 ]
 
 CORS_ORIGIN_WHITELIST = [
