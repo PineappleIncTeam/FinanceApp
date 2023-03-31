@@ -276,6 +276,9 @@ class BalanceAPIView(APIView):
 
 
 class SumMonthlyIncomeView(ListAPIView):
+    """
+    Представление возвращает сумму всех доходов пользователя в разрезе категорий с разделением по месяцам.
+    """
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
@@ -285,6 +288,9 @@ class SumMonthlyIncomeView(ListAPIView):
 
 
 class SumMonthlyOutcomeView(ListAPIView):
+    """
+    Представление возвращает сумму всех расходов пользователя в разрезе категорий с разделением по месяцам.
+    """
     queryset = OutcomeCash.objects.all()
     permission_classes = (IsAuthenticated,)
 
