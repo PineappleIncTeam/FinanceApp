@@ -1,7 +1,6 @@
 from django.contrib.auth import password_validation
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from datetime import datetime
 
 """
     Используем встроенную модель User

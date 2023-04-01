@@ -278,16 +278,12 @@ class SumOutcomeGroupCashSerializer(serializers.ModelSerializer):
 
 
 class MonthlySumIncomeGroupCashSerializer(serializers.ModelSerializer):
-    sum = serializers.SerializerMethodField()
 
-    def get_sum(self, validated_data):
+    def to_representation(self, data):
         user_id = self.context.get('request').user.pk
-        result = []
-        try:
-            date_start = datetime.strptime(self.context.get('request').query_params.get('date_start'),
-                                           '%Y-%m-%d').date()
-            date_end = datetime.strptime(self.context.get('request').query_params.get('date_end'), '%Y-%m-%d').date()
-        except:
+        date_start = self.context.get('request').query_params.get('date_start')
+        date_end = self.context.get('request').query_params.get('date_end')
+        if not date_start or not date_end:
             date_start = IncomeCash.objects.all().order_by('date').values('date')[0].get('date')
             date_end = IncomeCash.objects.all().order_by('-date').values('date')[0].get('date')
 
@@ -299,20 +295,41 @@ class MonthlySumIncomeGroupCashSerializer(serializers.ModelSerializer):
             result_sum=Sum('sum')
         )
 
-        incomes_by_month = {}
+        categories = {}
         for income in incomes:
             month = income['date'].strftime('%B')
-            if month not in incomes_by_month:
-                incomes_by_month[month] = []
-            incomes_by_month[month].append({
-                "categories__categoryName": income['categories__categoryName'],
-                "result_sum": income['result_sum']
-            })
+            category_name = income['categories__categoryName']
+            if category_name not in categories:
+                categories[category_name] = {}
+            categories[category_name][month] = income['result_sum']
 
-        for month, incomes in incomes_by_month.items():
-            result.append({month: incomes})
+        result = []
+        for category_name, months in categories.items():
+            category_dict = {}
+            for month in self.get_requested_months(date_start, date_end):
+                category_dict[month] = months.get(month, 0)
+            result.append({category_name: category_dict})
 
         return result
+
+    def get_requested_months(self, date_start, date_end):
+        date_start_str = self.context.get('request').query_params.get('date_start')
+        date_end_str = self.context.get('request').query_params.get('date_end')
+
+        if date_start_str and date_end_str:
+            date_start = datetime.strptime(date_start_str, '%Y-%m-%d').date()
+            date_end = datetime.strptime(date_end_str, '%Y-%m-%d').date()
+        else:
+            date_start = IncomeCash.objects.all().order_by('date').values('date')[0].get('date')
+            date_end = IncomeCash.objects.all().order_by('-date').values('date')[0].get('date')
+
+        months = []
+        while date_start <= date_end:
+            months.append(date_start.strftime('%B'))
+            next_month = date_start.month + 1 if date_start.month < 12 else 1
+            date_start = date_start.replace(year=date_start.year + 1 if next_month == 1 else date_start.year,
+                                            month=next_month, day=1)
+        return months
 
     class Meta:
         model = IncomeCash
@@ -320,16 +337,12 @@ class MonthlySumIncomeGroupCashSerializer(serializers.ModelSerializer):
 
 
 class MonthlySumOutcomeGroupCashSerializer(serializers.ModelSerializer):
-    sum = serializers.SerializerMethodField()
 
-    def get_sum(self, validated_data):
+    def to_representation(self, data):
         user_id = self.context.get('request').user.pk
-        result = []
-        try:
-            date_start = datetime.strptime(self.context.get('request').query_params.get('date_start'),
-                                           '%Y-%m-%d').date()
-            date_end = datetime.strptime(self.context.get('request').query_params.get('date_end'), '%Y-%m-%d').date()
-        except:
+        date_start = self.context.get('request').query_params.get('date_start')
+        date_end = self.context.get('request').query_params.get('date_end')
+        if not date_start or not date_end:
             date_start = OutcomeCash.objects.all().order_by('date').values('date')[0].get('date')
             date_end = OutcomeCash.objects.all().order_by('-date').values('date')[0].get('date')
 
@@ -341,20 +354,41 @@ class MonthlySumOutcomeGroupCashSerializer(serializers.ModelSerializer):
             result_sum=Sum('sum')
         )
 
-        outcomes_by_month = {}
+        categories = {}
         for outcome in outcomes:
             month = outcome['date'].strftime('%B')
-            if month not in outcomes_by_month:
-                outcomes_by_month[month] = []
-            outcomes_by_month[month].append({
-                "categories__categoryName": outcome['categories__categoryName'],
-                "result_sum": outcome['result_sum']
-            })
+            category_name = outcome['categories__categoryName']
+            if category_name not in categories:
+                categories[category_name] = {}
+            categories[category_name][month] = outcome['result_sum']
 
-        for month, outcomes in outcomes_by_month.items():
-            result.append({month: outcomes})
+        result = []
+        for category_name, months in categories.items():
+            category_dict = {}
+            for month in self.get_requested_months(date_start, date_end):
+                category_dict[month] = months.get(month, 0)
+            result.append({category_name: category_dict})
 
         return result
+
+    def get_requested_months(self, date_start, date_end):
+        date_start_str = self.context.get('request').query_params.get('date_start')
+        date_end_str = self.context.get('request').query_params.get('date_end')
+
+        if date_start_str and date_end_str:
+            date_start = datetime.strptime(date_start_str, '%Y-%m-%d').date()
+            date_end = datetime.strptime(date_end_str, '%Y-%m-%d').date()
+        else:
+            date_start = OutcomeCash.objects.all().order_by('date').values('date')[0].get('date')
+            date_end = OutcomeCash.objects.all().order_by('-date').values('date')[0].get('date')
+
+        months = []
+        while date_start <= date_end:
+            months.append(date_start.strftime('%B'))
+            next_month = date_start.month + 1 if date_start.month < 12 else 1
+            date_start = date_start.replace(year=date_start.year + 1 if next_month == 1 else date_start.year,
+                                            month=next_month, day=1)
+        return months
 
     class Meta:
         model = OutcomeCash
