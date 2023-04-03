@@ -172,4 +172,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://back.freenance.online/"
 ]
 
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 LOGIN_REDIRECT_URL = '/'

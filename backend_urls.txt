@@ -229,7 +229,7 @@ http://92.255.79.239:8000/api/sum-outcomecash-group/?date_start=2022-08-10&date_
     }
 ]
 
-http://127.0.0.1:8000/api/sum-monthly-income/?date_start=2023-01-01&date_end=2023-12-31 - GET сумму всех доходов пользователя в разрезе категорий
+http://127.0.0.1:8000/api/sum-monthly-income/?date_start=2023-01-01&date_end=2023-03-31 - GET сумму всех доходов пользователя в разрезе категорий
 с разделением по месяцам.
 JSON:
 [
@@ -237,53 +237,33 @@ JSON:
         "Зарплата": {
             "January": 0,
             "February": 50000.0,
-            "March": 0,
-            "April": 0,
-            "May": 0,
-            "June": 0,
-            "July": 0,
-            "August": 0,
-            "September": 0,
-            "October": 0,
-            "November": 0,
-            "December": 0
+            "March": 0
         }
     },
     {
         "Подработка": {
             "January": 0,
             "February": 4000.0,
-            "March": 60000.0,
-            "April": 0,
-            "May": 0,
-            "June": 0,
-            "July": 0,
-            "August": 0,
-            "September": 0,
-            "October": 0,
-            "November": 0,
-            "December": 0
+            "March": 60000.0
+        }
+    },
+    {
+        "Наследство": {
+            "January": 0,
+            "February": 5000.0,
+            "March": 0
         }
     },
     {
         "Пассивный доход": {
             "January": 0,
             "February": 0,
-            "March": 60000.0,
-            "April": 0,
-            "May": 0,
-            "June": 0,
-            "July": 0,
-            "August": 0,
-            "September": 0,
-            "October": 0,
-            "November": 0,
-            "December": 0
+            "March": 60000.0
         }
     }
 ]
 
-http://127.0.0.1:8000/api/sum-monthly-outcome/?date_start=2023-01-01&date_end=2023-12-31 - GET сумму всех расходов пользователя в разрезе категорий
+http://127.0.0.1:8000/api/sum-monthly-outcome/?date_start=2023-01-01&date_end=2023-03-31 - GET сумму всех расходов пользователя в разрезе категорий
 с разделением по месяцам.
 JSON:
 [
@@ -291,64 +271,96 @@ JSON:
         "Еда": {
             "January": 0,
             "February": 5000.0,
-            "March": 0,
-            "April": 0,
-            "May": 0,
-            "June": 0,
-            "July": 0,
-            "August": 0,
-            "September": 0,
-            "October": 0,
-            "November": 0,
-            "December": 0
+            "March": 0
         }
     },
     {
         "Одежда": {
             "January": 0,
             "February": 300.0,
-            "March": 0,
-            "April": 0,
-            "May": 0,
-            "June": 0,
-            "July": 0,
-            "August": 0,
-            "September": 0,
-            "October": 0,
-            "November": 0,
-            "December": 0
+            "March": 0
         }
     },
     {
         "Развлечения": {
             "January": 0,
             "February": 0,
-            "March": 500.0,
-            "April": 0,
-            "May": 0,
-            "June": 0,
-            "July": 0,
-            "August": 0,
-            "September": 0,
-            "October": 0,
-            "November": 0,
-            "December": 0
+            "March": 500.0
         }
     },
     {
         "ЖКХ": {
             "January": 0,
             "February": 0,
-            "March": 7000.0,
-            "April": 0,
-            "May": 0,
-            "June": 0,
-            "July": 0,
-            "August": 0,
-            "September": 0,
-            "October": 0,
-            "November": 0,
-            "December": 0
+            "March": 7000.0
+        }
+    }
+]
+
+http://127.0.0.1:8000/api/sum-monthly-percent-income/?date_start=2023-01-01&date_end=2023-03-31 - GET сумму всех доходов пользователя в разрезе категорий
+с разделением по месяцам в процентах.
+JSON:
+[
+    {
+        "Зарплата": {
+            "January": 0,
+            "February": 84.7,
+            "March": 0
+        }
+    },
+    {
+        "Подработка": {
+            "January": 0,
+            "February": 6.8,
+            "March": 50.0
+        }
+    },
+    {
+        "Наследство": {
+            "January": 0,
+            "February": 8.5,
+            "March": 0
+        }
+    },
+    {
+        "Пассивный доход": {
+            "January": 0,
+            "February": 0,
+            "March": 50.0
+        }
+    }
+]
+
+http://127.0.0.1:8000/api/sum-monthly-percent-outcome/?date_start=2023-01-01&date_end=2023-03-31 - GET сумму всех расходов пользователя в разрезе категорий
+с разделением по месяцам в процентах.
+JSON:
+[
+    {
+        "Еда": {
+            "January": 0,
+            "February": 94.3,
+            "March": 0
+        }
+    },
+    {
+        "Одежда": {
+            "January": 0,
+            "February": 5.7,
+            "March": 0
+        }
+    },
+    {
+        "Развлечения": {
+            "January": 0,
+            "February": 0,
+            "March": 6.7
+        }
+    },
+    {
+        "ЖКХ": {
+            "January": 0,
+            "February": 0,
+            "March": 93.3
         }
     }
 ]
