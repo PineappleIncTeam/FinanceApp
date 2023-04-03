@@ -3,6 +3,7 @@ from django.db.models.aggregates import Sum
 from rest_framework import serializers
 from .models import Categories, OutcomeCash, IncomeCash, MoneyBox
 from datetime import datetime
+from .utils import MONTH_NAMES
 
 
 # class UserSerializer(serializers.ModelSerializer):
@@ -296,7 +297,7 @@ class MonthlySumIncomeGroupCashSerializer(serializers.ModelSerializer):
 
         categories = {}
         for income in incomes:
-            month = income['date'].strftime('%B')
+            month = MONTH_NAMES[income['date'].month]
             category_name = income['categories__categoryName']
             if category_name not in categories:
                 categories[category_name] = {}
@@ -324,7 +325,7 @@ class MonthlySumIncomeGroupCashSerializer(serializers.ModelSerializer):
 
         months = []
         while date_start <= date_end:
-            months.append(date_start.strftime('%B'))
+            months.append(MONTH_NAMES[date_start.month])
             next_month = date_start.month + 1 if date_start.month < 12 else 1
             date_start = date_start.replace(year=date_start.year + 1 if next_month == 1 else date_start.year,
                                             month=next_month, day=1)
@@ -355,7 +356,7 @@ class MonthlySumOutcomeGroupCashSerializer(serializers.ModelSerializer):
 
         categories = {}
         for outcome in outcomes:
-            month = outcome['date'].strftime('%B')
+            month = MONTH_NAMES[outcome['date'].month]
             category_name = outcome['categories__categoryName']
             if category_name not in categories:
                 categories[category_name] = {}
@@ -383,7 +384,7 @@ class MonthlySumOutcomeGroupCashSerializer(serializers.ModelSerializer):
 
         months = []
         while date_start <= date_end:
-            months.append(date_start.strftime('%B'))
+            months.append(MONTH_NAMES[date_start.month])
             next_month = date_start.month + 1 if date_start.month < 12 else 1
             date_start = date_start.replace(year=date_start.year + 1 if next_month == 1 else date_start.year,
                                             month=next_month, day=1)
@@ -414,13 +415,12 @@ class MonthlySumPercentIncomeGroupCashSerializer(serializers.ModelSerializer):
 
         categories = {}
         for income in incomes:
-            month = income['date'].strftime('%B')
+            month = MONTH_NAMES[income['date'].month]
             category_name = income['categories__categoryName']
             if category_name not in categories:
                 categories[category_name] = {}
             categories[category_name][month] = income['result_sum']
 
-        # расчёт процентов
         total_by_month = {month: sum(data.get(month, 0) for data in categories.values()) for month in
                           self.get_requested_months(date_start, date_end)}
         for category in categories:
@@ -450,7 +450,7 @@ class MonthlySumPercentIncomeGroupCashSerializer(serializers.ModelSerializer):
 
         months = []
         while date_start <= date_end:
-            months.append(date_start.strftime('%B'))
+            months.append(MONTH_NAMES[date_start.month])
             next_month = date_start.month + 1 if date_start.month < 12 else 1
             date_start = date_start.replace(year=date_start.year + 1 if next_month == 1 else date_start.year,
                                             month=next_month, day=1)
@@ -481,7 +481,7 @@ class MonthlySumPercentOutcomeGroupCashSerializer(serializers.ModelSerializer):
 
         categories = {}
         for outcome in outcomes:
-            month = outcome['date'].strftime('%B')
+            month = MONTH_NAMES[outcome['date'].month]
             category_name = outcome['categories__categoryName']
             if category_name not in categories:
                 categories[category_name] = {}
@@ -517,7 +517,7 @@ class MonthlySumPercentOutcomeGroupCashSerializer(serializers.ModelSerializer):
 
         months = []
         while date_start <= date_end:
-            months.append(date_start.strftime('%B'))
+            months.append(MONTH_NAMES[date_start.month])
             next_month = date_start.month + 1 if date_start.month < 12 else 1
             date_start = date_start.replace(year=date_start.year + 1 if next_month == 1 else date_start.year,
                                             month=next_month, day=1)
