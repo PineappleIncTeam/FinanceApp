@@ -19,7 +19,9 @@ from .views import (GetCreateCategoryAPIView,
                     SumIncomeCashGroup,
                     SumOutcomeCashGroup,
                     SumMonthlyIncomeView,
-                    SumMonthlyOutcomeView)
+                    SumMonthlyOutcomeView,
+                    SumPercentMonthlyIncomeView,
+                    SumPercentMonthlyOutcomeView)
 
 router = DefaultRouter()
 
@@ -47,6 +49,8 @@ urlpatterns = [
     path('sum-outcomecash-group/', SumOutcomeCashGroup.as_view(), name='sum-outcomecash-group'),
     path('sum-monthly-income/', SumMonthlyIncomeView.as_view(), name='sum-monthly_income'),
     path('sum-monthly-outcome/', SumMonthlyOutcomeView.as_view(), name='sum-monthly_outcome'),
+    path('sum-monthly-percent-income/', SumPercentMonthlyIncomeView.as_view(), name='sum-percent-monthly_income'),
+    path('sum-monthly-percent-outcome/', SumPercentMonthlyOutcomeView.as_view(), name='sum-percent-monthly_outcome'),
     # path('api/get-users/', GetUsers.as_view(), name='get-users'),
     path('auth/', include('djoser.urls')),  # new
     re_path(r'^auth/', include('djoser.urls.authtoken')),  # new

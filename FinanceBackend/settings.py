@@ -81,8 +81,8 @@ WSGI_APPLICATION = 'FinanceBackend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
-        'NAME': '/opt/db/db.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'NAME': '/opt/db/db.sqlite3',
     }
 }
 
@@ -171,5 +171,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
     "https://back.freenance.online/"
 ]
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 LOGIN_REDIRECT_URL = '/'
