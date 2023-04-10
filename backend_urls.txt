@@ -364,3 +364,18 @@ JSON:
         }
     }
 ]
+
+http://127.0.0.1:8000/api/auth/users/reset_password/ - POST запрос для восстановления пароля по email
+JSON:
+{
+  "email": "user@example.com"
+}
+
+http://127.0.0.1:8000/api/auth/users/reset_password_confirm/ - POST запрос для ввода нового пароля
+JSON:
+{
+  "uid": "string",
+  "token": "string",
+  "new_password": "string",
+  "re_new_password": "string"
+}
