@@ -379,3 +379,10 @@ JSON:
   "new_password": "string",
   "re_new_password": "string"
 }
+
+http://127.0.0.1:8000/api/auth/users/activation/ - POST запрос для подтверждения регистрации через email
+JSON:
+{
+  "uid": "string",
+  "token": "string"
+}
