@@ -11,5 +11,11 @@ lint:
 	flake8 api
 	flake8 FinanceBackend
 
+test:
+	python manage.py test
+	coverage run manage.py test
+	coverage report
+	coverage html
+
 secretkey:
 	python -c 'from django.utils.crypto import get_random_string; print(get_random_string(40))'

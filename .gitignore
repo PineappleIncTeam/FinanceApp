@@ -3,6 +3,9 @@
 __pycache__/
 .env
 staticfiles
+*.xml
+.coverage
+htmlcov/
 
 Cache_files/*
 db.sqlite3
