@@ -60,7 +60,6 @@ class IncomeCashSerializer(serializers.ModelSerializer):
     categoryName = serializers.CharField(source='categories.categoryName', required=False)
     category_type = serializers.CharField(source='categories.category_type', required=False)
     sum = serializers.DecimalField(max_digits=19, decimal_places=2, required=False, default=0)
-    # date = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S, %a', required=False)
     date = serializers.SerializerMethodField()
 
     class Meta:
