@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
             name='Categories',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('categoryName', models.CharField(default='Название категории', max_length=255, verbose_name='Название категории')),
+                ('categoryName', models.CharField(default='Название категории', max_length=255, verbose_name='Название категории', unique=True)),
                 ('category_type', models.CharField(choices=[('constant', 'Постоянные'), ('once', 'Разовые')], default='constant', max_length=8)),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='Пользователь')),
             ],
