@@ -9,25 +9,30 @@ from django.shortcuts import get_object_or_404
 
 class CategorySerializer(serializers.ModelSerializer):
     category_id = serializers.IntegerField(source='pk', required=False)
+    is_hidden = serializers.BooleanField(default=False)
 
     def create(self, validated_data):
         cat_name = validated_data.get('category_name')
         category_type = validated_data.get('category_type')
         income_outcome = validated_data.get('income_outcome')
         user_id = self.context.get('request').user.pk
+        is_hidden = validated_data.get('is_hidden', False)
+
         category, created = Categories.objects.get_or_create(
             user_id=user_id,
             category_name=cat_name,
             category_type=category_type,
-            income_outcome=income_outcome
+            income_outcome=income_outcome,
+            is_hidden=is_hidden
         )
         if not created:
             raise serializers.ValidationError('Категория с таким названием уже существует')
+
         return category
 
     class Meta:
         model = Categories
-        fields = ('category_name', 'category_id', 'category_type', 'income_outcome', 'user_id')
+        fields = ('category_name', 'category_id', 'category_type', 'income_outcome', 'user_id', 'is_hidden')
 
 
 class MoneyBoxSerializer(serializers.ModelSerializer):
