@@ -36,7 +36,8 @@ JSON:
     {
         "categoryName": "Название категории",
         "category_type": "constant" или "once",
-        "income_outcome": "income" или "outcome"
+        "income_outcome": "income" или "outcome",
+        "is_hidden": true или false
     }
 
 http://92.255.79.239:8000/api/income-categories/ GET запрос возвращает список всех доходных категорий.
@@ -47,6 +48,7 @@ JSON возвращает:
         "category_id": 1,
         "category_type": "constant",
         "income_outcome": "income",
+        "is_hidden": false
         "user_id": 1
     },
 
@@ -59,6 +61,7 @@ JSON возвращает:
         "category_id": 20,
         "category_type": "once",
         "income_outcome": "outcome",
+        "is_hidden": false
         "user_id": 2
     }
 
@@ -66,6 +69,7 @@ http://92.255.79.239:8000/api/update-category/{id категории} - PUT за
 JSON:
     {
         "categoryName": "Название категории"
+        "is_hidden": true or false
     }
 
 http://92.255.79.239:8000/api/del-category/{id категории} - DELETE запрос удаление категории
@@ -366,12 +370,15 @@ JSON:
 ]
 
 http://127.0.0.1:8000/api/auth/users/reset_password/ - POST запрос для восстановления пароля по email
+Пользователю на email отправляется письмо со ссылкой http://127.0.0.1:8000/password/reset/confirm/{uid}/{token}
 JSON:
 {
   "email": "user@example.com"
 }
 
+
 http://127.0.0.1:8000/api/auth/users/reset_password_confirm/ - POST запрос для ввода нового пароля
+Пользователю на email приходит письмо со ссылкой http://127.0.0.1:8000/password/reset/confirm/{uid}/{token}
 JSON:
 {
   "uid": "string",
@@ -380,7 +387,10 @@ JSON:
   "re_new_password": "string"
 }
 
+
+ПОКА ОТЛОЖИЛИ!!!
 http://127.0.0.1:8000/api/auth/users/activation/ - POST запрос для подтверждения регистрации через email
+Пользователю на email приходит письмо со ссылкой http://127.0.0.1:8000/activate/{uid}/{token}
 JSON:
 {
   "uid": "string",
