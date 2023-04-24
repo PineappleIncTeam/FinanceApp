@@ -1,7 +1,6 @@
 from django.contrib.auth import password_validation
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
 
 """
     Используем встроенную модель User
@@ -15,34 +14,34 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
         if not self.last_login:
             # заполнение категорий доходов
-            Categories.objects.create(category_name='Зарплата', user=self, category_type='constant',
-                                      income_outcome='income')
-            Categories.objects.create(category_name='Подработка', user=self, category_type='constant',
-                                      income_outcome='income')
-            Categories.objects.create(category_name='Пассивный доход', user=self, category_type='constant',
-                                      income_outcome='income')
-            Categories.objects.create(category_name='Подработка', user=self, category_type='once',
-                                      income_outcome='income')
-            Categories.objects.create(category_name='Наследство', user=self, category_type='once',
-                                      income_outcome='income')
+            Category.objects.create(category_name='Зарплата', user=self, category_type='constant',
+                                    income_outcome='income')
+            Category.objects.create(category_name='Подработка', user=self, category_type='constant',
+                                    income_outcome='income')
+            Category.objects.create(category_name='Пассивный доход', user=self, category_type='constant',
+                                    income_outcome='income')
+            Category.objects.create(category_name='Подработка', user=self, category_type='once',
+                                    income_outcome='income')
+            Category.objects.create(category_name='Наследство', user=self, category_type='once',
+                                    income_outcome='income')
             # заполнение категорий расходов
-            Categories.objects.create(category_name='Еда', user=self, category_type='constant',
-                                      income_outcome='outcome')
-            Categories.objects.create(category_name='Одежда', user=self, category_type='constant',
-                                      income_outcome='outcome')
-            Categories.objects.create(category_name='Развлечения', user=self, category_type='constant',
-                                      income_outcome='outcome')
-            Categories.objects.create(category_name='ЖКХ', user=self, category_type='constant',
-                                      income_outcome='outcome')
-            Categories.objects.create(category_name='Внезапная покупка', user=self, category_type='once',
-                                      income_outcome='outcome')
+            Category.objects.create(category_name='Еда', user=self, category_type='constant',
+                                    income_outcome='outcome')
+            Category.objects.create(category_name='Одежда', user=self, category_type='constant',
+                                    income_outcome='outcome')
+            Category.objects.create(category_name='Развлечения', user=self, category_type='constant',
+                                    income_outcome='outcome')
+            Category.objects.create(category_name='ЖКХ', user=self, category_type='constant',
+                                    income_outcome='outcome')
+            Category.objects.create(category_name='Внезапная покупка', user=self, category_type='once',
+                                    income_outcome='outcome')
 
         if self._password is not None:
             password_validation.password_changed(self._password, self)
             self._password = None
 
 
-class Categories(models.Model):
+class Category(models.Model):
     constant_cat = 'constant'  # постоянные
     once_cat = 'once'  # разовые
     CAT_TYPES = [
@@ -75,13 +74,13 @@ class AbstractCash(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     sum = models.DecimalField(max_digits=19, decimal_places=2, verbose_name='Сумма')
-    categories = models.ForeignKey(Categories, on_delete=models.CASCADE, verbose_name='Категория',
-                                   null=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория',
+                                 null=True, blank=True)
     date = models.DateField(verbose_name='Дата записи')
     date_record = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания записи')
 
     def __str__(self):
-        return f'{str(self.categories)} {str(self.date)}'
+        return f'{str(self.category)} {str(self.date)}'
 
 
 class OutcomeCash(AbstractCash):

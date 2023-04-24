@@ -1,7 +1,7 @@
 from django.db.models import Q
 from django.db.models.aggregates import Sum
 from rest_framework import serializers
-from .models import Categories, OutcomeCash, IncomeCash, MoneyBox
+from .models import Category, OutcomeCash, IncomeCash, MoneyBox
 from datetime import datetime
 from .utils import MONTH_NAMES
 from django.shortcuts import get_object_or_404
@@ -18,7 +18,7 @@ class CategorySerializer(serializers.ModelSerializer):
         user_id = self.context.get('request').user.pk
         is_hidden = validated_data.get('is_hidden', False)
 
-        category, created = Categories.objects.get_or_create(
+        category, created = Category.objects.get_or_create(
             user_id=user_id,
             category_name=cat_name,
             category_type=category_type,
@@ -31,7 +31,7 @@ class CategorySerializer(serializers.ModelSerializer):
         return category
 
     class Meta:
-        model = Categories
+        model = Category
         fields = ('category_name', 'category_id', 'category_type', 'income_outcome', 'user_id', 'is_hidden')
 
 
@@ -43,9 +43,9 @@ class MoneyBoxSerializer(serializers.ModelSerializer):
 
 class IncomeCashSerializer(serializers.ModelSerializer):
     user = serializers.CharField(required=False)
-    category_id = serializers.IntegerField(source='categories_id')
-    category_name = serializers.CharField(source='categories.category_name', required=False)
-    category_type = serializers.CharField(source='categories.category_type', required=False)
+    category_id = serializers.IntegerField(source='category_id')
+    category_name = serializers.CharField(source='category.category_name', required=False)
+    category_type = serializers.CharField(source='category.category_type', required=False)
     sum = serializers.DecimalField(max_digits=19, decimal_places=2, required=False, default=0)
     date = serializers.SerializerMethodField()
 
@@ -55,11 +55,11 @@ class IncomeCashSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_id = self.context.get('request').user.pk
-        category_id = validated_data.get('categories_id')
+        category_id = validated_data.get('category_id')
         sum_value = validated_data.get('sum')
         date = validated_data.get('date')
 
-        category = get_object_or_404(Categories, user_id=user_id, id=category_id)
+        category = get_object_or_404(Category, user_id=user_id, id=category_id)
 
         income_cash = IncomeCash.objects.create(
             user_id=user_id,
@@ -153,9 +153,9 @@ class SumIncomeGroupCashSerializer(serializers.ModelSerializer):
 
 class OutcomeCashSerializer(serializers.ModelSerializer):
     user = serializers.CharField(required=False)
-    category_id = serializers.IntegerField(source='categories_id')
-    category_name = serializers.CharField(source='categories.category_name', required=False)
-    category_type = serializers.CharField(source='categories.category_type', required=False)
+    category_id = serializers.IntegerField(source='category_id')
+    category_name = serializers.CharField(source='category.category_name', required=False)
+    category_type = serializers.CharField(source='category.category_type', required=False)
     sum = serializers.DecimalField(max_digits=19, decimal_places=2, required=False, default=0)
     date = serializers.SerializerMethodField()
 
@@ -169,7 +169,7 @@ class OutcomeCashSerializer(serializers.ModelSerializer):
         sum_value = validated_data.get('sum')
         date = validated_data.get('date')
 
-        category = get_object_or_404(Categories, user_id=user_id, id=category_id)
+        category = get_object_or_404(Category, user_id=user_id, id=category_id)
 
         outcome_cash = OutcomeCash.objects.create(
             user_id=user_id,
