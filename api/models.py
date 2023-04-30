@@ -14,34 +14,34 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
         if not self.last_login:
             # заполнение категорий доходов
-            Category.objects.create(category_name='Зарплата', user=self, category_type='constant',
-                                    income_outcome='income')
-            Category.objects.create(category_name='Подработка', user=self, category_type='constant',
-                                    income_outcome='income')
-            Category.objects.create(category_name='Пассивный доход', user=self, category_type='constant',
-                                    income_outcome='income')
-            Category.objects.create(category_name='Подработка', user=self, category_type='once',
-                                    income_outcome='income')
-            Category.objects.create(category_name='Наследство', user=self, category_type='once',
-                                    income_outcome='income')
+            Categories.objects.create(categoryName='Зарплата', user=self, category_type='constant',
+                                      income_outcome='income')
+            Categories.objects.create(categoryName='Подработка', user=self, category_type='constant',
+                                      income_outcome='income')
+            Categories.objects.create(categoryName='Пассивный доход', user=self, category_type='constant',
+                                      income_outcome='income')
+            Categories.objects.create(categoryName='Подработка', user=self, category_type='once',
+                                      income_outcome='income')
+            Categories.objects.create(categoryName='Наследство', user=self, category_type='once',
+                                      income_outcome='income')
             # заполнение категорий расходов
-            Category.objects.create(category_name='Еда', user=self, category_type='constant',
-                                    income_outcome='outcome')
-            Category.objects.create(category_name='Одежда', user=self, category_type='constant',
-                                    income_outcome='outcome')
-            Category.objects.create(category_name='Развлечения', user=self, category_type='constant',
-                                    income_outcome='outcome')
-            Category.objects.create(category_name='ЖКХ', user=self, category_type='constant',
-                                    income_outcome='outcome')
-            Category.objects.create(category_name='Внезапная покупка', user=self, category_type='once',
-                                    income_outcome='outcome')
+            Categories.objects.create(categoryName='Еда', user=self, category_type='constant',
+                                      income_outcome='outcome')
+            Categories.objects.create(categoryName='Одежда', user=self, category_type='constant',
+                                      income_outcome='outcome')
+            Categories.objects.create(categoryName='Развлечения', user=self, category_type='constant',
+                                      income_outcome='outcome')
+            Categories.objects.create(categoryName='ЖКХ', user=self, category_type='constant',
+                                      income_outcome='outcome')
+            Categories.objects.create(categoryName='Внезапная покупка', user=self, category_type='once',
+                                      income_outcome='outcome')
 
         if self._password is not None:
             password_validation.password_changed(self._password, self)
             self._password = None
 
 
-class Category(models.Model):
+class Categories(models.Model):
     constant_cat = 'constant'  # постоянные
     once_cat = 'once'  # разовые
     CAT_TYPES = [
@@ -58,14 +58,13 @@ class Category(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-    category_name = models.CharField(max_length=255, default="Название категории", verbose_name='Название категории',
-                                     unique=True)
+    categoryName = models.CharField(max_length=255, default="Название категории", verbose_name='Название категории')
     category_type = models.CharField(max_length=8, choices=CAT_TYPES, default=constant_cat)
     income_outcome = models.CharField(max_length=11, choices=CAT_INCOME_OUTCOME, default=income_cat)
     is_hidden = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.category_name
+        return self.categoryName
 
 
 class AbstractCash(models.Model):
@@ -74,13 +73,12 @@ class AbstractCash(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     sum = models.DecimalField(max_digits=19, decimal_places=2, verbose_name='Сумма')
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория',
-                                 null=True, blank=True)
+    categories = models.ForeignKey(Categories, on_delete=models.CASCADE, verbose_name='Категория', null=True)
     date = models.DateField(verbose_name='Дата записи')
     date_record = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания записи')
 
     def __str__(self):
-        return f'{str(self.category)} {str(self.date)}'
+        return f'{str(self.categories)} {str(self.date)}'
 
 
 class OutcomeCash(AbstractCash):

@@ -1,10 +1,9 @@
 from django.db.models import Q
 from django.db.models.aggregates import Sum
 from rest_framework import serializers
-from .models import Category, OutcomeCash, IncomeCash, MoneyBox
+from .models import Categories, OutcomeCash, IncomeCash, MoneyBox
 from datetime import datetime
 from .utils import MONTH_NAMES
-from django.shortcuts import get_object_or_404
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -12,27 +11,22 @@ class CategorySerializer(serializers.ModelSerializer):
     is_hidden = serializers.BooleanField(default=False)
 
     def create(self, validated_data):
-        cat_name = validated_data.get('category_name')
-        category_type = validated_data.get('category_type')
-        income_outcome = validated_data.get('income_outcome')
+        cat_name = validated_data.__getitem__('categoryName')
+        category_type = validated_data.__getitem__('category_type')
+        income_outcome = validated_data.__getitem__('income_outcome')
         user_id = self.context.get('request').user.pk
         is_hidden = validated_data.get('is_hidden', False)
-
-        category, created = Category.objects.get_or_create(
+        category = Categories.objects.create(
             user_id=user_id,
-            category_name=cat_name,
+            categoryName=cat_name,
             category_type=category_type,
             income_outcome=income_outcome,
-            is_hidden=is_hidden
-        )
-        if not created:
-            raise serializers.ValidationError('Категория с таким названием уже существует')
-
+            is_hidden=is_hidden)
         return category
 
     class Meta:
-        model = Category
-        fields = ('category_name', 'category_id', 'category_type', 'income_outcome', 'user_id', 'is_hidden')
+        model = Categories
+        fields = ('categoryName', 'category_id', 'category_type', 'income_outcome', 'user_id', 'is_hidden')
 
 
 class MoneyBoxSerializer(serializers.ModelSerializer):
@@ -43,30 +37,31 @@ class MoneyBoxSerializer(serializers.ModelSerializer):
 
 class IncomeCashSerializer(serializers.ModelSerializer):
     user = serializers.CharField(required=False)
-    category_id = serializers.IntegerField(source='category_id')
-    category_name = serializers.CharField(source='category.category_name', required=False)
-    category_type = serializers.CharField(source='category.category_type', required=False)
+    category_id = serializers.IntegerField(source='categories_id')
+    categoryName = serializers.CharField(source='categories.categoryName', required=False)
+    category_type = serializers.CharField(source='categories.category_type', required=False)
     sum = serializers.DecimalField(max_digits=19, decimal_places=2, required=False, default=0)
     date = serializers.SerializerMethodField()
 
     class Meta:
         model = IncomeCash
-        fields = ('id', 'user', 'category_id', 'category_name', 'category_type', 'sum', 'date')
+        fields = ('id', 'user', 'category_id', 'categoryName', 'category_type', 'sum', 'date')
 
     def create(self, validated_data):
         user_id = self.context.get('request').user.pk
-        category_id = validated_data.get('category_id')
-        sum_value = validated_data.get('sum')
+        category_id = validated_data.__getitem__('categories_id')
+        sum = self.validated_data.__getitem__('sum')
         date = validated_data.get('date')
+        if not date:
+            date = datetime.now().date()
 
-        category = get_object_or_404(Category, user_id=user_id, id=category_id)
+        Categories.objects.get(user_id=user_id, id=category_id)
 
         income_cash = IncomeCash.objects.create(
             user_id=user_id,
-            category=category,
-            sum=sum_value,
-            date=date
-        )
+            categories_id=category_id,
+            sum=sum,
+            date=date)
         return income_cash
 
     def get_date(self, validated_data):
@@ -142,7 +137,7 @@ class SumIncomeGroupCashSerializer(serializers.ModelSerializer):
         once_sum = IncomeCash.objects.filter(
             Q(categories__category_type='once') | Q(categories__category_type='constant'),
             user_id=user_id,
-            date__range=(date_start, date_end)).values('categories__category_name').annotate(
+            date__range=(date_start, date_end)).values('categories__categoryName').annotate(
             result_sum=Sum('sum'))
         return once_sum
 
@@ -153,43 +148,44 @@ class SumIncomeGroupCashSerializer(serializers.ModelSerializer):
 
 class OutcomeCashSerializer(serializers.ModelSerializer):
     user = serializers.CharField(required=False)
-    category_id = serializers.IntegerField(source='category_id')
-    category_name = serializers.CharField(source='category.category_name', required=False)
-    category_type = serializers.CharField(source='category.category_type', required=False)
+    category_id = serializers.IntegerField(source='categories_id')
+    categoryName = serializers.CharField(source='categories.categoryName', required=False)
+    category_type = serializers.CharField(source='categories.category_type', required=False)
     sum = serializers.DecimalField(max_digits=19, decimal_places=2, required=False, default=0)
     date = serializers.SerializerMethodField()
 
     class Meta:
         model = OutcomeCash
-        fields = ('id', 'user', 'category_id', 'category_name', 'category_type', 'sum', 'date')
+        fields = ('id', 'user', 'category_id', 'categoryName', 'category_type', 'sum', 'date')
 
     def create(self, validated_data):
         user_id = self.context.get('request').user.pk
-        category_id = validated_data.get('categories_id')
-        sum_value = validated_data.get('sum')
+        category_id = validated_data.__getitem__('categories_id')
+        sum = self.validated_data.__getitem__('sum')
         date = validated_data.get('date')
+        if not date:
+            date = datetime.now().date()
 
-        category = get_object_or_404(Category, user_id=user_id, id=category_id)
+        Categories.objects.get(user_id=user_id, id=category_id)
 
-        outcome_cash = OutcomeCash.objects.create(
+        outcomecash = OutcomeCash.objects.create(
             user_id=user_id,
-            category=category,
-            sum=sum_value,
-            date=date
-        )
-        return outcome_cash
+            categories_id=category_id,
+            sum=sum,
+            date=date)
+        return outcomecash
 
     def get_date(self, validated_data):
         days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
-        months = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября",
-                  "Ноября", "Декабря"]
+        monthes = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября",
+                   "Ноября", "Декабря"]
         try:
             today = datetime.strptime(str(validated_data.date), '%Y-%m-%d')
         except:
             today = validated_data.date
         num_week_day = datetime.weekday(today)
         num_month = int(datetime.strftime(today, '%m')) - 1
-        return datetime.strftime(today, f'%d {months[num_month]} %Y, {days[num_week_day]}')
+        return datetime.strftime(today, f'%d {monthes[num_month]} %Y, {days[num_week_day]}')
 
 
 class SumOutcomeCashSerializer(serializers.ModelSerializer):
@@ -252,7 +248,7 @@ class SumOutcomeGroupCashSerializer(serializers.ModelSerializer):
         once_sum = OutcomeCash.objects.filter(
             Q(categories__category_type='once') | Q(categories__category_type='constant'),
             user_id=user_id,
-            date__range=(date_start, date_end)).values('categories__category_name').annotate(
+            date__range=(date_start, date_end)).values('categories__categoryName').annotate(
             result_sum=Sum('sum'))
         return once_sum
 
@@ -275,14 +271,14 @@ class MonthlySumIncomeGroupCashSerializer(serializers.ModelSerializer):
             Q(categories__category_type='once') | Q(categories__category_type='constant'),
             user_id=user_id,
             date__range=(date_start, date_end)
-        ).values('categories__category_name', 'date').annotate(
+        ).values('categories__categoryName', 'date').annotate(
             result_sum=Sum('sum')
-        ).order_by('categories__category_name', 'date')
+        ).order_by('categories__categoryName', 'date')
 
         categories = {}
         for income in incomes:
             month = MONTH_NAMES[income['date'].month]
-            category_name = income['categories__category_name']
+            category_name = income['categories__categoryName']
             if category_name not in categories:
                 categories[category_name] = {}
             if month not in categories[category_name]:
@@ -337,14 +333,14 @@ class MonthlySumOutcomeGroupCashSerializer(serializers.ModelSerializer):
             Q(categories__category_type='once') | Q(categories__category_type='constant'),
             user_id=user_id,
             date__range=(date_start, date_end)
-        ).values('categories__category_name', 'date').annotate(
+        ).values('categories__categoryName', 'date').annotate(
             result_sum=Sum('sum')
-        ).order_by('categories__category_name', 'date')
+        ).order_by('categories__categoryName', 'date')
 
         categories = {}
         for outcome in outcomes:
             month = MONTH_NAMES[outcome['date'].month]
-            category_name = outcome['categories__category_name']
+            category_name = outcome['categories__categoryName']
             if category_name not in categories:
                 categories[category_name] = {}
             if month not in categories[category_name]:
@@ -401,14 +397,14 @@ class MonthlySumPercentIncomeGroupCashSerializer(serializers.ModelSerializer):
             Q(categories__category_type='once') | Q(categories__category_type='constant'),
             user_id=user_id,
             date__range=(date_start, date_end)
-        ).values('date', 'categories__category_name').annotate(
+        ).values('date', 'categories__categoryName').annotate(
             result_sum=Sum('sum')
         )
 
         categories = {}
         for income in incomes:
             month = MONTH_NAMES[income['date'].month]
-            category_name = income['categories__category_name']
+            category_name = income['categories__categoryName']
             if category_name not in categories:
                 categories[category_name] = {}
             categories[category_name][month] = income['result_sum']
@@ -457,14 +453,14 @@ class MonthlySumPercentOutcomeGroupCashSerializer(serializers.ModelSerializer):
             Q(categories__category_type='once') | Q(categories__category_type='constant'),
             user_id=user_id,
             date__range=(date_start, date_end)
-        ).values('date', 'categories__category_name').annotate(
+        ).values('date', 'categories__categoryName').annotate(
             result_sum=Sum('sum')
         )
 
         categories = {}
         for outcome in outcomes:
             month = MONTH_NAMES[outcome['date'].month]
-            category_name = outcome['categories__category_name']
+            category_name = outcome['categories__categoryName']
             if category_name not in categories:
                 categories[category_name] = {}
             categories[category_name][month] = outcome['result_sum']
