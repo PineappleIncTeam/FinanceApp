@@ -378,7 +378,7 @@ JSON:
 
 
 http://127.0.0.1:8000/api/auth/users/reset_password_confirm/ - POST запрос для ввода нового пароля
-Пользователю на email приходит письмо со ссылкой http://127.0.0.1:8000/password/reset/confirm/{uid}/{token}
+Пользователю на email приходит письмо со ссылкой http://127.0.0.1:8000/password/reset/confirm/?uid={uid}&token={token}
 JSON:
 {
   "uid": "string",
@@ -390,7 +390,7 @@ JSON:
 
 ПОКА ОТЛОЖИЛИ!!!
 http://127.0.0.1:8000/api/auth/users/activation/ - POST запрос для подтверждения регистрации через email
-Пользователю на email приходит письмо со ссылкой http://127.0.0.1:8000/activate/{uid}/{token}
+Пользователю на email приходит письмо со ссылкой http://127.0.0.1:8000/activate/?uid={uid}&token={token}
 JSON:
 {
   "uid": "string",

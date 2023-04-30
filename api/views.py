@@ -19,7 +19,7 @@ from .serializers import (CategorySerializer,
                           MonthlySumOutcomeGroupCashSerializer,
                           MonthlySumPercentIncomeGroupCashSerializer,
                           MonthlySumPercentOutcomeGroupCashSerializer)
-from .models import (Category,
+from .models import (Categories,
                      IncomeCash,
                      OutcomeCash)
 
@@ -35,7 +35,7 @@ class GetCreateCategoryAPIView(ListCreateAPIView):
     """
 
     serializer_class = CategorySerializer
-    queryset = Category.objects.all()
+    queryset = Categories.objects.all()
     permission_classes = (IsAuthenticated,)
 
     def perform_create(self, serializer):
@@ -43,34 +43,34 @@ class GetCreateCategoryAPIView(ListCreateAPIView):
 
     def get_queryset(self):
         user_id = self.request.user.pk
-        return Category.objects.filter(user_id=user_id)
+        return Categories.objects.filter(user_id=user_id)
 
 
-class GetIncomeCategory(ListAPIView):
+class GetIncomeCategories(ListAPIView):
     """
     Представление возвращает список категорий доходов
     """
     serializer_class = CategorySerializer
-    queryset = Category.objects.all()
+    queryset = Categories.objects.all()
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         user_id = self.request.user.pk
-        return Category.objects.filter(user_id=user_id,
+        return Categories.objects.filter(user_id=user_id,
                                          income_outcome='income')
 
 
-class GetOutcomeCategory(ListAPIView):
+class GetOutcomeCategories(ListAPIView):
     """
     Представление возвращает список категорий расходов
     """
     serializer_class = CategorySerializer
-    queryset = Category.objects.all()
+    queryset = Categories.objects.all()
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         user_id = self.request.user.pk
-        return Category.objects.filter(user_id=user_id,
+        return Categories.objects.filter(user_id=user_id,
                                          income_outcome='outcome')
 
 
@@ -79,7 +79,7 @@ class DeleteCategory(DestroyAPIView):
     Удаление категории (DELETE)
     """
     serializer_class = CategorySerializer
-    queryset = Category.objects.all()
+    queryset = Categories.objects.all()
     permission_classes = (IsAuthenticated,)
 
 
@@ -88,7 +88,7 @@ class UpdateCategory(UpdateAPIView):
     Изменение категории (PUT)
     """
     serializer_class = CategorySerializer
-    queryset = Category.objects.all()
+    queryset = Categories.objects.all()
     permission_classes = (IsAuthenticated,)
 
 
@@ -103,7 +103,7 @@ class AddIncomeCash(ListCreateAPIView):
     def get_queryset(self):
         user_id = self.request.user.pk
         category_id = self.request.data.get('category_id')
-        return IncomeCash.objects.filter(user_id=user_id, category_id=category_id)
+        return IncomeCash.objects.filter(user_id=user_id, categories_id=category_id)
 
     def perform_create(self, serializer):
         serializer.save()
@@ -177,7 +177,7 @@ class AddOutcomeCash(ListCreateAPIView):
     def get_queryset(self):
         user_id = self.request.user.pk
         category_id = self.request.data.get('category_id')
-        return OutcomeCash.objects.filter(user_id=user_id, category_id=category_id)
+        return OutcomeCash.objects.filter(user_id=user_id, categories_id=category_id)
 
     def perform_create(self, serializer):
         serializer.save()
