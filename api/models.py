@@ -8,7 +8,6 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
-    email = models.EmailField(unique=True)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
