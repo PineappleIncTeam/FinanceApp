@@ -201,3 +201,8 @@ CSRF_COOKIE_SECURE = True
 LOGIN_REDIRECT_URL = '/'
 
 WHITENOISE_AUTOREFRESH = True
+
+AUTHENTICATION_BACKENDS = [
+    'api.backends.EmailOrUsernameModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
