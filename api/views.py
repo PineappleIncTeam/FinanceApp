@@ -1,6 +1,7 @@
 from django.db.models.aggregates import Sum
 from django.http import JsonResponse
 from datetime import datetime
+
 from rest_framework.generics import (ListCreateAPIView,
                                      ListAPIView,
                                      DestroyAPIView,
@@ -18,10 +19,11 @@ from .serializers import (CategorySerializer,
                           MonthlySumIncomeGroupCashSerializer,
                           MonthlySumOutcomeGroupCashSerializer,
                           MonthlySumPercentIncomeGroupCashSerializer,
-                          MonthlySumPercentOutcomeGroupCashSerializer)
+                          MonthlySumPercentOutcomeGroupCashSerializer,
+                          MoneyBoxSerializer)
 from .models import (Categories,
                      IncomeCash,
-                     OutcomeCash)
+                     OutcomeCash, MoneyBox)
 
 
 class GetCreateCategoryAPIView(ListCreateAPIView):
@@ -31,6 +33,7 @@ class GetCreateCategoryAPIView(ListCreateAPIView):
     Виды категорий (category_type):
         constant - постоянная
         once - разовая
+        accumulate - накопления
 
     """
 
@@ -357,3 +360,51 @@ class SumPercentMonthlyOutcomeView(ListAPIView):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data[0])
+
+
+class MoneyBoxView(ListCreateAPIView):
+    """
+    Представление возвращает сумму накоплений и целевую сумму
+    """
+    serializer_class = MoneyBoxSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        return MoneyBox.objects.filter(user_id=user_id)
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        # получаем значение, которое нужно добавить к текущей сумме
+        box_increment = serializer.validated_data.get('box_increment', None)
+
+        if box_increment:
+            # добавляем значение к текущей сумме
+            instance.box_sum += box_increment
+            instance.save()
+
+        return Response(serializer.data)
+
+
+class UpdateMoneyBox(UpdateAPIView):
+    """
+    Представление обновляет накопление
+    """
+    serializer_class = MoneyBoxSerializer
+    queryset = MoneyBox.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+
+class DeleteMoneyBox(DestroyAPIView):
+    """
+    Представление удаляет сумму в накоплении
+    """
+    serializer_class = MoneyBoxSerializer
+    queryset = MoneyBox.objects.all()
+    permission_classes = (IsAuthenticated,)
