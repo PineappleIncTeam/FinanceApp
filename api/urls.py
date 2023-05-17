@@ -1,27 +1,6 @@
 from django.urls import path, include, re_path
 from rest_framework.routers import DefaultRouter
-from .views import (GetCreateCategoryAPIView,
-                    DeleteCategory,
-                    UpdateCategory,
-                    GetIncomeCategories,
-                    GetOutcomeCategories,
-                    AddIncomeCash,
-                    AddOutcomeCash,
-                    Last5IncomeCash,
-                    Last5OutcomeCash,
-                    SumIncomeCash,
-                    SumOutcomeCash,
-                    BalanceAPIView,
-                    UpdateIncomeCash,
-                    UpdateOutcomeCash,
-                    DeleteIncomeCash,
-                    DeleteOutcomeCash,
-                    SumIncomeCashGroup,
-                    SumOutcomeCashGroup,
-                    SumMonthlyIncomeView,
-                    SumMonthlyOutcomeView,
-                    SumPercentMonthlyIncomeView,
-                    SumPercentMonthlyOutcomeView)
+from .views import *
 
 router = DefaultRouter()
 
@@ -51,7 +30,10 @@ urlpatterns = [
     path('sum-monthly-outcome/', SumMonthlyOutcomeView.as_view(), name='sum-monthly_outcome'),
     path('sum-monthly-percent-income/', SumPercentMonthlyIncomeView.as_view(), name='sum-percent-monthly_income'),
     path('sum-monthly-percent-outcome/', SumPercentMonthlyOutcomeView.as_view(), name='sum-percent-monthly_outcome'),
+    path('money-box/', MoneyBoxView.as_view(), name='money-box'),
+    path('update-money-box/<int:pk>', UpdateMoneyBox.as_view(), name='update-money-box'),
+    path('delete-money-box/<int:pk>', DeleteMoneyBox.as_view(), name='delete-money-box'),
     # path('api/get-users/', GetUsers.as_view(), name='get-users'),
-    path('auth/', include('djoser.urls')),  # new
-    re_path(r'^auth/', include('djoser.urls.authtoken')),  # new
+    path('auth/', include('djoser.urls')),
+    re_path(r'^auth/', include('djoser.urls.authtoken')),
 ]

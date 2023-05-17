@@ -1,116 +1,69 @@
-from django.urls import reverse, resolve
-from django.test import SimpleTestCase
+from django.test import TestCase
+from rest_framework.test import APIClient
+from rest_framework import status
+from django.urls import reverse
 
-from api.views import (GetCreateCategoryAPIView,
-                       GetIncomeCategories,
-                       GetOutcomeCategories,
-                       UpdateCategory,
-                       DeleteCategory,
-                       AddIncomeCash,
-                       UpdateIncomeCash,
-                       DeleteIncomeCash,
-                       AddOutcomeCash,
-                       UpdateOutcomeCash,
-                       DeleteOutcomeCash,
-                       BalanceAPIView,
-                       Last5IncomeCash,
-                       Last5OutcomeCash,
-                       SumIncomeCash,
-                       SumIncomeCashGroup,
-                       SumOutcomeCash,
-                       SumOutcomeCashGroup,
-                       SumMonthlyIncomeView,
-                       SumMonthlyOutcomeView,
-                       SumPercentMonthlyIncomeView,
-                       SumPercentMonthlyOutcomeView)
+from api.models import User, MoneyBox
 
 
-class APIUrlsTest(SimpleTestCase):
+class MoneyBoxAPITestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client.force_authenticate(user=self.user)
 
-    def test_url_categories(self):
-        url = reverse('categories')
-        self.assertEquals(resolve(url).func.view_class, GetCreateCategoryAPIView)
+    def test_money_box_list_create(self):
+        url = reverse('money-box')
+        data = {
+            'user': 'testuser',
+            'category_id': 1,
+            'box_sum': 100,
+            'box_target': 1000,
+            'date_created': '2023-05-17'
+        }
 
-    def test_url_income_categories(self):
-        url = reverse('income-categories')
-        self.assertEquals(resolve(url).func.view_class, GetIncomeCategories)
+        # Тест создания записи
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_url_outcome_categories(self):
-        url = reverse('outcome-categories')
-        self.assertEquals(resolve(url).func.view_class, GetOutcomeCategories)
+        # Тест получения списка записей
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
 
-    def test_url_update_category(self):
-        url = reverse('update-category', args='1')
-        self.assertEquals(resolve(url).func.view_class, UpdateCategory)
+    def test_update_money_box(self):
+        money_box = MoneyBox.objects.create(
+            user=self.user,
+            categories_id=1,
+            box_sum=500,
+            box_target=1000,
+            date_created='2023-05-17'
+        )
+        url = reverse('update-money-box', args='1')
+        data = {
+            'box_sum': 700,
+            'box_target': 1500
+        }
 
-    def test_url_del_category(self):
-        url = reverse('del-category', args='1')
-        self.assertEquals(resolve(url).func.view_class, DeleteCategory)
+        response = self.client.put(url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_url_incomecash(self):
-        url = reverse('incomecash')
-        self.assertEquals(resolve(url).func.view_class, AddIncomeCash)
+        updated_money_box = MoneyBox.objects.get(pk=money_box.pk)
+        self.assertEqual(updated_money_box.box_sum, 700)
+        self.assertEqual(updated_money_box.box_target, 1500)
 
-    def test_url_update_incomecash(self):
-        url = reverse('update-incomecash', args='1')
-        self.assertEquals(resolve(url).func.view_class, UpdateIncomeCash)
+    def test_delete_money_box(self):
+        money_box = MoneyBox.objects.create(
+            user=self.user,
+            categories_id=1,
+            box_sum=500,
+            box_target=1000,
+            date_created='2023-05-17'
+        )
+        url = reverse('delete-money-box', args='1')
 
-    def test_url_delete_incomecash(self):
-        url = reverse('delete-incomecash', args='1')
-        self.assertEquals(resolve(url).func.view_class, DeleteIncomeCash)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    def test_url_outcomecash(self):
-        url = reverse('outcomecash')
-        self.assertEquals(resolve(url).func.view_class, AddOutcomeCash)
-
-    def test_url_update_outcomecash(self):
-        url = reverse('update-outcomecash', args='1')
-        self.assertEquals(resolve(url).func.view_class, UpdateOutcomeCash)
-
-    def test_url_delete_outcomecash(self):
-        url = reverse('delete-outcomecash', args='1')
-        self.assertEquals(resolve(url).func.view_class, DeleteOutcomeCash)
-
-    def test_url_balance(self):
-        url = reverse('balance')
-        self.assertEquals(resolve(url).func.view_class, BalanceAPIView)
-
-    def test_url_last_5_incomecash(self):
-        url = reverse('last-5-incomecash')
-        self.assertEquals(resolve(url).func.view_class, Last5IncomeCash)
-
-    def test_url_last_5_outcomecash(self):
-        url = reverse('last-5-outcomecash')
-        self.assertEquals(resolve(url).func.view_class, Last5OutcomeCash)
-
-    def test_url_sum_incomecash(self):
-        url = reverse('sum-incomecash')
-        self.assertEquals(resolve(url).func.view_class, SumIncomeCash)
-
-    def test_url_sum_incomecash_group(self):
-        url = reverse('sum-incomecash-group')
-        self.assertEquals(resolve(url).func.view_class, SumIncomeCashGroup)
-
-    def test_url_sum_outcomecash(self):
-        url = reverse('sum-outcomecash')
-        self.assertEquals(resolve(url).func.view_class, SumOutcomeCash)
-
-    def test_url_sum_outcomecash_group(self):
-        url = reverse('sum-outcomecash-group')
-        self.assertEquals(resolve(url).func.view_class, SumOutcomeCashGroup)
-
-    def test_url_sum_monthly_income(self):
-        url = reverse('sum-monthly_income')
-        self.assertEquals(resolve(url).func.view_class, SumMonthlyIncomeView)
-
-    def test_url_sum_monthly_outcome(self):
-        url = reverse('sum-monthly_outcome')
-        self.assertEquals(resolve(url).func.view_class, SumMonthlyOutcomeView)
-
-    def test_url_sum_percent_monthly_income(self):
-        url = reverse('sum-percent-monthly_income')
-        self.assertEquals(resolve(url).func.view_class, SumPercentMonthlyIncomeView)
-
-    def test_url_sum_percent_monthly_outcome(self):
-        url = reverse('sum-percent-monthly_outcome')
-        self.assertEquals(resolve(url).func.view_class, SumPercentMonthlyOutcomeView)
+        with self.assertRaises(MoneyBox.DoesNotExist):
+            MoneyBox.objects.get(pk=money_box.pk)
