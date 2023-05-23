@@ -10,18 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import (CategorySerializer,
-                          IncomeCashSerializer,
-                          OutcomeCashSerializer,
-                          SumIncomeCashSerializer,
-                          SumOutcomeCashSerializer,
-                          SumIncomeGroupCashSerializer,
-                          SumOutcomeGroupCashSerializer,
-                          MonthlySumIncomeGroupCashSerializer,
-                          MonthlySumOutcomeGroupCashSerializer,
-                          MonthlySumPercentIncomeGroupCashSerializer,
-                          MonthlySumPercentOutcomeGroupCashSerializer,
-                          MoneyBoxSerializer)
+from .serializers import *
 from .models import (Categories,
                      IncomeCash,
                      OutcomeCash, MoneyBox)
@@ -258,10 +247,12 @@ class BalanceAPIView(APIView):
         except:
             d_start_outcome = OutcomeCash.objects.all().order_by('date').values('date')[0].get('date')
             d_end_outcome = OutcomeCash.objects.all().order_by('-date').values('date')[0].get('date')
+            d_start_money_box = MoneyBox.objects.all().order_by('date').values('date')[0].get('date')
+            d_end_money_box = MoneyBox.objects.all().order_by('date').values('date')[0].get('date')
             d_start_income = IncomeCash.objects.all().order_by('date').values('date')[0].get('date')
             d_end_income = IncomeCash.objects.all().order_by('-date').values('date')[0].get('date')
-            date_start = min(d_start_outcome, d_start_income)
-            date_end = max(d_end_outcome, d_end_income)
+            date_start = min(d_start_outcome, d_start_income, d_start_money_box)
+            date_end = max(d_end_outcome, d_end_income, d_end_money_box)
 
         income_sum = IncomeCash.objects.filter(user_id=user_id, date__range=(date_start, date_end)).aggregate(
             Sum('sum')).get('sum__sum', 0.00)
@@ -271,7 +262,11 @@ class BalanceAPIView(APIView):
             Sum('sum')).get('sum__sum', 0.00)
         if not outcome_sum:
             outcome_sum = 0
-        balance = round(income_sum - outcome_sum, 2)
+        money_box_sum = MoneyBox.objects.filter(user_id=user_id, date__range=(date_start, date_end)).aggregate(
+            Sum('sum')).get('sum__sum', 0.00)
+        if not money_box_sum:
+            money_box_sum = 0
+        balance = round(income_sum - (outcome_sum + money_box_sum), 2)
         return JsonResponse({'sum_balance': balance})
 
 
@@ -294,7 +289,10 @@ class SumMonthlyIncomeView(ListAPIView):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data[0])
+        if serializer.data:
+            return Response(serializer.data[0])
+        else:
+            return Response([])
 
 
 class SumMonthlyOutcomeView(ListAPIView):
@@ -316,7 +314,10 @@ class SumMonthlyOutcomeView(ListAPIView):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data[0])
+        if serializer.data:
+            return Response(serializer.data[0])
+        else:
+            return Response([])
 
 
 class SumPercentMonthlyIncomeView(ListAPIView):
@@ -338,7 +339,10 @@ class SumPercentMonthlyIncomeView(ListAPIView):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data[0])
+        if serializer.data:
+            return Response(serializer.data[0])
+        else:
+            return Response([])
 
 
 class SumPercentMonthlyOutcomeView(ListAPIView):
@@ -360,22 +364,36 @@ class SumPercentMonthlyOutcomeView(ListAPIView):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data[0])
+        if serializer.data:
+            return Response(serializer.data[0])
+        else:
+            return Response([])
 
 
-class MoneyBoxView(ListCreateAPIView):
+class AddMoneyBox(ListCreateAPIView):
     """
-    Представление возвращает сумму накоплений и целевую сумму
+    Представление добавляет сумму накоплений
     """
     serializer_class = MoneyBoxSerializer
+    queryset = MoneyBox.objects.all()
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         user_id = self.request.user.pk
-        return MoneyBox.objects.filter(user_id=user_id)
+        category_id = self.request.data.get('category_id')
+        return MoneyBox.objects.filter(user_id=user_id, categories_id=category_id)
 
     def perform_create(self, serializer):
         serializer.save()
+
+
+class UpdateMoneyBox(UpdateAPIView):
+    """
+    Представление изменяет сумму накопления в категории
+    """
+    serializer_class = MoneyBoxSerializer
+    queryset = MoneyBox.objects.all()
+    permission_classes = (IsAuthenticated,)
 
 
 class DeleteMoneyBox(DestroyAPIView):
@@ -385,6 +403,32 @@ class DeleteMoneyBox(DestroyAPIView):
     serializer_class = MoneyBoxSerializer
     queryset = MoneyBox.objects.all()
     permission_classes = (IsAuthenticated,)
+
+
+class SumMoneyBox(ListAPIView):
+    """
+    Представление возвращает сумму всех накоплений по всем категориям
+    """
+    serializer_class = SumMoneyBoxSerializer
+    queryset = MoneyBox.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        return MoneyBox.objects.filter(user_id=user_id).values('user').distinct()
+
+
+class SumMoneyBoxGroup(ListAPIView):
+    """
+    Представление возвращает сумму всех накоплений в разрезе категорий
+    """
+    serializer_class = SumMoneyBoxGroupSerializer
+    queryset = MoneyBox.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        return MoneyBox.objects.filter(user_id=user_id).values('user').distinct()
 
 
 class Last5MoneyBox(ListAPIView):
@@ -397,3 +441,53 @@ class Last5MoneyBox(ListAPIView):
     def get_queryset(self):
         user_id = self.request.user.pk
         return MoneyBox.objects.filter(user_id=user_id).order_by('-id')[:5]
+
+
+class SumMonthlyMoneyBoxView(ListAPIView):
+    """
+    Представление возвращает сумму всех накоплений пользователя в разрезе категорий с разделением по месяцам.
+    """
+    serializer_class = MonthlySumMoneyBoxGroupSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        return MoneyBox.objects.filter(user_id=user_id)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({'request': self.request})
+        return context
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        if serializer.data:
+            return Response(serializer.data[0])
+        else:
+            return Response([])
+
+
+class SumPercentMonthlyMoneyBoxView(ListAPIView):
+    """
+    Представление возвращает сумму всех накоплений пользователя в разрезе категорий с разделением по месяцам в процентах.
+    """
+    serializer_class = MonthlySumPercentMoneyBoxGroupSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        return MoneyBox.objects.filter(user_id=user_id)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({'request': self.request})
+        return context
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        if serializer.data:
+            return Response(serializer.data[0])
+        else:
+            return Response([])

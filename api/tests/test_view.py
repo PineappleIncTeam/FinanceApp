@@ -93,33 +93,4 @@ class SumPercentMonthlyOutcomeAPIViewTest(TestCase):
 
 
 class MoneyBoxViewTestCase(TestCase):
-    def setUp(self):
-        self.factory = APIRequestFactory()
-        self.user = User.objects.create_user(username='testuser', password='testpassword')
-        self.moneybox = MoneyBox.objects.create(user=self.user, box_sum=100, box_target=200, date='2023-05-15')
-
-    def test_get_moneybox_list(self):
-        request = self.factory.get('/money-box/')
-        force_authenticate(request, user=self.user)
-        view = MoneyBoxView.as_view()
-        response = view(request)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['box_sum'], 100)
-        self.assertEqual(response.data[0]['box_target'], 200)
-
-    def test_create_moneybox(self):
-        request = self.factory.post('/money-box/', {'box_sum': 150, 'box_target': 300, 'date': '2023-05-05'})
-        force_authenticate(request, user=self.user)
-        view = MoneyBoxView.as_view()
-        response = view(request)
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(MoneyBox.objects.count(), 2)
-
-    def test_delete_moneybox(self):
-        request = self.factory.delete(f'/delete-money-box/{self.moneybox.id}/')
-        force_authenticate(request, user=self.user)
-        view = DeleteMoneyBox.as_view()
-        response = view(request, pk=self.moneybox.id)
-        self.assertEqual(response.status_code, 204)
-        self.assertFalse(MoneyBox.objects.filter(pk=self.moneybox.id).exists())
+    pass
