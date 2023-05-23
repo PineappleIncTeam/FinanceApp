@@ -40,7 +40,7 @@ class IncomeCashSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IncomeCash
-        fields = ('id', 'user', 'category_id', 'categoryName', 'category_type', 'sum', 'date',)
+        fields = ('id', 'user', 'category_id', 'categoryName', 'category_type', 'sum', 'date')
 
     def create(self, validated_data):
         user_id = self.context.get('request').user.pk
@@ -520,7 +520,8 @@ class MoneyBoxSerializer(serializers.ModelSerializer):
     user = serializers.CharField(required=False)
     category_id = serializers.IntegerField(source='categories_id', required=False)
     category_name = serializers.CharField(source='categories.categoryName', read_only=True)
-    date = serializers.SerializerMethodField(required=False)
+    date = serializers.SerializerMethodField()
+    box_target = serializers.DecimalField(max_digits=19, decimal_places=2, default=0, required=False)
 
     class Meta:
         model = MoneyBox
@@ -531,39 +532,32 @@ class MoneyBoxSerializer(serializers.ModelSerializer):
         category_id = validated_data.get('categories_id')
         box_sum = validated_data.get('box_sum')
         box_target = validated_data.get('box_target')
-        date = validated_data.get('date_created')
-        if not date:
-            date = datetime.now().date()
+        date = self.initial_data.get('date')
 
-            # Ищем существующий объект MoneyBox для данного пользователя и категории
-            try:
-                box_income = MoneyBox.objects.get(user_id=user_id, categories_id=category_id)
-            except MoneyBox.DoesNotExist:
-                box_income = MoneyBox.objects.create(
-                    user_id=user_id,
-                    categories_id=category_id,
-                    box_sum=box_sum,
-                    box_target=box_target,
-                    date_created=date,
-                )
-            else:
-                # Если объект найден и сумма не достигла цели, добавляем box_sum к существующей сумме
-                if box_income.box_sum < box_income.box_target:
-                    box_income.box_sum += box_sum
-                    box_income.save()
+        total_sum = MoneyBox.objects.filter(categories_id=category_id).aggregate(Sum('box_sum'))['box_sum__sum']
+        if total_sum is not None and total_sum >= box_target:
+            raise serializers.ValidationError(f'Congratulations! You have reached your goal. You have accumulated {box_target}.')
 
-                # Если сумма достигла цели, выводим ошибку
-                else:
-                    raise serializers.ValidationError(
-                        f"The target for category '{box_income.categories.categoryName}' has already been reached")
+        if total_sum is not None and total_sum + box_sum > box_target:
+            target = box_target - total_sum
+            raise serializers.ValidationError(
+                f'The sum cannot exceed the goal. You can add only {target} to reach the goal.')
 
-            return box_income
+        if self.is_target_reached(category_id, box_target):
+            raise serializers.ValidationError(f'The target amount has already been reached for this accumulation.')
 
-        def partial_update(self, instance, validated_data):
-            instance.box_sum = validated_data.get('box_sum', instance.box_sum)
-            instance.box_target = validated_data.get('box_target', instance.box_target)
-            instance.save()
-            return instance
+        box_income = MoneyBox.objects.create(
+            user_id=user_id,
+            categories_id=category_id,
+            box_sum=box_sum,
+            box_target=box_target,
+            date=date,
+        )
+        return box_income
+
+    def is_target_reached(self, category_id, box_target):
+        total_sum = MoneyBox.objects.filter(categories_id=category_id).aggregate(Sum('box_sum'))['box_sum__sum']
+        return total_sum and total_sum >= box_target
 
     def get_date(self, validated_data):
         days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
@@ -572,7 +566,7 @@ class MoneyBoxSerializer(serializers.ModelSerializer):
         try:
             today = datetime.strptime(validated_data.date, '%Y-%m-%d')
         except:
-            today = validated_data.date_created
+            today = validated_data.date
         num_week_day = datetime.weekday(today)
         num_month = int(datetime.strftime(today, '%m')) - 1
         return datetime.strftime(today, f'%d {months[num_month]} %Y, {days[num_week_day]}')

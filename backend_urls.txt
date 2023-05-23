@@ -422,5 +422,18 @@ JSON:
   "category_id": 1
 }
 
-http://92.255.79.239:8000/api/update-money-box/{id записи накопления} - UPDATE запрос изменение записи накопления
 http://92.255.79.239:8000/api/delete-money-box/{id записи накопления} - DELETE запрос удаление записи накопления
+
+http://92.255.79.239:8000/api/last-5-money-box/- GET запрос возвращает последние 5 записей накоплений пользователя
+JSON:
+[
+    {
+        "id": 24,
+        "user": "admin",
+        "box_sum": 9.0,
+        "box_target": 10.0,
+        "category_id": 11,
+        "category_name": "Test",
+        "date": "17 Мая 2023, Ср"
+    }
+]

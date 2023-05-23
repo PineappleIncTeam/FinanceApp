@@ -9,6 +9,7 @@ from rest_framework.generics import (ListCreateAPIView,
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
 from .serializers import (CategorySerializer,
                           IncomeCashSerializer,
                           OutcomeCashSerializer,
@@ -376,30 +377,6 @@ class MoneyBoxView(ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save()
 
-    def partial_update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-
-        # получаем значение, которое нужно добавить к текущей сумме
-        box_increment = serializer.validated_data.get('box_increment', None)
-
-        if box_increment:
-            # добавляем значение к текущей сумме
-            instance.box_sum += box_increment
-            instance.save()
-
-        return Response(serializer.data)
-
-
-class UpdateMoneyBox(UpdateAPIView):
-    """
-    Представление обновляет накопление
-    """
-    serializer_class = MoneyBoxSerializer
-    queryset = MoneyBox.objects.all()
-    permission_classes = (IsAuthenticated,)
-
 
 class DeleteMoneyBox(DestroyAPIView):
     """
@@ -408,3 +385,15 @@ class DeleteMoneyBox(DestroyAPIView):
     serializer_class = MoneyBoxSerializer
     queryset = MoneyBox.objects.all()
     permission_classes = (IsAuthenticated,)
+
+
+class Last5MoneyBox(ListAPIView):
+    """
+    Представление возвращает 5 последних записей накоплений
+    """
+    serializer_class = MoneyBoxSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        return MoneyBox.objects.filter(user_id=user_id).order_by('-id')[:5]

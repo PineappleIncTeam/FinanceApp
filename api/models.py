@@ -75,7 +75,7 @@ class AbstractCash(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     sum = models.DecimalField(max_digits=19, decimal_places=2, verbose_name='Сумма')
-    categories = models.ForeignKey(Categories, on_delete=models.CASCADE, verbose_name='Категория', null=True)
+    categories = models.ForeignKey(Categories, on_delete=models.DO_NOTHING, verbose_name='Категория', null=True)
     date = models.DateField(verbose_name='Дата записи')
     date_record = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания записи')
 
@@ -96,7 +96,7 @@ class MoneyBox(models.Model):
     categories = models.ForeignKey(Categories, on_delete=models.CASCADE, verbose_name='Категория', null=True)
     box_sum = models.DecimalField(max_digits=19, decimal_places=2, verbose_name='Сумма накопления')
     box_target = models.DecimalField(max_digits=19, decimal_places=2, verbose_name='Конечная цель')
-    date_created = models.DateField(verbose_name='Дата создания накопления')
+    date = models.DateField(verbose_name='Дата создания накопления')
 
     def save(self, *args, **kwargs):
         # Создаём запись в MoneyBox
@@ -106,8 +106,15 @@ class MoneyBox(models.Model):
             prev_box_sum = 0
         # Одновременно создаём запись в OutcomeCash
         OutcomeCash.objects.create(user=self.user, sum=self.box_sum - prev_box_sum, categories=self.categories,
-                                   date=self.date_created)
+                                   date=self.date)
         super().save(*args, **kwargs)
+
+    def delete(self, using=None, keep_parents=False):
+        outcome_cash = OutcomeCash.objects.filter(user=self.user, categories=self.categories)
+        if outcome_cash:
+            outcome_cash.delete()
+
+        super().delete(using=using, keep_parents=keep_parents)
 
     def __str__(self):
         return f'{self.categories} {self.box_sum} {self.box_target}'
