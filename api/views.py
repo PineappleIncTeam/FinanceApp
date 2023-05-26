@@ -1,6 +1,6 @@
-from django.db.models.aggregates import Sum
+from datetime import timedelta
+
 from django.http import JsonResponse
-from datetime import datetime
 
 from rest_framework.generics import (ListCreateAPIView,
                                      ListAPIView,
@@ -65,6 +65,20 @@ class GetOutcomeCategories(ListAPIView):
         user_id = self.request.user.pk
         return Categories.objects.filter(user_id=user_id,
                                          income_outcome='outcome')
+
+
+class GetMoneyBoxCategories(ListAPIView):
+    """
+    Представление возвращает список категорий расходов
+    """
+    serializer_class = CategorySerializer
+    queryset = Categories.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user_id = self.request.user.pk
+        return Categories.objects.filter(user_id=user_id,
+                                         income_outcome='money_box')
 
 
 class DeleteCategory(DestroyAPIView):
@@ -242,15 +256,26 @@ class BalanceAPIView(APIView):
     def get(self, request):
         user_id = request.user.pk
         try:
-            date_start = datetime.strptime(self.request.query_params.get('date_start'), '%Y-%m-%d').date()
-            date_end = datetime.strptime(self.request.query_params.get('date_end'), '%Y-%m-%d').date()
+            date_start = self.request.query_params.get('date_start')
+            date_end = self.request.query_params.get('date_end')
+
+            if date_end is None or len(date_end) <= 0:
+                date_end = datetime.now()
+            else:
+                date_end = datetime.strptime(date_end, '%Y-%m-%d')
+
+            if date_start is None or len(date_start) <= 0:
+                date_start = date_end - timedelta(days=365)
+            else:
+                date_start = datetime.strptime(date_start, '%Y-%m-%d')
+
         except:
             d_start_outcome = OutcomeCash.objects.all().order_by('date').values('date')[0].get('date')
             d_end_outcome = OutcomeCash.objects.all().order_by('-date').values('date')[0].get('date')
-            d_start_money_box = MoneyBox.objects.all().order_by('date').values('date')[0].get('date')
-            d_end_money_box = MoneyBox.objects.all().order_by('date').values('date')[0].get('date')
             d_start_income = IncomeCash.objects.all().order_by('date').values('date')[0].get('date')
             d_end_income = IncomeCash.objects.all().order_by('-date').values('date')[0].get('date')
+            d_start_money_box = MoneyBox.objects.all().order_by('date').values('date')[0].get('date')
+            d_end_money_box = MoneyBox.objects.all().order_by('-date').values('date')[0].get('date')
             date_start = min(d_start_outcome, d_start_income, d_start_money_box)
             date_end = max(d_end_outcome, d_end_income, d_end_money_box)
 

@@ -52,6 +52,18 @@ JSON возвращает:
         "user_id": 1
     },
 
+http://92.255.79.239:8000/api/money-box-categories/ GET запрос возвращает список всех накопительных категорий.
+JSON возвращает:
+[
+    {
+        "categoryName": "Test",
+        "category_id": 16,
+        "category_type": "accumulate",
+        "income_outcome": "outcome",
+        "user_id": 1,
+        "is_hidden": false
+    }
+]
 
 http://92.255.79.239:8000/api/outcome-categories/ GET запрос возвращает список всех расходных категорий.
 JSON возвращает:
