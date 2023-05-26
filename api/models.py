@@ -53,10 +53,12 @@ class Categories(models.Model):
 
     income_cat = 'income'
     outcome_cat = 'outcome'
+    money_box_cat = 'money_box'
 
     CAT_INCOME_OUTCOME = [
         (income_cat, 'Категория доходов'),
         (outcome_cat, 'Категория расходов'),
+        (money_box_cat, 'Категория накоплений')
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
@@ -75,12 +77,12 @@ class AbstractCash(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     sum = models.DecimalField(max_digits=19, decimal_places=2, verbose_name='Сумма')
-    categories = models.ForeignKey(Categories, on_delete=models.DO_NOTHING, verbose_name='Категория', null=True)
+    categories = models.ForeignKey(Categories, on_delete=models.CASCADE, verbose_name='Категория', null=True)
     date = models.DateField(verbose_name='Дата записи')
     date_record = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания записи')
 
     def __str__(self):
-        return f'{str(self.categories)} {str(self.date)}'
+        return f'{self.categories} {self.date}'
 
 
 class OutcomeCash(AbstractCash):
@@ -95,4 +97,4 @@ class MoneyBox(AbstractCash):
     target = models.DecimalField(max_digits=19, decimal_places=2, verbose_name='Конечная цель')
 
     def __str__(self):
-        return f'{self.categories} {self.date}'
+        return f'{self.categories} {self.sum} {self.target}'
