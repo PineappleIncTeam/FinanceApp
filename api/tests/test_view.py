@@ -1,7 +1,7 @@
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
 from api.models import User, MoneyBox
-from api.views import MoneyBoxView, DeleteMoneyBox
+from api.views import AddMoneyBox, DeleteMoneyBox
 
 
 class CategoryAPIViewTest(TestCase):
@@ -92,5 +92,33 @@ class SumPercentMonthlyOutcomeAPIViewTest(TestCase):
     pass
 
 
-class MoneyBoxViewTestCase(TestCase):
+class AddMoneyBoxViewAPIViewTest(TestCase):
+    pass
+
+
+class UpdateMoneyBoxAPIViewTest(TestCase):
+    pass
+
+
+class DeleteMoneyBoxAPIViewTest(TestCase):
+    pass
+
+
+class SumMoneyBoxAPIViewTest(TestCase):
+    pass
+
+
+class SumMoneyBoxGroupAPIViewTest(TestCase):
+    pass
+
+
+class Last5MoneyBoxAPIViewTest(TestCase):
+    pass
+
+
+class SumMonthlyMoneyBoxViewAPIViewTest(TestCase):
+    pass
+
+
+class SumPercentMonthlyMoneyBoxViewAPIViewTest(TestCase):
     pass
