@@ -181,7 +181,6 @@ class SumOutcomeCashSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(source='user')
     constant_sum = serializers.SerializerMethodField()
     once_sum = serializers.SerializerMethodField()
-    accumulate_sum = serializers.SerializerMethodField()
 
     def get_constant_sum(self, validated_data):
         user_id = self.context.get('request').user.pk
