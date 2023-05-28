@@ -220,7 +220,7 @@ class SumOutcomeCashSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OutcomeCash
-        fields = ('user_id', 'constant_sum', 'once_sum', 'accumulate_sum')
+        fields = ('user_id', 'constant_sum', 'once_sum')
 
 
 class SumOutcomeGroupCashSerializer(serializers.ModelSerializer):

@@ -35,7 +35,7 @@ JSON:
 # outcome - расходные категории
     {
         "categoryName": "Название категории",
-        "category_type": "constant" или "once",
+        "category_type": "constant", "once" или "accumulate",
         "income_outcome": "income" или "outcome",
         "is_hidden": true или false
     }
@@ -77,7 +77,7 @@ JSON возвращает:
         "user_id": 2
     }
 
-http://92.255.79.239:8000/api/update-category/{id категории} - PUT запрос изменение категории
+http://92.255.79.239:8000/api/update-category/{id категории} - PATCH запрос изменение категории
 JSON:
     {
         "categoryName": "Название категории"
@@ -410,8 +410,16 @@ JSON:
 }
 
 http://92.255.79.239:8000/api/money-box/
-POST-запрос создаёт накопление
-JSON:
+POST-запрос на добавление суммы накопления
+
+{
+    "sum": 2,
+    "target": 10,
+    "category_id": 11,
+    "date": "2023-01-01"
+}
+
+В ответ получаем JSON:
 {
     "id": 25,
     "user": "admin",
