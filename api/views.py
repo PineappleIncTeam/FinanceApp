@@ -86,16 +86,17 @@ class GetOutcomeCategoriesView(ListAPIView):
 
 class GetMoneyBoxCategoriesView(ListAPIView):
     """
-    Представление возвращает список категорий расходов
+    Представление возвращает список категорий расходов с суммами и целями
     """
-    serializer_class = CategorySerializer
-    queryset = Categories.objects.all()
     permission_classes = (IsAuthenticated,)
 
-    def get_queryset(self):
+    def get(self, request):
         user_id = self.request.user.pk
-        return Categories.objects.filter(user_id=user_id,
-                                         income_outcome='money_box')
+        money_box = MoneyBox.objects.filter(user_id=user_id, categories__income_outcome='money_box')
+        return Response(money_box.values('categories__categoryName', 'categories__category_type',
+                                         'categories__income_outcome', 'categories_id', 'user_id', 'target',
+                                         'categories__is_hidden').annotate(
+            Sum('sum')))
 
 
 class DeleteCategoryView(DestroyAPIView):
@@ -533,18 +534,3 @@ class SumPercentMonthlyMoneyBoxView(ListAPIView):
             return Response(serializer.data[0])
         else:
             return Response([])
-
-
-class MoneyBoxCategoryView(APIView):
-    """
-        Возвращает категории накоплений с суммами и целями по группам
-    """
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request):
-        user_id = self.request.user.pk
-        money_box = MoneyBox.objects.filter(user_id=user_id)
-        return Response(money_box.values('categories__categoryName', 'categories__category_type',
-                                         'categories__income_outcome', 'categories_id', 'user_id', 'target',
-                                         'categories__is_hidden').annotate(
-            Sum('sum')))
