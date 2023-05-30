@@ -8,7 +8,7 @@ urlpatterns = [
     path('categories/', GetCreateCategoryAPIView.as_view(), name='categories'),
     path('income-categories/', GetIncomeCategoriesView.as_view(), name='income-categories'),
     path('outcome-categories/', GetOutcomeCategoriesView.as_view(), name='outcome-categories'),
-    path('money-box-categories/', MoneyBoxCategoryView.as_view(), name='money-box-categories'),
+    path('money-box-categories/', GetMoneyBoxCategoriesView.as_view(), name='money-box-categories'),
     path('update-category/<int:pk>', UpdateCategoryView.as_view(), name='update-category'),
     path('del-category/<int:pk>', DeleteCategoryView.as_view(), name='del-category'),
 
