@@ -1,7 +1,7 @@
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
 from api.models import User, MoneyBox
-from api.views import AddMoneyBox, DeleteMoneyBox
+from api.views import AddMoneyBoxView, DeleteMoneyBoxView
 
 
 class CategoryAPIViewTest(TestCase):

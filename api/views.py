@@ -29,7 +29,8 @@ from .serializers import (CategorySerializer,
                           )
 from .models import (Categories,
                      IncomeCash,
-                     OutcomeCash, MoneyBox)
+                     OutcomeCash,
+                     MoneyBox)
 
 
 class GetCreateCategoryAPIView(ListCreateAPIView):
@@ -55,7 +56,7 @@ class GetCreateCategoryAPIView(ListCreateAPIView):
         return Categories.objects.filter(user_id=user_id)
 
 
-class GetIncomeCategories(ListAPIView):
+class GetIncomeCategoriesView(ListAPIView):
     """
     Представление возвращает список категорий доходов
     """
@@ -69,7 +70,7 @@ class GetIncomeCategories(ListAPIView):
                                          income_outcome='income')
 
 
-class GetOutcomeCategories(ListAPIView):
+class GetOutcomeCategoriesView(ListAPIView):
     """
     Представление возвращает список категорий расходов
     """
@@ -83,7 +84,7 @@ class GetOutcomeCategories(ListAPIView):
                                          income_outcome='outcome')
 
 
-class GetMoneyBoxCategories(ListAPIView):
+class GetMoneyBoxCategoriesView(ListAPIView):
     """
     Представление возвращает список категорий расходов
     """
@@ -97,7 +98,7 @@ class GetMoneyBoxCategories(ListAPIView):
                                          income_outcome='money_box')
 
 
-class DeleteCategory(DestroyAPIView):
+class DeleteCategoryView(DestroyAPIView):
     """
     Удаление категории (DELETE)
     """
@@ -106,7 +107,7 @@ class DeleteCategory(DestroyAPIView):
     permission_classes = (IsAuthenticated,)
 
 
-class UpdateCategory(UpdateAPIView):
+class UpdateCategoryView(UpdateAPIView):
     """
     Изменение категории (PUT)
     """
@@ -115,7 +116,7 @@ class UpdateCategory(UpdateAPIView):
     permission_classes = (IsAuthenticated,)
 
 
-class AddIncomeCash(ListCreateAPIView):
+class AddIncomeCashView(ListCreateAPIView):
     """
     Представление добавляет сумму дохода в категорию
     """
@@ -132,7 +133,7 @@ class AddIncomeCash(ListCreateAPIView):
         serializer.save()
 
 
-class UpdateIncomeCash(UpdateAPIView):
+class UpdateIncomeCashView(UpdateAPIView):
     """
     Представление изменяет сумму дохода в категории
     """
@@ -141,7 +142,7 @@ class UpdateIncomeCash(UpdateAPIView):
     permission_classes = (IsAuthenticated,)
 
 
-class DeleteIncomeCash(DeleteCategory):
+class DeleteIncomeCashView(DeleteCategoryView):
     """
     Представление удаляет сумму дохода в категории
     """
@@ -150,7 +151,7 @@ class DeleteIncomeCash(DeleteCategory):
     permission_classes = (IsAuthenticated,)
 
 
-class Last5IncomeCash(ListAPIView):
+class Last5IncomeCashView(ListAPIView):
     """
     Представление возвращает 5 последних записей доходов
     """
@@ -163,7 +164,7 @@ class Last5IncomeCash(ListAPIView):
         return IncomeCash.objects.filter(user_id=user_id).order_by('-date_record')[:5]
 
 
-class SumIncomeCash(ListAPIView):
+class SumIncomeCashView(ListAPIView):
     """
     Представление возвращает сумму всех доходов по всем категориям
     """
@@ -176,7 +177,7 @@ class SumIncomeCash(ListAPIView):
         return IncomeCash.objects.filter(user_id=user_id).values('user').distinct()
 
 
-class SumIncomeCashGroup(ListAPIView):
+class SumIncomeCashGroupView(ListAPIView):
     """
     Представление возвращает сумму всех доходов в разрезе категорий
     """
@@ -189,7 +190,7 @@ class SumIncomeCashGroup(ListAPIView):
         return IncomeCash.objects.filter(user_id=user_id).values('user').distinct()
 
 
-class AddOutcomeCash(ListCreateAPIView):
+class AddOutcomeCashView(ListCreateAPIView):
     """
     Представление добавляет сумму расхода в категорию
     """
@@ -206,7 +207,7 @@ class AddOutcomeCash(ListCreateAPIView):
         serializer.save()
 
 
-class UpdateOutcomeCash(UpdateAPIView):
+class UpdateOutcomeCashView(UpdateAPIView):
     """
     Представление изменяет сумму расхода в категории
     """
@@ -215,7 +216,7 @@ class UpdateOutcomeCash(UpdateAPIView):
     permission_classes = (IsAuthenticated,)
 
 
-class DeleteOutcomeCash(DestroyAPIView):
+class DeleteOutcomeCashView(DestroyAPIView):
     """
     Представление удаляет сумму расхода в категории
     """
@@ -224,7 +225,7 @@ class DeleteOutcomeCash(DestroyAPIView):
     permission_classes = (IsAuthenticated,)
 
 
-class SumOutcomeCash(ListAPIView):
+class SumOutcomeCashView(ListAPIView):
     """
     Представление возвращает сумму всех расходов по всем категориям
     """
@@ -237,7 +238,7 @@ class SumOutcomeCash(ListAPIView):
         return OutcomeCash.objects.filter(user_id=user_id).values('user').distinct()
 
 
-class SumOutcomeCashGroup(ListAPIView):
+class SumOutcomeCashGroupView(ListAPIView):
     """
     Представление возвращает сумму всех расходов в разрезе категорий
     """
@@ -250,7 +251,7 @@ class SumOutcomeCashGroup(ListAPIView):
         return OutcomeCash.objects.filter(user_id=user_id).values('user').distinct()
 
 
-class Last5OutcomeCash(ListAPIView):
+class Last5OutcomeCashView(ListAPIView):
     """
     Представление возвращает 5 последних записей расходов
     """
@@ -411,7 +412,7 @@ class SumPercentMonthlyOutcomeView(ListAPIView):
             return Response([])
 
 
-class AddMoneyBox(ListCreateAPIView):
+class AddMoneyBoxView(ListCreateAPIView):
     """
     Представление добавляет сумму накоплений
     """
@@ -428,7 +429,7 @@ class AddMoneyBox(ListCreateAPIView):
         serializer.save()
 
 
-class UpdateMoneyBox(UpdateAPIView):
+class UpdateMoneyBoxView(UpdateAPIView):
     """
     Представление изменяет сумму накопления в категории
     """
@@ -437,7 +438,7 @@ class UpdateMoneyBox(UpdateAPIView):
     permission_classes = (IsAuthenticated,)
 
 
-class DeleteMoneyBox(DestroyAPIView):
+class DeleteMoneyBoxView(DestroyAPIView):
     """
     Представление удаляет сумму в накоплении
     """
@@ -446,7 +447,7 @@ class DeleteMoneyBox(DestroyAPIView):
     permission_classes = (IsAuthenticated,)
 
 
-class SumMoneyBox(ListAPIView):
+class SumMoneyBoxView(ListAPIView):
     """
     Представление возвращает сумму всех накоплений по всем категориям
     """
@@ -459,7 +460,7 @@ class SumMoneyBox(ListAPIView):
         return MoneyBox.objects.filter(user_id=user_id).values('user').distinct()
 
 
-class SumMoneyBoxGroup(ListAPIView):
+class SumMoneyBoxGroupView(ListAPIView):
     """
     Представление возвращает сумму всех накоплений в разрезе категорий
     """
@@ -472,7 +473,7 @@ class SumMoneyBoxGroup(ListAPIView):
         return MoneyBox.objects.filter(user_id=user_id).values('user').distinct()
 
 
-class Last5MoneyBox(ListAPIView):
+class Last5MoneyBoxView(ListAPIView):
     """
     Представление возвращает 5 последних записей накоплений
     """
@@ -532,3 +533,18 @@ class SumPercentMonthlyMoneyBoxView(ListAPIView):
             return Response(serializer.data[0])
         else:
             return Response([])
+
+
+class MoneyBoxCategoryView(APIView):
+    """
+        Возвращает категории накоплений с суммами и целями по группам
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user_id = self.request.user.pk
+        money_box = MoneyBox.objects.filter(user_id=user_id)
+        return Response(money_box.values('categories__categoryName', 'categories__category_type',
+                                         'categories__income_outcome', 'categories_id', 'user_id', 'target',
+                                         'categories__is_hidden').annotate(
+            Sum('sum')))

@@ -56,12 +56,14 @@ http://92.255.79.239:8000/api/money-box-categories/ GET запрос возвр�
 JSON возвращает:
 [
     {
-        "categoryName": "Test",
-        "category_id": 16,
-        "category_type": "accumulate",
-        "income_outcome": "outcome",
+        "categories__categoryName": "Test",
+        "categories__category_type": "accumulate",
+        "categories__income_outcome": "money_box",
+        "categories_id": 13,
         "user_id": 1,
-        "is_hidden": false
+        "target": 10.0,
+        "categories__is_hidden": false,
+        "sum__sum": 10.0
     }
 ]
 
