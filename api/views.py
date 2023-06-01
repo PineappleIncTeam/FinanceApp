@@ -1,6 +1,7 @@
 from datetime import timedelta, datetime
 from django.db.models.aggregates import Sum
 from django.http import JsonResponse
+from django.db.models import F
 
 from rest_framework.generics import (ListCreateAPIView,
                                      ListAPIView,
@@ -92,11 +93,9 @@ class GetMoneyBoxCategoriesView(ListAPIView):
 
     def get(self, request):
         user_id = self.request.user.pk
-        money_box = MoneyBox.objects.filter(user_id=user_id, categories__income_outcome='money_box')
-        return Response(money_box.values('categories__categoryName', 'categories__category_type',
-                                         'categories__income_outcome', 'categories_id', 'user_id', 'target',
-                                         'categories__is_hidden').annotate(
-            Sum('sum')))
+        money_box_cat = Categories.objects.filter(user_id=user_id, income_outcome='money_box')
+        return Response(money_box_cat.values('categoryName', 'category_type', 'income_outcome', 'id', 'user_id')
+                        .annotate(sum=Sum('moneybox__sum'), target=F('moneybox__target')))
 
 
 class DeleteCategoryView(DestroyAPIView):
