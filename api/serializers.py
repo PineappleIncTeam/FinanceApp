@@ -181,6 +181,7 @@ class SumOutcomeCashSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(source='user')
     constant_sum = serializers.SerializerMethodField()
     once_sum = serializers.SerializerMethodField()
+    accum_sum = serializers.SerializerMethodField()
 
     def get_constant_sum(self, validated_data):
         user_id = self.context.get('request').user.pk
@@ -217,9 +218,26 @@ class SumOutcomeCashSerializer(serializers.ModelSerializer):
 
         return once_sum
 
+    def get_accum_sum(self, validated_data):
+        user_id = self.context.get('request').user.pk
+        try:
+            date_start = datetime.strptime(self.context.get('request').query_params.get('date_start'),
+                                           '%Y-%m-%d').date()
+            date_end = datetime.strptime(self.context.get('request').query_params.get('date_end'), '%Y-%m-%d').date()
+        except:
+            date_start = MoneyBox.objects.all().order_by('date').values('date')[0].get('date')
+            date_end = MoneyBox.objects.all().order_by('-date').values('date')[0].get('date')
+
+        accum_sum = MoneyBox.objects.filter(
+            user_id=user_id,
+            date__range=(date_start, date_end)).aggregate(
+            Sum('sum')).get('sum__sum', 0.00)
+
+        return accum_sum
+
     class Meta:
         model = OutcomeCash
-        fields = ('user_id', 'constant_sum', 'once_sum')
+        fields = ('user_id', 'constant_sum', 'once_sum', 'accum_sum')
 
 
 class SumOutcomeGroupCashSerializer(serializers.ModelSerializer):
@@ -310,6 +328,7 @@ class MonthlySumIncomeGroupCashSerializer(serializers.ModelSerializer):
 
 
 class MonthlySumOutcomeGroupCashSerializer(serializers.ModelSerializer):
+    money_box_sum = serializers.SerializerMethodField()
 
     def to_representation(self, data):
         user_id = self.context.get('request').user.pk
