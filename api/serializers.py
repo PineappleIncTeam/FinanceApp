@@ -328,7 +328,6 @@ class MonthlySumIncomeGroupCashSerializer(serializers.ModelSerializer):
 
 
 class MonthlySumOutcomeGroupCashSerializer(serializers.ModelSerializer):
-    money_box_sum = serializers.SerializerMethodField()
 
     def to_representation(self, data):
         user_id = self.context.get('request').user.pk
