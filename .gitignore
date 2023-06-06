@@ -3,6 +3,7 @@
 __pycache__/
 .env
 staticfiles
+*.log
 *.xml
 .coverage
 htmlcov/
