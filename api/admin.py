@@ -1,9 +1,15 @@
 from django.contrib import admin
-from .models import User, Categories, IncomeCash, OutcomeCash, MoneyBox
+from api.models import User, Categories, IncomeCash, OutcomeCash, MoneyBox
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('id', 'username', 'email',)
+    ordering = ('email',)
+
 
 admin.site.register(
     (
-        User,
         Categories,
         IncomeCash,
         OutcomeCash,
