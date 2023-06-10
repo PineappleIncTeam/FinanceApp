@@ -95,8 +95,8 @@ class GetMoneyBoxCategoriesView(ListAPIView):
         user_id = self.request.user.pk
         money_box_cat = Categories.objects.filter(user_id=user_id, income_outcome='money_box')
         return Response(
-            money_box_cat.values('categoryName', 'category_type', 'income_outcome', 'id', 'user_id', 'is_hidden')
-            .annotate(sum=Sum('moneybox__sum'), target=F('moneybox__target')))
+            money_box_cat.values('categoryName', 'category_type', 'income_outcome', 'user_id', 'is_hidden')
+            .annotate(sum=Sum('moneybox__sum'), target=F('moneybox__target'), category_id=F('id')))
 
 
 class DeleteCategoryView(DestroyAPIView):
