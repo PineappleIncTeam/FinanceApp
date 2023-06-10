@@ -525,7 +525,7 @@ class MoneyBoxSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MoneyBox
-        fields = ('id', 'user', 'category_id', 'categoryName', 'category_type', 'sum', 'target', 'date')
+        fields = ('user', 'category_id', 'categoryName', 'category_type', 'sum', 'target', 'date')
 
     def create(self, validated_data):
         user_id = self.context.get('request').user.pk
