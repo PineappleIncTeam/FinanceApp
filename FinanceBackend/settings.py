@@ -175,11 +175,6 @@ CORS_ORIGIN_WHITELIST = [
     "https://back.freenance.online"
 ]
 
-CORS_ALLOW_HEADERS = (
-    'Access-Control-Allow-Headers',
-    'Access-Control-Allow-Credentials',
-)
-
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:8000",
