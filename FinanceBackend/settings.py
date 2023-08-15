@@ -155,12 +155,16 @@ CORS_ALLOWED_ORIGINS = [
     "https://back.freenance.online"
 ]
 
-# CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = False
 
-ALLOWED_HOSTS = ['*']
-
-CORS_ALLOW_CREDENTIALS = True
+ALLOWED_HOSTS = [
+    "http://localhost:3000",
+    "127.0.0.1",
+    "92.255.79.239",
+    "freenance.online",
+    "back.freenance.online",
+]
 
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:8000",
