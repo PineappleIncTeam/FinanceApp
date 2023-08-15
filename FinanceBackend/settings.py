@@ -152,7 +152,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://localhost:3000",
     "https://localhost:8000",
     "https://freenance.online",
-    "https://back.freenance.online:8000"
+    "https://back.freenance.online"
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -163,7 +163,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "92.255.79.239",
     "freenance.online",
-    "back.freenance.online:8000",
+    "back.freenance.online",
 ]
 
 CORS_ORIGIN_WHITELIST = [
@@ -172,14 +172,14 @@ CORS_ORIGIN_WHITELIST = [
     "http://127.0.0.1:8000",
     "http://localhost:3000",
     "https://freenance.online",
-    "https://back.freenance.online:8000"
+    "https://back.freenance.online"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:8000",
     "https://freenance.online",
-    "https://back.freenance.online:8000"
+    "https://back.freenance.online"
 ]
 
 EMAIL_HOST = os.getenv('EMAIL_HOST')
