@@ -160,7 +160,7 @@ CORS_ALLOW_CREDENTIALS = False
 
 ALLOWED_HOSTS = [
     "http://localhost:3000",
-    "127.0.0.1",
+    "127.0.0.1:8000",
     "92.255.79.239",
     "freenance.online",
     "back.freenance.online",
