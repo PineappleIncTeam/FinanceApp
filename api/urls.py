@@ -51,6 +51,8 @@ urlpatterns = [
     # path('api/', include(router.urls)),
     # path('api/registration/', CreateUser.as_view(), name='create-user'),
     # path('api/drf-auth/', include('rest_framework.urls'))
+
+    path('report/', ReportAPIView.as_view(), name='report'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
