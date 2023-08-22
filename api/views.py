@@ -27,6 +27,7 @@ from .serializers import (CategorySerializer,
                           SumMoneyBoxGroupSerializer,
                           MonthlySumMoneyBoxGroupSerializer,
                           MonthlySumPercentMoneyBoxGroupSerializer,
+                          ReportSerializer,
                           )
 from .models import (Categories,
                      IncomeCash,
@@ -534,3 +535,22 @@ class SumPercentMonthlyMoneyBoxView(ListAPIView):
             return Response(serializer.data[0])
         else:
             return Response([])
+
+
+class ReportAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user_id = request.user.pk
+
+        income_cash_data = IncomeCash.objects.filter(user_id=user_id).order_by('-date_record')
+        outcome_cash_data = OutcomeCash.objects.filter(user_id=user_id).order_by('-date_record')
+        money_box_data = MoneyBox.objects.filter(user_id=user_id).order_by('-id')
+
+        serializer = ReportSerializer({
+            'income_cash': income_cash_data,
+            'outcome_cash': outcome_cash_data,
+            'money_box': money_box_data
+        })
+
+        return Response(serializer.data)

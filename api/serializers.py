@@ -751,3 +751,9 @@ class MonthlySumPercentMoneyBoxGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = MoneyBox
         fields = ('sum',)
+
+
+class ReportSerializer(serializers.Serializer):
+    income_cash = IncomeCashSerializer(many=True, read_only=True)
+    outcome_cash = OutcomeCashSerializer(many=True, read_only=True)
+    money_box = MoneyBoxSerializer(many=True, read_only=True)
