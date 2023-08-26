@@ -460,7 +460,7 @@ JSON:
     }
 ]
 
-http://92.255.79.239:8000/api/sum-money-box-group/?date_start=2022-08-10&date_end=2022-12-31 - GET сумму всех накоплений пользователя в разрезе категорий.
+http://92.255.79.239:8000/api/sum-money-box-group/?date_start=2022-08-10&date_end=2022-12-31 - GET-запрос возвращает сумму всех накоплений пользователя в разрезе категорий.
 Если указать без периода, то вернет все суммы за все периоды
 В ответ получаем JSON:
 [
@@ -474,7 +474,7 @@ http://92.255.79.239:8000/api/sum-money-box-group/?date_start=2022-08-10&date_en
     }
 ]
 
-http://92.255.79.239:8000/api/sum-monthly-money-box/?date_start=2023-01-01&date_end=2023-03-31 - GET сумму всех накоплений пользователя в разрезе категорий
+http://92.255.79.239:8000/api/sum-monthly-money-box/?date_start=2023-01-01&date_end=2023-03-31 - GET-запрос возвращает сумму всех накоплений пользователя в разрезе категорий
 с разделением по месяцам.
 JSON:
 [
@@ -485,7 +485,7 @@ JSON:
     }
 ]
 
-http://92.255.79.239:8000/api/sum-monthly-percent-money-box/?date_start=2023-01-01&date_end=2023-03-31 - GET сумму всех накоплений пользователя в разрезе категорий
+http://92.255.79.239:8000/api/sum-monthly-percent-money-box/?date_start=2023-01-01&date_end=2023-03-31 - GET-запрос возвращает сумму всех накоплений пользователя в разрезе категорий
 с разделением по месяцам в процентах.
 JSON:
 [
@@ -495,3 +495,98 @@ JSON:
         }
     }
 ]
+
+http://92.255.79.239:8000/api/report/?date_start=2023-01-01&date_end=2023-08-25 - GET-запрос возвращает все записи пользователя за выбранный период
+JSON:
+{
+    "income_cash": [
+        {
+            "id": 2,
+            "user": "admin",
+            "category_id": 2,
+            "categoryName": "Подработка",
+            "category_type": "constant",
+            "sum": 6000.0,
+            "date": "25 Августа 2023, Пт"
+        },
+        {
+            "id": 1,
+            "user": "admin",
+            "category_id": 1,
+            "categoryName": "Зарплата",
+            "category_type": "constant",
+            "sum": 2000.0,
+            "date": "20 Августа 2023, Вс"
+        },
+        {
+            "id": 3,
+            "user": "admin",
+            "category_id": 1,
+            "categoryName": "Зарплата",
+            "category_type": "constant",
+            "sum": 7000.0,
+            "date": "19 Августа 2023, Сб"
+        }
+    ],
+    "outcome_cash": [
+        {
+            "id": 2,
+            "user": "admin",
+            "category_id": 7,
+            "categoryName": "Одежда",
+            "category_type": "constant",
+            "sum": 8000.0,
+            "date": "25 Августа 2023, Пт"
+        },
+        {
+            "id": 1,
+            "user": "admin",
+            "category_id": 9,
+            "categoryName": "ЖКХ",
+            "category_type": "constant",
+            "sum": 6000.0,
+            "date": "22 Августа 2023, Вт"
+        },
+        {
+            "id": 3,
+            "user": "admin",
+            "category_id": 8,
+            "categoryName": "Развлечения",
+            "category_type": "constant",
+            "sum": 900.0,
+            "date": "04 Августа 2023, Пт"
+        }
+    ],
+    "money_box": [
+        {
+            "id": 3,
+            "user": "admin",
+            "category_id": 11,
+            "categoryName": "Test",
+            "category_type": "accumulate",
+            "sum": 1000.0,
+            "target": 10000.0,
+            "date": "25 Августа 2023, Пт"
+        },
+        {
+            "id": 1,
+            "user": "admin",
+            "category_id": 11,
+            "categoryName": "Test",
+            "category_type": "accumulate",
+            "sum": 4000.0,
+            "target": 10000.0,
+            "date": "22 Августа 2023, Вт"
+        },
+        {
+            "id": 4,
+            "user": "admin",
+            "category_id": 11,
+            "categoryName": "Test",
+            "category_type": "accumulate",
+            "sum": 1500.0,
+            "target": 10000.0,
+            "date": "09 Августа 2023, Ср"
+        }
+    ]
+}
