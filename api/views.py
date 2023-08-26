@@ -10,6 +10,7 @@ from rest_framework.generics import (ListCreateAPIView,
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import serializers
 
 from .serializers import (CategorySerializer,
                           IncomeCashSerializer,
@@ -537,20 +538,49 @@ class SumPercentMonthlyMoneyBoxView(ListAPIView):
             return Response([])
 
 
+def date_filter(queryset, start_date=None, end_date=None):
+    if start_date:
+        queryset = queryset.filter(date__gte=start_date)
+    if end_date:
+        queryset = queryset.filter(date__lte=end_date)
+    return queryset
+
+
 class ReportAPIView(APIView):
+    """
+    Представление возвращает все записи пользователя
+    """
+    serializer_class = ReportSerializer
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
+        date_start = request.query_params.get('date_start', None)
+        date_end = request.query_params.get('date_end', None)
+
+        if date_start:
+            try:
+                date_start = datetime.strptime(date_start, '%Y-%m-%d').date()
+            except ValueError:
+                raise serializers.ValidationError('Incorrect date format for date_start, should be YYYY-MM-DD')
+
+        if date_end:
+            try:
+                date_end = datetime.strptime(date_end, '%Y-%m-%d').date()
+            except ValueError:
+                raise serializers.ValidationError('Incorrect date format for date_end, should be YYYY-MM-DD')
+
         user_id = request.user.pk
+        income_cash = date_filter(IncomeCash.objects.filter(user_id=user_id), date_start, date_end).order_by(
+            '-date')
+        outcome_cash = date_filter(OutcomeCash.objects.filter(user_id=user_id), date_start, date_end).order_by(
+            '-date')
+        money_box = date_filter(MoneyBox.objects.filter(user_id=user_id), date_start, date_end).order_by('-date')
 
-        income_cash_data = IncomeCash.objects.filter(user_id=user_id).order_by('-date_record')
-        outcome_cash_data = OutcomeCash.objects.filter(user_id=user_id).order_by('-date_record')
-        money_box_data = MoneyBox.objects.filter(user_id=user_id).order_by('-id')
+        queryset = {
+            'income_cash': income_cash,
+            'outcome_cash': outcome_cash,
+            'money_box': money_box,
+        }
 
-        serializer = ReportSerializer({
-            'income_cash': income_cash_data,
-            'outcome_cash': outcome_cash_data,
-            'money_box': money_box_data
-        })
-
+        serializer = self.serializer_class(queryset, context={'request': request})
         return Response(serializer.data)
