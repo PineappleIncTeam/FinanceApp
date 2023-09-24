@@ -57,6 +57,19 @@ class IncomeCashSerializer(serializers.ModelSerializer):
             date=date)
         return income_cash
 
+    def update(self, instance, validated_data):
+        category_data = validated_data.pop("categories")
+        categories = instance.categories
+
+        instance.sum = validated_data.get("sum", instance.sum)
+        instance.date = validated_data.get("date", instance.date)
+        instance.save()
+
+        categories.categoryName = category_data.get("categoryName", categories.categoryName)
+        categories.save()
+
+        return instance
+
     def get_date(self, validated_data):
         days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
         months = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября",
@@ -164,6 +177,19 @@ class OutcomeCashSerializer(serializers.ModelSerializer):
             date=date)
         return outcome_cash
 
+    def update(self, instance, validated_data):
+        category_data = validated_data.pop("categories")
+        categories = instance.categories
+
+        instance.sum = validated_data.get("sum", instance.sum)
+        instance.date = validated_data.get("date", instance.date)
+        instance.save()
+
+        categories.categoryName = category_data.get("categoryName", categories.categoryName)
+        categories.save()
+
+        return instance
+
     def get_date(self, validated_data):
         days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
         monthes = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября",
@@ -183,55 +209,62 @@ class SumOutcomeCashSerializer(serializers.ModelSerializer):
     once_sum = serializers.SerializerMethodField()
     accum_sum = serializers.SerializerMethodField()
 
+    def get_date_range(self, model, request):
+        try:
+            date_start = datetime.strptime(request.query_params.get('date_start'), '%Y-%m-%d').date()
+            date_end = datetime.strptime(request.query_params.get('date_end'), '%Y-%m-%d').date()
+        except:
+            date_values = model.objects.all().order_by('date').values('date')
+            if date_values:
+                date_start = date_values[0].get('date')
+                date_end = model.objects.all().order_by('-date').values('date')[0].get('date')
+            else:
+                date_start = None
+                date_end = None
+
+        return date_start, date_end
+
     def get_constant_sum(self, validated_data):
         user_id = self.context.get('request').user.pk
-        try:
-            date_start = datetime.strptime(self.context.get('request').query_params.get('date_start'),
-                                           '%Y-%m-%d').date()
-            date_end = datetime.strptime(self.context.get('request').query_params.get('date_end'), '%Y-%m-%d').date()
-        except:
-            date_start = OutcomeCash.objects.all().order_by('date').values('date')[0].get('date')
-            date_end = OutcomeCash.objects.all().order_by('-date').values('date')[0].get('date')
+        date_start, date_end = self.get_date_range(OutcomeCash, self.context.get('request'))
 
-        constant_sum = OutcomeCash.objects.filter(
-            user_id=user_id,
-            categories__category_type='constant',
-            date__range=(date_start, date_end)).aggregate(
-            Sum('sum')).get('sum__sum', 0.00)
+        if date_start is not None and date_end is not None:
+            constant_sum = OutcomeCash.objects.filter(
+                user_id=user_id,
+                categories__category_type='constant',
+                date__range=(date_start, date_end)).aggregate(
+                Sum('sum')).get('sum__sum', 0.00)
+        else:
+            constant_sum = 0.00
+
         return constant_sum
 
     def get_once_sum(self, validated_data):
         user_id = self.context.get('request').user.pk
-        try:
-            date_start = datetime.strptime(self.context.get('request').query_params.get('date_start'),
-                                           '%Y-%m-%d').date()
-            date_end = datetime.strptime(self.context.get('request').query_params.get('date_end'), '%Y-%m-%d').date()
-        except:
-            date_start = OutcomeCash.objects.all().order_by('date').values('date')[0].get('date')
-            date_end = OutcomeCash.objects.all().order_by('-date').values('date')[0].get('date')
+        date_start, date_end = self.get_date_range(OutcomeCash, self.context.get('request'))
 
-        once_sum = OutcomeCash.objects.filter(
-            user_id=user_id,
-            categories__category_type='once',
-            date__range=(date_start, date_end)).aggregate(
-            Sum('sum')).get('sum__sum', 0.00)
+        if date_start is not None and date_end is not None:
+            once_sum = OutcomeCash.objects.filter(
+                user_id=user_id,
+                categories__category_type='once',
+                date__range=(date_start, date_end)).aggregate(
+                Sum('sum')).get('sum__sum', 0.00)
+        else:
+            once_sum = 0.00
 
         return once_sum
 
     def get_accum_sum(self, validated_data):
         user_id = self.context.get('request').user.pk
-        try:
-            date_start = datetime.strptime(self.context.get('request').query_params.get('date_start'),
-                                           '%Y-%m-%d').date()
-            date_end = datetime.strptime(self.context.get('request').query_params.get('date_end'), '%Y-%m-%d').date()
-        except:
-            date_start = MoneyBox.objects.all().order_by('date').values('date')[0].get('date')
-            date_end = MoneyBox.objects.all().order_by('-date').values('date')[0].get('date')
+        date_start, date_end = self.get_date_range(MoneyBox, self.context.get('request'))
 
-        accum_sum = MoneyBox.objects.filter(
-            user_id=user_id,
-            date__range=(date_start, date_end)).aggregate(
-            Sum('sum')).get('sum__sum', 0.00)
+        if date_start is not None and date_end is not None:
+            accum_sum = MoneyBox.objects.filter(
+                user_id=user_id,
+                date__range=(date_start, date_end)).aggregate(
+                Sum('sum')).get('sum__sum', 0.00)
+        else:
+            accum_sum = 0.00
 
         return accum_sum
 

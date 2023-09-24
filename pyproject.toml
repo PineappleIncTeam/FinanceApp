@@ -20,6 +20,7 @@ django-cors-headers = "^4.0.0"
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.0.0"
 coverage = "^7.2.6"
+rich = "^13.5.2"
 
 [build-system]
 requires = ["poetry-core"]

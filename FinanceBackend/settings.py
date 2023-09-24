@@ -158,6 +158,7 @@ ALLOWED_HOSTS = [
     "92.255.79.239",
     "freenance.online",
     "back.freenance.online",
+    "127.0.0.1",
 ]
 
 CORS_ORIGIN_WHITELIST = [
@@ -208,25 +209,34 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+LOG_FILE_NAME = 'freenance.log' if DEBUG else '/var/log/freenance.log'
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
-        'main_format': {
-            'format': '{asctime} {levelname} {module} {filename} {message}',
+        'console': {
+            'format': '{asctime} {name} {levelname} {module} {message}',
+            'style': '{',
+        },
+        'file': {
+            'format': '{asctime} {name} {levelname} {module} {message}',
             'style': '{',
         },
     },
 
     'handlers': {
         'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'main_format',
+            'class': 'rich.logging.RichHandler',
+            'formatter': 'console',
         },
         'file': {
-            'class': 'logging.FileHandler',
-            'formatter': 'main_format',
-            'filename': 'logging.log',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'formatter': 'file',
+            'filename': LOG_FILE_NAME,
+            'when': 'D',
+            'interval': 7,
+            'backupCount': 0,
         },
     },
 
@@ -235,6 +245,10 @@ LOGGING = {
             'handlers': ['console', 'file'],
             'level': 'DEBUG',
             'propagate': True,
+        },
+        'django.request': {
+            'level': 'INFO',
+            'handlers': ['console', 'file'],
         },
     },
 }
