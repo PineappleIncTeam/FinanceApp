@@ -1222,15 +1222,15 @@ class BalanceAPIView(APIView):
             income_sum = IncomeCash.objects.filter(
                 user_id=self.request.user.pk,
                 date__range=(date_start, date_end)). \
-                aggregate(Sum('sum')).get('sum__sum', 0.00)
+                aggregate(Sum('sum')).get('sum__sum', 0.00) or 0
             outcome_sum = OutcomeCash.objects.filter(
                 user_id=self.request.user.pk,
                 date__range=(date_start, date_end)). \
-                aggregate(Sum('sum')).get('sum__sum', 0.00)
+                aggregate(Sum('sum')).get('sum__sum', 0.00) or 0
             money_box_sum = MoneyBox.objects.filter(
                 user_id=self.request.user.pk,
                 date__range=(date_start, date_end)). \
-                aggregate(Sum('sum')).get('sum__sum', 0.00)
+                aggregate(Sum('sum')).get('sum__sum', 0.00) or 0
 
             balance = round(income_sum - (outcome_sum + money_box_sum), 2)
             logger.info(

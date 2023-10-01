@@ -115,7 +115,7 @@ class IncomeCashSerializer(serializers.ModelSerializer):
         ]
         try:
             today = datetime.strptime(validated_data.date, '%Y-%m-%d')
-        except (ValueError, KeyError):
+        except TypeError:
             today = validated_data.date
         num_week_day = datetime.weekday(today)
         num_month = int(datetime.strftime(today, '%m')) - 1
@@ -142,7 +142,7 @@ class SumIncomeCashSerializer(serializers.ModelSerializer):
                                          get('request').query_params.
                                          get('date_end'),
                                          '%Y-%m-%d').date()
-        except (ValueError, KeyError):
+        except TypeError:
             date_start = IncomeCash.objects.all(
             ).order_by('date').values('date')[0].get('date')
             date_end = IncomeCash.objects.all(
@@ -166,7 +166,7 @@ class SumIncomeCashSerializer(serializers.ModelSerializer):
                                          get('request').query_params.
                                          get('date_end'),
                                          '%Y-%m-%d').date()
-        except (ValueError, KeyError):
+        except TypeError:
             date_start = IncomeCash.objects.all(
             ).order_by('date').values('date')[0].get('date')
             date_end = IncomeCash.objects.all(
@@ -198,7 +198,7 @@ class SumIncomeGroupCashSerializer(serializers.ModelSerializer):
                                          get('request').query_params.
                                          get('date_end'),
                                          '%Y-%m-%d').date()
-        except (ValueError, KeyError):
+        except TypeError:
             date_start = IncomeCash.objects.all(
             ).order_by('date').values('date')[0].get('date')
             date_end = IncomeCash.objects.all(
@@ -295,7 +295,7 @@ class OutcomeCashSerializer(serializers.ModelSerializer):
         ]
         try:
             today = datetime.strptime(str(validated_data.date), '%Y-%m-%d')
-        except (ValueError, KeyError):
+        except TypeError:
             today = validated_data.date
         num_week_day = datetime.weekday(today)
         num_month = int(datetime.strftime(today, '%m')) - 1
@@ -320,7 +320,7 @@ class SumOutcomeCashSerializer(serializers.ModelSerializer):
             date_end = datetime.strptime(request.query_params.
                                          get('date_end'),
                                          '%Y-%m-%d').date()
-        except (ValueError, KeyError):
+        except TypeError:
             date_values = model.objects.all().order_by('date').values('date')
             if date_values:
                 date_start = date_values[0].get('date')
@@ -398,7 +398,7 @@ class SumOutcomeGroupCashSerializer(serializers.ModelSerializer):
                                          get('request').query_params.
                                          get('date_end'),
                                          '%Y-%m-%d').date()
-        except (ValueError, KeyError):
+        except TypeError:
             date_start = OutcomeCash.objects.all(
             ).order_by('date').values('date')[0].get('date')
             date_end = OutcomeCash.objects.all(
@@ -813,7 +813,7 @@ class MoneyBoxSerializer(serializers.ModelSerializer):
         ]
         try:
             today = datetime.strptime(str(validated_data.date), '%Y-%m-%d')
-        except (ValueError, KeyError):
+        except TypeError:
             today = validated_data.date
         num_week_day = datetime.weekday(today)
         num_month = int(datetime.strftime(today, '%m')) - 1
@@ -837,7 +837,7 @@ class SumMoneyBoxSerializer(serializers.ModelSerializer):
             date_end = datetime.strptime(
                 self.context.get('request').query_params.
                 get('date_end'), '%Y-%m-%d').date()
-        except (ValueError, KeyError):
+        except TypeError:
             date_start = MoneyBox.objects.all(
             ).order_by('date').values('date')[0].get('date')
             date_end = MoneyBox.objects.all(
@@ -868,7 +868,7 @@ class SumMoneyBoxGroupSerializer(serializers.ModelSerializer):
             date_end = datetime.strptime(
                 self.context.get('request').query_params.
                 get('date_end'), '%Y-%m-%d').date()
-        except (ValueError, KeyError):
+        except TypeError:
             date_start = MoneyBox.objects.all(
             ).order_by('date').values('date')[0].get('date')
             date_end = MoneyBox.objects.all(
