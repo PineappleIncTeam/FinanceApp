@@ -9,7 +9,10 @@ from api.models import User, Categories, IncomeCash
 class CategoryURLTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpassword'
+        )
         self.client.force_authenticate(user=self.user)
 
     def test_category_create(self):
@@ -82,7 +85,10 @@ class CategoryURLTestCase(TestCase):
 class IncomeCashAPITestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpassword'
+        )
         self.client.force_authenticate(user=self.user)
 
     def test_income_cash_create(self):
@@ -97,11 +103,26 @@ class IncomeCashAPITestCase(TestCase):
 
         response = self.client.post(url, data)
         updated_income_cash = IncomeCash.objects.get(pk=1)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(updated_income_cash.sum, 5000)
-        self.assertEqual(updated_income_cash.pk, 1)
-        self.assertEqual(updated_income_cash.categories.income_outcome, 'income')
-        self.assertEqual(updated_income_cash.categories.category_type, 'constant')
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_201_CREATED
+        )
+        self.assertEqual(
+            updated_income_cash.sum,
+            5000
+        )
+        self.assertEqual(
+            updated_income_cash.pk,
+            1
+        )
+        self.assertEqual(
+            updated_income_cash.categories.income_outcome,
+            'income'
+        )
+        self.assertEqual(
+            updated_income_cash.categories.category_type,
+            'constant'
+        )
 
     # def test_last_5_income_cash_get(self):
     #     # Last 5 IncomeCash test
