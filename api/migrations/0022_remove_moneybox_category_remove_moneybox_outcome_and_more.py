@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='moneybox',
             name='box_name',
-            field=models.CharField(default='Название накопления', max_length=15, verbose_name='Название накопления'),
+            field=models.CharField(default='Название накопления', verbose_name='Название накопления'),
         ),
         migrations.AlterField(
             model_name='categories',

@@ -26,6 +26,7 @@ mccabe==0.7.0
 mdurl==0.1.2
 oauthlib==3.2.2
 packaging==23.1
+psycopg2-binary==2.9.9
 pycodestyle==2.10.0
 pycparser==2.21
 pyflakes==3.0.1
