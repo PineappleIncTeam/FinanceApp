@@ -36,10 +36,11 @@ metadata:
   labels:
     app: postgresdb-develop
 spec:
-  type: ClusterIP  # Fixed: Changed service type to ClusterIP
+  type: NodePort  
   ports:
     - port: 5432
       targetPort: 5432
+      nodePort: 30010 
   selector:
     app: postgresdb-develop
 ---
