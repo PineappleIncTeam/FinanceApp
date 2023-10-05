@@ -8,8 +8,6 @@ COPY . /opt/FinanceApp
 
 RUN mkdir -p /var/www/freenance/static/
 
-RUN python manage.py loaddata datadump.json
-
 RUN pip install -r /opt/FinanceApp/requirements.txt
 
 RUN python manage.py collectstatic
