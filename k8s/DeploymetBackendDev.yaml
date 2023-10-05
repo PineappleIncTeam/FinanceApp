@@ -36,11 +36,10 @@ metadata:
   labels:
     app: postgresdb-develop
 spec:
-  type: NodePort  
+  type: ClusterIP  # Fixed: Changed service type to ClusterIP
   ports:
     - port: 5432
       targetPort: 5432
-      nodePort: 30010 
   selector:
     app: postgresdb-develop
 ---
@@ -67,21 +66,21 @@ spec:
         image: postgres:15-bullseye
         env:
           - name: TZ
-            value: "UTC+3"
+            value: "UTC-3"
           - name: POSTGRES_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: postgresql-secret
-                key: password
+                name: postgresql-secret-dev
+                key: POSTGRES_PASSWORD
           - name: POSTGRES_USER
             valueFrom:
-              configMapKeyRef:
-                name: db-secret-credentials
+              secretKeyRef:
+                name: postgresql-secret-dev
                 key: POSTGRES_USER
           - name: POSTGRES_DB
             valueFrom:
-              configMapKeyRef:
-                name: db-secret-credentials
+              secretKeyRef:
+                name: postgresql-secret-dev
                 key: POSTGRES_DB
         volumeMounts:
         - name: postgresdb-data
@@ -127,7 +126,7 @@ spec:
           lifecycle:
             postStart:
               exec:
-                command: ["python", "manage.py", "migrate", "—run-syncdb"]
+                command: ["python", "manage.py", "migrate"]
       volumes:
         - name: django-storage
           persistentVolumeClaim:
@@ -162,7 +161,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: test-pv-python
+  name: python-pvc-dev
 spec:
   capacity:
     storage: 2Gi
