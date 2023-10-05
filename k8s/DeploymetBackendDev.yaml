@@ -115,12 +115,12 @@ spec:
     spec:
       containers:
         - name: django
-          image: twnsnd2team/backend:{{IMAGE_TAG}}
+          image: freenance/backend:{{IMAGE_TAG}}
           ports:
             - containerPort: 8000
           envFrom:
             - secretRef:
-                name: test-secret
+                name: finance-dev-secret
           volumeMounts:
             - name: django-storage
               mountPath: /app/static
