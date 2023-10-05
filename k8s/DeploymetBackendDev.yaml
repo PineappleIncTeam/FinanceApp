@@ -71,7 +71,7 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: postgresql-secret-dev
-                key: password
+                key: POSTGRES_PASSWORD
           - name: POSTGRES_USER
             valueFrom:
               secretKeyRef:
