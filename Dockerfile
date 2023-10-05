@@ -6,6 +6,8 @@ WORKDIR /opt/FinanceApp
 
 COPY . /opt/FinanceApp
 
+RUN mkdir -p /opt/FinanceApp/static
+
 RUN mkdir -p /var/www/freenance/static/
 
 RUN pip install -r /opt/FinanceApp/requirements.txt
