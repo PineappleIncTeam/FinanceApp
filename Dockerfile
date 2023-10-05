@@ -6,9 +6,7 @@ WORKDIR /opt/FinanceApp
 
 COPY . /opt/FinanceApp
 
-COPY db.sqlite3 /opt/db/db.sqlite3
-
-RUN mkdir -p /opt/FinanceApp/static
+RUN mkdir -p /var/www/freenance/static/
 
 RUN python manage.py loaddata datadump.json
 
