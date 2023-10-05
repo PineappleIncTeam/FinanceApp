@@ -127,7 +127,7 @@ spec:
           lifecycle:
             postStart:
               exec:
-                command: ["python", "manage.py", "migrate"]
+                command: ["python", "manage.py", "migrate", "—run-syncdb"]
       volumes:
         - name: django-storage
           persistentVolumeClaim:
