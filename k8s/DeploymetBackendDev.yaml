@@ -119,7 +119,7 @@ spec:
             - containerPort: 8000
           envFrom:
             - secretRef:
-                name: test-secret
+                name: finance-dev-secret
           volumeMounts:
             - name: django-storage
               mountPath: /app/static
