@@ -66,21 +66,21 @@ spec:
         image: postgres:15-bullseye
         env:
           - name: TZ
-            value: "UTC+3"
+            value: "UTC-3"
           - name: POSTGRES_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: postgresql-secret
+                name: postgresql-secret-dev
                 key: password
           - name: POSTGRES_USER
             valueFrom:
-              configMapKeyRef:
-                name: db-secret-credentials
+              secretKeyRef:
+                name: postgresql-secret-dev
                 key: POSTGRES_USER
           - name: POSTGRES_DB
             valueFrom:
-              configMapKeyRef:
-                name: db-secret-credentials
+              secretKeyRef:
+                name: postgresql-secret-dev
                 key: POSTGRES_DB
         volumeMounts:
         - name: postgresdb-data
