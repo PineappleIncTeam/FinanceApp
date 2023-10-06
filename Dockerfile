@@ -2,6 +2,8 @@ FROM python:3.9
 
 RUN apt-get update && apt-get install -y telnet tcpdump iputils-ping dnsutils
 
+RUN apt-get update && apt-get install -y sqlite3
+
 WORKDIR /opt/FinanceApp
 
 COPY . /opt/FinanceApp
