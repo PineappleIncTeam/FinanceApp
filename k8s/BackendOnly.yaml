@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: django-deployment
+  name: django-deployment-dev
   namespace: {{NAMESPACE}}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: django-backend
+      app: django-backend-dev
   template:
     metadata:
       labels:
-        app: django-backend
+        app: django-backend-dev
     spec:
       containers:
         - name: django
@@ -37,10 +37,10 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: {{NAMESPACE}}
-  name: django-app-service
+  name: django-app-service-dev
 spec:
   selector:
-    app: django-backend
+    app: django-backend-dev
   ports:
     - protocol: TCP
       port: 8000
