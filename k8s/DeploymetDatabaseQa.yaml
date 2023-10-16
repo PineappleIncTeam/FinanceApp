@@ -5,7 +5,7 @@ metadata:
   name: postgresdb-pv-{{NAMESPACE}}
   labels:
     type: local
-    app: postgresdb-dev
+    app: postgresdb-qa
 spec:
   storageClassName: local-storage
   capacity:
@@ -34,13 +34,13 @@ metadata:
   namespace: {{NAMESPACE}}
   name: postgresdb
   labels:
-    app: postgresdb-dev
+    app: postgresdb-qa
 spec:
   type: NodePort
   ports:
     - port: 5432
       targetPort: 5432
-      nodePort: 30030
+      nodePort: 30040
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -51,12 +51,12 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgresdb-dev
+      app: postgresdb-qa
   serviceName: postgresdb-headless
   template:
     metadata:
       labels:
-        app: postgresdb-develop
+        app: postgresdb-qa
       annotations:
         fluentd.active: 'true'
     spec:
@@ -69,17 +69,17 @@ spec:
           - name: POSTGRES_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: postgresql-secret-dev
+                name: postgresql-secret-qa
                 key: POSTGRES_PASSWORD
           - name: POSTGRES_USER
             valueFrom:
               secretKeyRef:
-                name: postgresql-secret-dev
+                name: postgresql-secret-qa
                 key: POSTGRES_USER
           - name: POSTGRES_DB
             valueFrom:
               secretKeyRef:
-                name: postgresql-secret-dev
+                name: postgresql-secret-qa
                 key: POSTGRES_DB
         volumeMounts:
         - name: postgresdb-data
