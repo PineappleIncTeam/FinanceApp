@@ -56,7 +56,7 @@ spec:
   template:
     metadata:
       labels:
-        app: postgresdb-develop
+        app: postgresdb-dev
       annotations:
         fluentd.active: 'true'
     spec:
