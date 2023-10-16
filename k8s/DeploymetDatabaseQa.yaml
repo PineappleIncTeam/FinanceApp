@@ -7,7 +7,7 @@ metadata:
     type: local
     app: postgresdb-qa
 spec:
-  storageClassName: local-storage
+  storageClassName: local
   capacity:
     storage: 2Gi
   accessModes:
@@ -21,7 +21,7 @@ metadata:
   namespace: {{NAMESPACE}}
   name: postgresdb-pvc-{{NAMESPACE}}
 spec:
-  storageClassName: local-storage
+  storageClassName: local
   accessModes:
     - ReadWriteOnce
   resources:
