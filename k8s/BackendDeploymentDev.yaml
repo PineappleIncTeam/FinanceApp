@@ -10,12 +10,14 @@ spec:
       app: django-backend-dev
   template:
     metadata:
+      annotations:
+        fluentd.active: 'true'
       labels:
         app: django-backend-dev
     spec:
       containers:
         - name: django
-          image: freenance/backend:{{IMAGE_TAG}}
+          image: freenance/backend-dev:{{IMAGE_TAG}}
           ports:
             - containerPort: 8000
           envFrom:
