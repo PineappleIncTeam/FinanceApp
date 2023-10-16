@@ -40,7 +40,7 @@ spec:
   ports:
     - port: 5432
       targetPort: 5432
-      nodePort: 30040
+      nodePort: 30030
 ---
 apiVersion: apps/v1
 kind: StatefulSet
