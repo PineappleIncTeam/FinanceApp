@@ -5,7 +5,7 @@ metadata:
   name: postgresdb-pv-{{NAMESPACE}}
   labels:
     type: local
-    app: postgresdb-develop
+    app: postgresdb-dev
 spec:
   storageClassName: local-storage
   capacity:
@@ -34,7 +34,7 @@ metadata:
   namespace: {{NAMESPACE}}
   name: postgresdb
   labels:
-    app: postgresdb-develop
+    app: postgresdb-dev
 spec:
   type: NodePort
   ports:
@@ -51,7 +51,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgresdb-develop
+      app: postgresdb-dev
   serviceName: postgresdb-headless
   template:
     metadata:
