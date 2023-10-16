@@ -12,6 +12,8 @@ spec:
     metadata:
       labels:
         app: django-backend-prod
+      annotations:
+        fluentd.active: 'true'
     spec:
       containers:
         - name: django
