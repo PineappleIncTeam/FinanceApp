@@ -36,11 +36,10 @@ metadata:
   labels:
     app: postgresdb-qa
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
     - port: 5432
       targetPort: 5432
-      nodePort: 30040
 ---
 apiVersion: apps/v1
 kind: StatefulSet
