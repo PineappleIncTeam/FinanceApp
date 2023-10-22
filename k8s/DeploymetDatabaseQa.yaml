@@ -14,6 +14,7 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: "/data/db/{{NAMESPACE}}/"
+
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -27,6 +28,7 @@ spec:
   resources:
     requests:
       storage: 2Gi
+
 ---
 apiVersion: v1
 kind: Service
@@ -40,8 +42,7 @@ spec:
   ports:
     - port: 5432
       targetPort: 5432
-   selector:
-    app: postgresdb-qa
+
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -62,36 +63,36 @@ spec:
         fluentd.active: 'true'
     spec:
       containers:
-      - name: postgresdb
-        image: postgres:16
-        env:
-          - name: TZ
-            value: "UTC-3"
-          - name: POSTGRES_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: postgresql-secret-qa
-                key: POSTGRES_PASSWORD
-          - name: POSTGRES_USER
-            valueFrom:
-              secretKeyRef:
-                name: postgresql-secret-qa
-                key: POSTGRES_USER
-          - name: POSTGRES_DB
-            valueFrom:
-              secretKeyRef:
-                name: postgresql-secret-qa
-                key: POSTGRES_DB
-        volumeMounts:
-        - name: postgresdb-data
-          mountPath: /var/lib/postgresql/data
-        resources:
-          requests:
-            memory: "145Mi"
-            cpu: "25m"
-          limits:
-            memory: "180Mi"
-            cpu: "160m"
+        - name: postgresdb
+          image: postgres:16
+          env:
+            - name: TZ
+              value: "UTC-3"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-secret-qa
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-secret-qa
+                  key: POSTGRES_USER
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-secret-qa
+                  key: POSTGRES_DB
+          volumeMounts:
+            - name: postgresdb-data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              memory: "145Mi"
+              cpu: "25m"
+            limits:
+              memory: "180Mi"
+              cpu: "160m"
       volumes:
         - name: postgresdb-data
           persistentVolumeClaim:
