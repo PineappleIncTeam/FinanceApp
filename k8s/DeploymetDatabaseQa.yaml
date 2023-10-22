@@ -43,7 +43,7 @@ spec:
     - port: 5432
       targetPort: 5432
   selector:
-    app: postgresdb-dev
+    app: postgresdb-qa
 
 ---
 apiVersion: apps/v1
