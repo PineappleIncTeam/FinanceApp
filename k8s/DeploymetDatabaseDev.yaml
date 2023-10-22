@@ -41,6 +41,8 @@ spec:
     - port: 5432
       targetPort: 5432
       nodePort: 30030
+  selector:
+    app: postgresdb-dev
 ---
 apiVersion: apps/v1
 kind: StatefulSet
