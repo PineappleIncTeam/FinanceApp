@@ -66,21 +66,21 @@ spec:
         image: postgres:15-bullseye
         env:
           - name: TZ
-            value: "UTC+3"
+            value: "UTC-3"
           - name: POSTGRES_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: postgresql-secret
-                key: password
+                name: postgresql-secret-dev
+                key: POSTGRES_PASSWORD
           - name: POSTGRES_USER
             valueFrom:
-              configMapKeyRef:
-                name: db-secret-credentials
+              secretKeyRef:
+                name: postgresql-secret-dev
                 key: POSTGRES_USER
           - name: POSTGRES_DB
             valueFrom:
-              configMapKeyRef:
-                name: db-secret-credentials
+              secretKeyRef:
+                name: postgresql-secret-dev
                 key: POSTGRES_DB
         volumeMounts:
         - name: postgresdb-data
@@ -114,12 +114,12 @@ spec:
     spec:
       containers:
         - name: django
-          image: twnsnd2team/backend:{{IMAGE_TAG}}
+          image: freenance/backend:{{IMAGE_TAG}}
           ports:
             - containerPort: 8000
           envFrom:
             - secretRef:
-                name: test-secret
+                name: finance-dev-secret
           volumeMounts:
             - name: django-storage
               mountPath: /app/static
@@ -161,7 +161,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: test-pv-python
+  name: python-pvc-dev
 spec:
   capacity:
     storage: 2Gi

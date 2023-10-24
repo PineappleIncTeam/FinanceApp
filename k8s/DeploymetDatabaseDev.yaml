@@ -5,7 +5,7 @@ metadata:
   name: postgresdb-pv-{{NAMESPACE}}
   labels:
     type: local
-    app: postgresdb-develop
+    app: postgresdb-dev
 spec:
   storageClassName: local-storage
   capacity:
@@ -34,14 +34,15 @@ metadata:
   namespace: {{NAMESPACE}}
   name: postgresdb
   labels:
-    app: postgresdb-develop
+    app: postgresdb-dev
 spec:
-  type: ClusterIP  # Fixed: Changed service type to ClusterIP
+  type: NodePort
   ports:
     - port: 5432
       targetPort: 5432
+      nodePort: 30030
   selector:
-    app: postgresdb-develop
+    app: postgresdb-dev
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -52,12 +53,12 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgresdb-develop
+      app: postgresdb-dev
   serviceName: postgresdb-headless
   template:
     metadata:
       labels:
-        app: postgresdb-develop
+        app: postgresdb-dev
       annotations:
         fluentd.active: 'true'
     spec:
@@ -71,7 +72,7 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: postgresql-secret-dev
-                key: password
+                key: POSTGRES_PASSWORD
           - name: POSTGRES_USER
             valueFrom:
               secretKeyRef:

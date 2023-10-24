@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-deployment-dev
+  namespace: {{NAMESPACE}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: django-backend-dev
+  template:
+    metadata:
+      annotations:
+        fluentd.active: 'true'
+      labels:
+        app: django-backend-dev
+    spec:
+      containers:
+        - name: django
+          image: freenance/backend-dev:{{IMAGE_TAG}}
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: finance-dev-secret
+          volumeMounts:
+            - name: django-storage
+              mountPath: /app/static
+          lifecycle:
+            postStart:
+              exec:
+                command: ["python", "manage.py", "migrate"]
+      volumes:
+        - name: django-storage
+          persistentVolumeClaim:
+            claimName: django-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{NAMESPACE}}
+  name: django-app-service-dev
+spec:
+  selector:
+    app: django-backend-dev
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+      nodePort: 30040
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: {{NAMESPACE}}
+  name: django-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: local-storage
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: python-pvc-dev
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: local-storage
+  hostPath:
+    path: /data/{{NAMESPACE}}
