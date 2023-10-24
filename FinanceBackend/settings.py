@@ -69,6 +69,13 @@ DATABASES = {
         'PORT': os.getenv('PG_PORT'),
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#         # 'NAME': '/opt/db/db.sqlite3',
+#     }
+# }
 
 AUTH_PASSWORD_VALIDATORS = []
 
@@ -149,7 +156,7 @@ DJOSER = {
         'username/reset/confirm/?uid={uid}&token={token}',
     'ACTIVATION_URL': 'activate/?uid={uid}&token={token}',
     'SEND_ACTIVATION_EMAIL': False,
-    'SEND_CONFIRMATION_EMAIL': False,
+    'SEND_CONFIRMATION_EMAIL': True,
     'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': True,
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
     'SERIALIZERS': {},
