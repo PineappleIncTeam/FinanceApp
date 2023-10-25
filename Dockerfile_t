@@ -20,4 +20,4 @@ COPY nginx.conf /etc/nginx/sites-available/default
 
 EXPOSE 80
 
-CMD service nginx start && gunicorn freenance.wsgi:application --bind 0.0.0.0:8000
+CMD service nginx start && gunicorn FinanceBackend.wsgi:application --bind 0.0.0.0:8000
