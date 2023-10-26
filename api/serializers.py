@@ -795,7 +795,22 @@ class MoneyBoxSerializer(serializers.ModelSerializer):
         ).aggregate(Sum('sum'))['sum__sum']
         return total_sum and total_sum >= target
 
-    def get_date(self, validated_data):
+    def update(self, instance, validated_data):
+        total_sum = \
+            MoneyBox.objects.filter(categories=instance.categories).exclude(pk=instance.pk).aggregate(Sum('sum'))[
+                'sum__sum'] or 0
+        new_sum = validated_data.get('sum', instance.sum)
+        target = validated_data.get('target', instance.target)
+
+        if new_sum <= (target - total_sum):
+            instance.sum = new_sum
+            instance.target = target
+            instance.save()
+            return instance
+        else:
+            raise serializers.ValidationError('The sum cannot exceed the difference between target and total_sum.')
+
+    def get_date(self, obj):
         days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
         months = [
             "Января",
@@ -812,9 +827,9 @@ class MoneyBoxSerializer(serializers.ModelSerializer):
             "Декабря"
         ]
         try:
-            today = datetime.strptime(str(validated_data.date), '%Y-%m-%d')
+            today = datetime.strptime(str(obj.date), '%Y-%m-%d')
         except TypeError:
-            today = validated_data.date
+            today = obj.date
         num_week_day = datetime.weekday(today)
         num_month = int(datetime.strftime(today, '%m')) - 1
         return datetime.strftime(

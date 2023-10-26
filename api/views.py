@@ -1134,15 +1134,15 @@ class UpdateMoneyBoxView(UpdateAPIView):
         money_box = self.get_object()
 
         try:
-
             logger.info(
                 f'The user [ID: {self.request.user.pk}, '
                 f'name: {self.request.user}] '
                 f'requested to update accumulate [ID: {money_box.pk}, '
                 f'name: {money_box.categories.categoryName}].')
 
-            response = super(UpdateMoneyBoxView, self). \
-                update(request, *args, **kwargs)
+            serializer = self.get_serializer(money_box, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(instance=money_box)
 
             logger.info(
                 f'The user [ID: {self.request.user.pk}, '
@@ -1150,7 +1150,7 @@ class UpdateMoneyBoxView(UpdateAPIView):
                 f'successfully updated accumulate [ID: {money_box.pk}, '
                 f'name: {money_box.categories.categoryName}].')
 
-            return response
+            return Response(serializer.data)
 
         except Exception as e:
             logger.error(
@@ -1158,6 +1158,7 @@ class UpdateMoneyBoxView(UpdateAPIView):
                 f'name: {money_box.categories.categoryName}] '
                 f'for user [ID: {self.request.user.pk}, '
                 f'name: {self.request.user}] is filed with error: {e}.')
+            return Response({'error': str(e)}, status=400)
 
 
 class DeleteMoneyBoxView(DestroyAPIView):
@@ -1222,15 +1223,15 @@ class BalanceAPIView(APIView):
             income_sum = IncomeCash.objects.filter(
                 user_id=self.request.user.pk,
                 date__range=(date_start, date_end)). \
-                aggregate(Sum('sum')).get('sum__sum', 0.00) or 0
+                             aggregate(Sum('sum')).get('sum__sum', 0.00) or 0
             outcome_sum = OutcomeCash.objects.filter(
                 user_id=self.request.user.pk,
                 date__range=(date_start, date_end)). \
-                aggregate(Sum('sum')).get('sum__sum', 0.00) or 0
+                              aggregate(Sum('sum')).get('sum__sum', 0.00) or 0
             money_box_sum = MoneyBox.objects.filter(
                 user_id=self.request.user.pk,
                 date__range=(date_start, date_end)). \
-                aggregate(Sum('sum')).get('sum__sum', 0.00) or 0
+                                aggregate(Sum('sum')).get('sum__sum', 0.00) or 0
 
             balance = round(income_sum - (outcome_sum + money_box_sum), 2)
             logger.info(
