@@ -38,13 +38,13 @@ metadata:
   labels:
     app: postgresdb-prod
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
     - port: 5432
       targetPort: 5432
+      nodePort: 30050
   selector:
     app: postgresdb-prod
-
 ---
 apiVersion: apps/v1
 kind: StatefulSet
