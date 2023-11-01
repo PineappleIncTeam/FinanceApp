@@ -1,3 +1,4 @@
+import logging
 from decimal import Decimal
 
 from django.db.models import Q
@@ -6,6 +7,8 @@ from rest_framework import serializers
 from .models import Categories, OutcomeCash, IncomeCash, MoneyBox
 from datetime import datetime
 from .utils import MONTH_NAMES
+
+logger = logging.getLogger(__name__)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -84,6 +87,7 @@ class IncomeCashSerializer(serializers.ModelSerializer):
         return income_cash
 
     def update(self, instance, validated_data):
+        logger.info("@@@ ", validated_data)
         category_data = validated_data.pop("categories")
         categories = instance.categories
 
