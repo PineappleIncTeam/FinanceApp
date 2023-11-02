@@ -84,7 +84,7 @@ class IncomeCashSerializer(serializers.ModelSerializer):
         return income_cash
 
     def update(self, instance, validated_data):
-        logger.info("@@@ ", validated_data)
+        
         category_data = validated_data.pop("categories")
         categories = instance.categories
 
