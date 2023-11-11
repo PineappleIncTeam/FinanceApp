@@ -35,7 +35,7 @@ from .views import (
     SumPercentMonthlyMoneyBoxView,
     UpdateMoneyBoxView,
     DeleteMoneyBoxView,
-    ReportAPIView,
+    ReportAPIView, RequestDataAIView,
 )
 
 router = DefaultRouter()
@@ -199,6 +199,11 @@ urlpatterns = [
         'delete-money-box/<int:pk>',
         DeleteMoneyBoxView.as_view(),
         name='delete-money-box'
+    ),
+    path(
+        'ai-answer/',
+        RequestDataAIView.as_view(),
+        name='ai-answer'
     ),
 
     path('report/', ReportAPIView.as_view(), name='report'),

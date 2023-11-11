@@ -1,11 +1,16 @@
+import calendar
 import logging
+import os
+from datetime import timedelta, datetime, date
 
-from datetime import timedelta, datetime
+from django.contrib.auth import get_user_model
+from django.db.models import F
 from django.db.models.aggregates import Sum
 from django.http import JsonResponse
-from django.db.models import F
-from django.contrib.auth import get_user_model
-
+from dotenv import load_dotenv
+from langchain.schema import HumanMessage, SystemMessage
+from langchain.chat_models.gigachat import GigaChat
+from rest_framework import serializers
 from rest_framework.generics import (ListCreateAPIView,
                                      ListAPIView,
                                      DestroyAPIView,
@@ -13,8 +18,11 @@ from rest_framework.generics import (ListCreateAPIView,
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import serializers
 
+from .models import (Categories,
+                     IncomeCash,
+                     OutcomeCash,
+                     MoneyBox)
 from .serializers import (CategorySerializer,
                           IncomeCashSerializer,
                           SumIncomeCashSerializer,
@@ -33,10 +41,6 @@ from .serializers import (CategorySerializer,
                           MonthlySumPercentMoneyBoxGroupSerializer,
                           ReportSerializer,
                           )
-from .models import (Categories,
-                     IncomeCash,
-                     OutcomeCash,
-                     MoneyBox)
 
 User = get_user_model()
 
@@ -1318,3 +1322,89 @@ class ReportAPIView(APIView):
             logger.error(
                 f'Requesting report for user [ID: {self.request.user.pk}, '
                 f'name: {self.request.user}] is filed with error: {e}.')
+
+
+class RequestDataAIView(APIView):
+    """
+    AI совет
+    """
+    permission_classes = (IsAuthenticated,)
+    def get(self, request):
+        def ai_question(
+                balance,
+                outcome_sum,
+                income_sum,
+                len_outcome_categories,
+                negative_categories,
+                outcome_categories_3_query
+        ) -> str:
+            load_dotenv()
+            chat = GigaChat(credentials=os.environ.get('GIGA_CHAT_TOKEN'), verify_ssl_certs=False)
+            question = (f"баланс: {balance}\nрасходы: {outcome_sum}\n"
+                        f"доходы: {income_sum}\nВсего расходных статей за месяц: {len_outcome_categories}\n"
+                        f"Негативные статьи: {negative_categories}\n"
+                        f"самые крупные статьи расходов: {', '.join(outcome_categories_3_query)}\n"
+                        f"Что можно сказать по этой ситуации?\n"
+                        f"Дай совет что можно улучшить и как увеличить доход")
+            messages = [
+                SystemMessage(
+                    content="Ты финансовый аналитик, который понятно и доступно может дать совет любому человеку."
+                ),
+                HumanMessage(
+                    content=question
+                ),
+            ]
+
+            res = chat(messages)
+            return res.content
+
+        date_end = date.today()
+        if date_end.day < 25:
+            previous_month = (date_end.replace(day=1) - timedelta(days=1)).replace(day=date_end.day)
+            _, last_day = calendar.monthrange(previous_month.year, previous_month.month)
+            date_end = previous_month.replace(day=last_day)
+        date_start = date_end.replace(day=1)
+
+        logger.info(
+            f"The user [ID: {self.request.user.pk}, name: "
+            f"{self.request.user}] requested AI answer")
+
+        income_sum = IncomeCash.objects.filter(
+            user_id=self.request.user.pk,
+            date__range=(date_start, date_end)). \
+                         aggregate(Sum('sum')).get('sum__sum', 0.00) or 0
+        outcome_sum = OutcomeCash.objects.filter(
+            user_id=self.request.user.pk,
+            date__range=(date_start, date_end)). \
+                          aggregate(Sum('sum')).get('sum__sum', 0.00) or 0
+        money_box_sum = MoneyBox.objects.filter(
+            user_id=self.request.user.pk,
+            date__range=(date_start, date_end)). \
+                            aggregate(Sum('sum')).get('sum__sum', 0.00) or 0
+
+        balance = round(income_sum - (outcome_sum + money_box_sum), 2)
+
+        outcome_categories = list(OutcomeCash.objects.filter(
+            user_id=self.request.user.pk,
+            date__range=(date_start, date_end)
+        ).values_list('categories__categoryName', flat=True))
+
+        negative_categories = 0
+        negative_categories_list = ['алкололь', 'кальян', 'кальянная', 'бар', 'фастфуд']
+        for category in outcome_categories:
+            if category in negative_categories_list:
+                negative_categories += 1
+
+        outcome_categories_3_query = OutcomeCash.objects.filter(
+            user_id=self.request.user.pk,
+            date__range=(date_start, date_end)
+        ).values_list('categories__categoryName').annotate(total=Sum('sum')).order_by('-total')[:3]
+        outcome_categories_3_query = [item[0] for item in outcome_categories_3_query]
+
+        ai_answer = ai_question(balance, outcome_sum, income_sum, len(outcome_categories), negative_categories,
+                                outcome_categories_3_query)
+
+        logger.info(
+            f'The user [ID: {self.request.user.pk}, name: '
+            f'{self.request.user}] successfully received their AI answer')
+        return JsonResponse({'ai_answer': ai_answer},)
