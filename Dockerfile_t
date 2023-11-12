@@ -1,22 +1,25 @@
-FROM python:3.8-alpine
-
-WORKDIR /usr/src/app
+FROM python:3.8
+RUN apt update && apt install bash
+RUN apt install libffi-dev
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-RUN apk update \
-    && apk add postgresql-dev gcc python3-dev musl-dev
+WORKDIR /code
 
-RUN pip install --upgrade pip
+COPY requirements.txt /code/
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install drf-spectacular
+COPY . /code/
 
-COPY ./requirements.txt .
-RUN pip install -r requirements.txt
+RUN python manage.py collectstatic --no-input
 
-COPY . .
+RUN pip install gunicorn
 
-EXPOSE 8000
+RUN apt-get update && apt-get install -y nginx
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+COPY nginx.conf /etc/nginx/sites-available/default
+
+EXPOSE 80
+
+CMD service nginx start && gunicorn FinanceBackend.wsgi:application --bind 0.0.0.0:8000
