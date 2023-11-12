@@ -2,7 +2,6 @@
 .idea/
 __pycache__/
 .env
-staticfiles
 *.log
 *.xml
 .coverage
