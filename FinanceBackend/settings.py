@@ -116,9 +116,11 @@ SPECTACULAR_SETTINGS = {
     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
     'REDOC_DIST': 'SIDECAR',
 }
-CSP_SCRIPT_SRC = ("'self'", 'ajax.googleapis.com', "'unsafe-inline'")
-
-
+CSP_DEFAULT_SRC = ("'self'", "'unsafe-inline'")
+CSP_WORKER_SRC = ("'self'", "blob:")
+CSP_IMG_SRC = ("'self'", "data:", "cdn.redoc.ly ")
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "fonts.googleapis.com ")
+CSP_FONT_SRC = ("'self'", "fonts.gstatic.com ")
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
