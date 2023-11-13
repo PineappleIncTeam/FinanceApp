@@ -41,6 +41,19 @@ from .serializers import (CategorySerializer,
                           MonthlySumPercentMoneyBoxGroupSerializer,
                           ReportSerializer,
                           )
+from django.urls import path
+from rest_framework.schemas import get_schema_view
+from rest_framework_swagger.renderers import SwaggerUIRenderer, OpenAPIRenderer
+
+schema_view = get_schema_view(
+    title='API Documentation',
+    renderer_classes=[SwaggerUIRenderer, OpenAPIRenderer],
+    url='/api/schema/',
+)
+
+urlpatterns = [
+    path('api/schema/swagger-ui/', schema_view, name='swagger-ui'),
+]
 
 User = get_user_model()
 
