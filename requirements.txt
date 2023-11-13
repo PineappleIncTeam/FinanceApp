@@ -25,6 +25,7 @@ django-cors-headers==4.0.0
 django-templated-mail==1.1.1
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
+djangorestframework-swagger==2.2.0
 djoser==2.2.0
 drf-spectacular==0.26.5
 drf-spectacular-sidecar==2023.10.1
