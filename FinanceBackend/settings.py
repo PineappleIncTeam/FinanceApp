@@ -93,7 +93,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "staticfiles/admin"),
     os.path.join(BASE_DIR, "staticfiles/rest_framework"),
-    os.path.join(BASE_DIR, "staticfiles/drf_spectacular_sidecar"),
+    os.path.join(BASE_DIR, "staticfiles/drf_spectacular_sidecar/swagger-ui-dist"),
+    os.path.join(BASE_DIR, "staticfiles/drf_spectacular_sidecar/redoc"),
 ]
 os.makedirs(STATIC_ROOT, exist_ok=True)
 
@@ -124,10 +125,7 @@ SPECTACULAR_SETTINGS = {
     'REDOC_DIST': 'SIDECAR',
 }
 CSP_DEFAULT_SRC = ("'self'", "'unsafe-inline'")
-CSP_WORKER_SRC = ("'self'", "blob:")
-CSP_IMG_SRC = ("'self'", "data:", "cdn.redoc.ly ")
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "fonts.googleapis.com ")
-CSP_FONT_SRC = ("'self'", "fonts.gstatic.com ")
+CSP_IMG_SRC = ("'self'", "data:")
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
