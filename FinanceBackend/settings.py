@@ -127,28 +127,27 @@ CSP_FONT_SRC = ("'self'", "fonts.gstatic.com ")
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CORS_ALLOWED_ORIGINS = [
-    "https://freenance.online",
-    "https://back.freenance.online"
+    "https://freenance.store",
+    "https://dev.freenance.store"
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 ALLOWED_HOSTS = [
-    "92.255.79.239",
-    "freenance.online",
-    "back.freenance.online",
+    "freenance.store",
+    "dev.freenance.store",
     "127.0.0.1",
 ]
 
 CORS_ORIGIN_WHITELIST = [
-    "https://freenance.online",
-    "https://back.freenance.online"
+    "https://freenance.store",
+    "https://dev.freenance.store"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://freenance.online",
-    "https://back.freenance.online"
+    "https://freenance.store",
+    "https://dev.freenance.store"
 ]
 
 EMAIL_HOST = os.getenv('EMAIL_HOST')
@@ -162,7 +161,7 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-DOMAIN = 'freenance.online'
+DOMAIN = 'freenance.store'
 SITE_NAME = 'Freenance App'
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL':
