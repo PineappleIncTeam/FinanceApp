@@ -132,8 +132,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CORS_ALLOWED_ORIGINS = [
     "https://freenance.store",
     "https://dev.freenance.store",
-    "http://localhost:3000",
-    "localhost"
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -147,13 +145,8 @@ ALLOWED_HOSTS = [
 
 CORS_ORIGIN_WHITELIST = [
     "https://freenance.store",
-    "https://dev.freenance.store"
-
+    "https://dev.freenance.store",
 ]
-
-CORS_ALLOW_HEADERS = ('content-disposition', 'accept-encoding',
-                      'content-type', 'accept', 'origin', 'Authorization',
-                      'autorization')
 
 CSRF_TRUSTED_ORIGINS = [
     "https://freenance.store",
