@@ -152,7 +152,8 @@ CORS_ORIGIN_WHITELIST = [
 ]
 
 CORS_ALLOW_HEADERS = ('content-disposition', 'accept-encoding',
-                      'content-type', 'accept', 'origin', 'Authorization')
+                      'content-type', 'accept', 'origin', 'Authorization',
+                      'autorization')
 
 CSRF_TRUSTED_ORIGINS = [
     "https://freenance.store",
