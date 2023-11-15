@@ -131,7 +131,8 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CORS_ALLOWED_ORIGINS = [
     "https://freenance.store",
-    "https://dev.freenance.store"
+    "https://dev.freenance.store",
+    "http://localhost:3000"
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
