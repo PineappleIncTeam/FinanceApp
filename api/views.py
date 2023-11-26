@@ -41,6 +41,7 @@ from .serializers import (CategorySerializer,
                           MonthlySumPercentMoneyBoxGroupSerializer,
                           ReportSerializer,
                           )
+from .utils import ai_question
 
 User = get_user_model()
 
@@ -1326,37 +1327,10 @@ class ReportAPIView(APIView):
 
 class RequestDataAIView(APIView):
     """
-    AI совет
+    AI общий совет за прошлый месяц или текущий, если наступило 25 число
     """
     permission_classes = (IsAuthenticated,)
     def get(self, request):
-        def ai_question(
-                balance,
-                outcome_sum,
-                income_sum,
-                len_outcome_categories,
-                negative_categories,
-                outcome_categories_3_query
-        ) -> str:
-            load_dotenv()
-            chat = GigaChat(credentials=os.environ.get('GIGA_CHAT_TOKEN'), verify_ssl_certs=False)
-            question = (f"баланс: {balance}\nрасходы: {outcome_sum}\n"
-                        f"доходы: {income_sum}\nВсего расходных статей за месяц: {len_outcome_categories}\n"
-                        f"Негативные статьи: {negative_categories}\n"
-                        f"самые крупные статьи расходов: {', '.join(outcome_categories_3_query)}\n"
-                        f"Что можно сказать по этой ситуации?\n"
-                        f"Дай совет что можно улучшить и как увеличить доход")
-            messages = [
-                SystemMessage(
-                    content="Ты финансовый аналитик, который понятно и доступно может дать совет любому человеку."
-                ),
-                HumanMessage(
-                    content=question
-                ),
-            ]
-
-            res = chat(messages)
-            return res.content
 
         date_end = date.today()
         if date_end.day < 25:
@@ -1401,10 +1375,62 @@ class RequestDataAIView(APIView):
         ).values_list('categories__categoryName').annotate(total=Sum('sum')).order_by('-total')[:3]
         outcome_categories_3_query = [item[0] for item in outcome_categories_3_query]
 
-        ai_answer = ai_question(balance, outcome_sum, income_sum, len(outcome_categories), negative_categories,
-                                outcome_categories_3_query)
+        question = (f"баланс: {balance}\nрасходы: {outcome_sum}\n"
+                    f"доходы: {income_sum}\nВсего расходных статей за месяц: {len(outcome_categories)}\n"
+                    f"Негативные статьи: {negative_categories}\n"
+                    f"самые крупные статьи расходов: {', '.join(outcome_categories_3_query)}\n"
+                    f"Что можно сказать по этой ситуации?\n"
+                    f"Дай совет что можно улучшить и как увеличить доход")
+
+        ai_answer = ai_question(question)
 
         logger.info(
             f'The user [ID: {self.request.user.pk}, name: '
             f'{self.request.user}] successfully received their AI answer')
         return JsonResponse({'ai_answer': ai_answer},)
+
+
+class AIAnswerTaxDeductionView(APIView):
+    def get(self, request):
+        date_end = date.today()
+        if date_end.day < 25:
+            previous_month = (date_end.replace(day=1) - timedelta(days=1)).replace(day=date_end.day)
+            _, last_day = calendar.monthrange(previous_month.year, previous_month.month)
+            date_end = previous_month.replace(day=last_day)
+        date_start = date_end.replace(day=1)
+
+        tax_deduction_list = ['учеба', 'ипотека']
+        outcome_cash = OutcomeCash.objects.filter(
+            user_id=self.request.user.pk,
+            date__range=(date_start, date_end),
+        ).values_list('categories__categoryName').annotate(total=Sum('sum'))
+        result_dict = {i[0]: float(i[1]) for i in outcome_cash if i[0].lower() in tax_deduction_list}
+        ai_answer = None
+        if result_dict:
+            string_data = ""
+            for key, value in result_dict.items():
+                string_data += key + " - " + str(value) + " рублей, "
+            result = string_data[:-2]
+            question = (f'Я оплатил {result}. '
+                        'Какие налоговые вычеты я могу получить и напиши подробно как это сделать? Добавь ссылки')
+            ai_answer = ai_question(question)
+        return JsonResponse({'ai_answer': ai_answer})
+
+
+class AIAnswerSavingMoneyAdvice(APIView):
+    def get(self, request):
+        outcome_cash = MoneyBox.objects.filter(
+            user_id=self.request.user.pk,
+            target__gt=1000000,
+        ).values_list('categories__categoryName', 'target').annotate(total=Sum('sum'))
+        ai_answer = None
+        for item in outcome_cash:
+            if item[1] - item[2] > 1000000:
+                question = (f'я накопил {item[2]} из {item[1]}. '
+                            f'Повтори данные, которые я написал и дай подробные рекомендации по ним - '
+                            f'как планировать накопления на {item[0]}.')
+                print(question)
+                ai_answer = ai_question(question)
+                break
+
+        return JsonResponse({'ai_answer': ai_answer})

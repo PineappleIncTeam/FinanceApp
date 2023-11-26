@@ -35,7 +35,7 @@ from .views import (
     SumPercentMonthlyMoneyBoxView,
     UpdateMoneyBoxView,
     DeleteMoneyBoxView,
-    ReportAPIView, RequestDataAIView,
+    ReportAPIView, RequestDataAIView, AIAnswerTaxDeductionView, AIAnswerSavingMoneyAdvice,
 )
 
 router = DefaultRouter()
@@ -205,7 +205,16 @@ urlpatterns = [
         RequestDataAIView.as_view(),
         name='ai-answer'
     ),
-
+    path(
+        'tax_deduction',
+        AIAnswerTaxDeductionView.as_view(),
+        name='tax-deduction'
+    ),
+    path(
+        'saving_money_advice',
+        AIAnswerSavingMoneyAdvice.as_view(),
+        name='saving-money-advice'
+    ),
     path('report/', ReportAPIView.as_view(), name='report'),
 
     path('auth/', include('djoser.urls')),
