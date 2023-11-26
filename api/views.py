@@ -1391,6 +1391,9 @@ class RequestDataAIView(APIView):
 
 
 class AIAnswerTaxDeductionView(APIView):
+    """
+    AI совет по налоговым вычетам, если данных не хватает вернет {'ai_answer': None}
+    """
     def get(self, request):
         date_end = date.today()
         if date_end.day < 25:
@@ -1418,6 +1421,9 @@ class AIAnswerTaxDeductionView(APIView):
 
 
 class AIAnswerSavingMoneyAdvice(APIView):
+    """
+    AI совет по накоплениям, если данных не хватает вернет {'ai_answer': None}
+    """
     def get(self, request):
         outcome_cash = MoneyBox.objects.filter(
             user_id=self.request.user.pk,
