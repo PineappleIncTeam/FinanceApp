@@ -206,12 +206,12 @@ urlpatterns = [
         name='ai-answer'
     ),
     path(
-        'tax_deduction',
+        'tax_deduction/',
         AIAnswerTaxDeductionView.as_view(),
         name='tax-deduction'
     ),
     path(
-        'saving_money_advice',
+        'saving_money_advice/',
         AIAnswerSavingMoneyAdvice.as_view(),
         name='saving-money-advice'
     ),
