@@ -6,4 +6,4 @@ WORKDIR /code
 COPY --from=builder /root/.local/bin /root/.local
 COPY . /opt/FinanceApp
 ENV PATH=/root/.local:$PATH
-CMD [ "python", "./server.py" ]
+CMD ["python", "/opt/FinanceApp/manage.py", "runserver", "0.0.0.0:8000"]
