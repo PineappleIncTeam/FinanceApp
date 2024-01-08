@@ -1,10 +1,6 @@
-FROM python:3.8 AS builder
-WORKDIR /opt/FinanceApp
-COPY . /opt/FinanceApp
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install django
 FROM python:3.8-slim
-WORKDIR /code
-COPY --from=builder /opt/FinanceApp /opt/FinanceApp
-ENV PATH=/opt/FinanceApp:$PATH
-CMD ["python", "/opt/FinanceApp/manage.py", "runserver", "0.0.0.0:8000"]
+WORKDIR /app
+COPY . /app
+RUN pip install —trusted-host pypi.python.org -r requirements.txt
+EXPOSE 8080
+CMD ["python", "/app/manage.py", "runserver", "0.0.0.0:8000"]
