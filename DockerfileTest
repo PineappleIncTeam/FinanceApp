@@ -1,7 +1,6 @@
-FROM python:3.8 AS builder
-COPY requirements.txt .
+FROM python:3.9 AS builder
 RUN pip install --user -r requirements.txt
-FROM python:3.8-slim
+FROM python:3.9-slim
 WORKDIR /code
 COPY --from=builder /root/.local/bin /root/.local
 COPY . /opt/FinanceApp
