@@ -1,8 +1,8 @@
-FROM python:3.9 AS builder
+FROM python:3.8 AS builder
 WORKDIR /opt/FinanceApp
 COPY . /opt/FinanceApp
 RUN pip install --no-cache-dir -r requirements.txt
-FROM python:3.9-slim
+FROM python:3.8-slim
 WORKDIR /code
 COPY --from=builder /root/.local/bin /root/.local
 COPY . /opt/FinanceApp
