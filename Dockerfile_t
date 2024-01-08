@@ -1,5 +1,5 @@
 FROM python:3.8
-RUN apt update && apk add bash
+RUN apt update && apt add bash
 RUN apt add libffi-dev
 
 ENV PYTHONDONTWRITEBYTECODE 1
