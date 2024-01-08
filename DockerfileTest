@@ -1,5 +1,5 @@
 FROM python:3.9 AS builder
-RUN pip install  -r requirements.txt
+RUN pip install  -r /opt/FinanceApp/requirements.txt
 FROM python:3.9-slim
 WORKDIR /code
 COPY --from=builder /root/.local/bin /root/.local
