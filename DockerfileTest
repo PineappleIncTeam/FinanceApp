@@ -4,7 +4,6 @@ COPY . /opt/FinanceApp
 RUN pip install --no-cache-dir -r requirements.txt
 FROM python:3.8-slim
 WORKDIR /code
-COPY --from=builder /root/.local/bin /root/.local
-COPY . /opt/FinanceApp
-ENV PATH=/root/.local:$PATH
+COPY --from=builder /opt/FinanceApp /opt/FinanceApp
+ENV PATH=/opt/FinanceApp:$PATH
 CMD ["python", "/opt/FinanceApp/manage.py", "runserver", "0.0.0.0:8000"]
