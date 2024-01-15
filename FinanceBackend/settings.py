@@ -124,7 +124,7 @@ SPECTACULAR_SETTINGS = {
     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
     'REDOC_DIST': 'SIDECAR',
     'SERVERS': [
-    {'url': 'https://dev.freenance.store/api/', 'description': 'Основной сервер'},
+    {'url': 'https://dev.freenance.store/api/',},
     
 ]
     'SWAGGER_UI_FAVICON_HREF': 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@latest/favicon-32x32.png',
