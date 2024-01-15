@@ -5,5 +5,6 @@ WORKDIR /app
 COPY . /app
 RUN mkdir -p static
 RUN pip install  -r requirements.txt
+RUN python manage.py collectstatic --noinput
 EXPOSE 8080
 CMD ["python", "/app/manage.py", "runserver", "0.0.0.0:8000"]
