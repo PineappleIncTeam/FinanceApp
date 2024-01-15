@@ -118,16 +118,11 @@ SPECTACULAR_SETTINGS = {
     'TITLE': 'Freenance API',
     'DESCRIPTION': 'ololo pishch pishch',
     'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': True,
+    'SERVE_INCLUDE_SCHEMA': False,
     'SERVE_PUBLIC': True,
     'SWAGGER_UI_DIST': 'SIDECAR',
     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
     'REDOC_DIST': 'SIDECAR',
-    'SWAGGER_UI_FAVICON_HREF': 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@latest/favicon-32x32.png',
-    'SERVERS': [
-    {'url': 'https://dev.freenance.store/api/',},
-    
-]
 }
 CSP_DEFAULT_SRC = ("'self'", "'unsafe-inline'")
 CSP_IMG_SRC = ("'self'", "data:")
