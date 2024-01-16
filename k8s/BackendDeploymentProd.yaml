@@ -25,8 +25,8 @@ spec:
               memory: "100Mi"
               cpu: "50m"
             limits:
-              memory: "150Mi"
-              cpu: "200m"
+              memory: "250Mi"
+              cpu: "300m"
           envFrom:
             - secretRef:
                 name: finance-prod-secret
