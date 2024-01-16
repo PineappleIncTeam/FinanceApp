@@ -116,7 +116,7 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Freenance API',
-    'DESCRIPTION': 'ololo pishch pishch',
+    'DESCRIPTION': 'DEV ENV SWAGGER',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'SERVE_PUBLIC': True,
@@ -132,6 +132,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CORS_ALLOWED_ORIGINS = [
     "https://freenance.store",
     "https://dev.freenance.store",
+    "http://localhost",
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -141,16 +142,19 @@ ALLOWED_HOSTS = [
     "freenance.store",
     "dev.freenance.store",
     "127.0.0.1",
+    "localhost",
 ]
 
 CORS_ORIGIN_WHITELIST = [
     "https://freenance.store",
     "https://dev.freenance.store",
+    "http://localhost",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://freenance.store",
     "https://dev.freenance.store"
+    "http://localhost",
 ]
 
 EMAIL_HOST = os.getenv('EMAIL_HOST')
