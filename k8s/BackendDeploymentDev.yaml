@@ -20,6 +20,13 @@ spec:
           image: freenance/backend-dev:{{IMAGE_TAG}}
           ports:
             - containerPort: 8000
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "50m"
+            limits:
+              memory: "250Mi"
+              cpu: "300m"
           envFrom:
             - secretRef:
                 name: finance-dev-secret
