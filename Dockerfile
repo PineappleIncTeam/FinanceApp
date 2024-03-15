@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.9
 
 RUN apt-get update && apt-get install -y telnet tcpdump iputils-ping dnsutils
 
@@ -11,4 +11,4 @@ RUN pip install -r /opt/FinanceApp/requirements.txt
 # RUN python manage.py collectstatic --noinput
 
 
-CMD ["python", "/manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "/opt/FinanceApp/manage.py", "runserver", "0.0.0.0:8000"]
