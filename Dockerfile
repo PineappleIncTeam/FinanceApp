@@ -2,7 +2,7 @@ FROM python:3.7-alpine as base
 
 ENV PYTHONDONTWRITEBYTECODE 1
 
-COPY requirements.txt requirements_dev.txt ./
+COPY requirements.txt ./
 RUN apk add --update --no-cache --virtual .build-deps \
     build-base \
     postgresql-dev \
