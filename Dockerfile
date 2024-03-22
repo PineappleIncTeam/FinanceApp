@@ -1,3 +1,4 @@
+# Stage 1: Base image
 FROM python:3.7-alpine as base
 
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -8,18 +9,17 @@ RUN apk add --update --no-cache --virtual .build-deps \
     postgresql-dev \
     libffi-dev \
     python3-dev \
-    libffi-dev \
     jpeg-dev \
     zlib-dev \
     musl-dev \
     libpq \
-    &amp;&amp; pip install --no-cache-dir -r requirements_dev.txt \
-    &amp;&amp; find /usr/local \
-        \( -type d -a -name test -o -name tests \) \
-        -o \( -type f -a -name '*.pyc' -o -name '*.pyo' \) \
+    && pip install --no-cache-dir -r requirements.txt \
+    && find /usr/local \
+        \( -type d -a \( -name test -o -name tests \) \) \
+        -o \( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
         -exec rm -rf '{}' +
 
-# Now multistage builds
+# Stage 2: Final image
 FROM python:3.7-alpine
 
 RUN apk add --update --no-cache libpq libjpeg-turbo
