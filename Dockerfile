@@ -1,5 +1,5 @@
 # Stage 1: Base image
-FROM python:3.7-alpine as base
+FROM python:3.8-alpine as base
 
 ENV PYTHONDONTWRITEBYTECODE 1
 
@@ -20,7 +20,7 @@ RUN apk add --update --no-cache --virtual .build-deps \
         -exec rm -rf '{}' +
 
 # Stage 2: Final image
-FROM python:3.7-alpine
+FROM python:3.8-alpine
 
 RUN apk add --update --no-cache libpq libjpeg-turbo
 
