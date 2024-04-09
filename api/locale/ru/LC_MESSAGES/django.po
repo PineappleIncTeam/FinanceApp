@@ -1,0 +1,130 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-04-08 22:05+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: models/users.py:21
+msgid "User must have an email address"
+msgstr "Пользователь должен иметь адрес электронной почты."
+
+#: models/users.py:35
+msgid "Superuser must have is_staff=True."
+msgstr "Суперюзер должен иметь is_staff=True."
+
+#: models/users.py:37
+msgid "Superuser must have is_superuser=True."
+msgstr "Суперюзер должен иметь is_superuser=True."
+
+#: templates/djoser/email/activation.html:5
+#, python-format
+msgid "Account activation on %(site_name)s"
+msgstr "Активация аккаунта на %(site_name)s"
+
+#: templates/djoser/email/activation.html:9
+#: templates/djoser/email/activation.html:22
+#, python-format
+msgid ""
+"You're receiving this email because you need to finish activation process on "
+"%(site_name)s."
+msgstr ""
+"Вы получили это письмо, потому что вам нужно завершить процесс активации "
+"учетной записи на %(site_name)s."
+
+#: templates/djoser/email/activation.html:11
+#: templates/djoser/email/activation.html:24
+msgid "Your account has been created and is ready to use!"
+msgstr "Ваша учетная запись создана и готова к использованию."
+
+#: templates/djoser/email/activation.html:13
+#: templates/djoser/email/activation.html:26
+msgid "Please go to the following page to activate account:"
+msgstr "Для активации, пожалуйста, перейдите по ссылке: "
+
+#: templates/djoser/email/activation.html:16
+#: templates/djoser/email/activation.html:29
+msgid "If you did not indicate your email, please ignore this letter."
+msgstr "Если вы не указывали свою почту, пожалуйста, проигнорируйте данное письмо"
+
+#: templates/djoser/email/activation.html:18
+#: templates/djoser/email/activation.html:31
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "Команда %(site_name)s"
+
+#: validators/email_validator.py:23
+#, python-format
+msgid "Email local name length must be from %(min_length)d to %(max_length)d."
+msgstr "Длина локального имени в адресе электронной почты должна быть от %(min_length)d до %(max_length)d."
+
+#: validators/email_validator.py:30
+msgid "Email contains invalid characters."
+msgstr "Ваш пароль содержит недопустимые символы."
+
+#: validators/email_validator.py:52
+msgid "Invalid domain name."
+msgstr "Неверное доменное имя."
+
+#: validators/email_validator.py:54 validators/email_validator.py:56
+msgid "Invalid domain name length."
+msgstr "Недопустимая длина доменного имени."
+
+#: validators/email_validator.py:61
+msgid "Domain name contains invalid characters."
+msgstr "Ваш пароль содержит недопустимые символы."
+
+#: validators/email_validator.py:68
+msgid "Invalid email."
+msgstr "Неверный адрес электронной почты."
+
+#: validators/letters_symbols_password_validator.py:20
+msgid "Your password contains unsupported symbols."
+msgstr "Ваш пароль содержит недопустимые символы."
+
+#: validators/letters_symbols_password_validator.py:28
+msgid ""
+"Your password doesn't contain at least one uppercase letter or at least one "
+"number"
+msgstr ""
+"Ваш пароль не содержит хотя бы одной буквы в верхнем регистре или хотя бы "
+"одной цифры."
+
+#: validators/letters_symbols_password_validator.py:34
+msgid ""
+"\n"
+"            Your password should contain only english letters or\n"
+"            any symbols and also at least one uppercase letter and at least "
+"one number.\n"
+"            "
+msgstr ""
+"\n"
+"            Ваш пароль должен содержать только аглийский буквы или\n"
+"            любые символы, а также хотя бы одну букву в верхнем регистре и "
+"хотя бы одну цифру.\n"
+"            "
+
+#: validators/maximum_length_password_validator.py:16
+#, python-format
+msgid "This password must contain less than %(max_length)d characters."
+msgstr "Пароль должен содержать меньше %(max_length)d символов."
+
+#: validators/maximum_length_password_validator.py:23
+#, python-format
+msgid "Your password must contain less than %(max_length)d characters."
+msgstr "Ваш пароль должен содержать меньше %(max_length)d символов."

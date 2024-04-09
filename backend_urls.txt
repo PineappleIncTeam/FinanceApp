@@ -1,18 +1,46 @@
-http://92.255.79.239:8000/api/auth/users/ - POST запрос регистрация пользователя
-GET запрос возвращает список всех пользователей (только с правами админа)
-JSON:
-{
-    "username": "",
-    "password": ""
-}
+http://92.255.79.239:8000/api/v1/auth/users/ - 
 
-http://92.255.79.239:8000/api/auth/token/login/ - POST запрос вход пользователя
-{
-    "username": "admin",
-    "password": "111"
-}
+        POST запрос регистрация пользователя
+            Request:
+            {
+                "email": "",
+                "password": "",
+                "re_password": ""
+            }
+            Resonse:
+            HTTP_201_CREATED
+            {
+                "id": "",
+                "email": ""
+            }
 
-http://92.255.79.239:8000/api/auth/token/logout/ - выход пользователя
+        GET запрос (для авторизованного пользователя) возвращает список всех пользователей
+            Response:
+            [
+                {
+                    "id": 78,
+                    "email": "frfrffr@gm.com"
+                }
+            ]
+
+
+http://92.255.79.239:8000/api/v1/auth/token/login/
+        POST запрос - to obtain user authentication token. 
+        Request:
+            {
+                "email": "",
+                "password": ""
+            }
+        Response:
+        HTTP_200_OK
+        {
+            "auth_token": ""
+        }
+
+http://92.255.79.239:8000/api/v1/auth/token/logout/
+       POST - to logout user (remove user authentication token)
+       Headers
+       Authorization: Token <token>
 
 
 !!!РОУТ ПОКА НЕ РАБОТАЕТ:
