@@ -32,6 +32,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -45,7 +46,7 @@ ROOT_URLCONF = 'FinanceBackend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, "api", "templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -70,15 +71,28 @@ DATABASES = {
         'PORT': os.getenv('PG_PORT'),
     }
 }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#         # 'NAME': '/opt/db/db.sqlite3',
-#     }
-# }
 
-AUTH_PASSWORD_VALIDATORS = []
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {
+            "min_length": 6,
+        },
+    },
+    {
+        "NAME": "api.validators.MaximumLengthValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "api.validators.EnglishLettersSymbolsPasswordValidator",
+    },
+
+]
 
 LANGUAGE_CODE = 'ru'
 
@@ -86,10 +100,14 @@ TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
+USE_L10N = True
+
 USE_TZ = True
 
 STATIC_URL = '/static/'
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "staticfiles/admin"),
     os.path.join(BASE_DIR, "staticfiles/rest_framework"),
@@ -124,7 +142,9 @@ SPECTACULAR_SETTINGS = {
     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
     'REDOC_DIST': 'SIDECAR',
 }
+
 CSP_DEFAULT_SRC = ("'self'", "'unsafe-inline'")
+
 CSP_IMG_SRC = ("'self'", "data:")
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -136,6 +156,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
+
 CORS_ALLOW_CREDENTIALS = True
 
 ALLOWED_HOSTS = [
@@ -169,18 +190,27 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 DOMAIN = 'freenance.store'
+
 SITE_NAME = 'Freenance App'
+
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL':
         'password/reset/confirm/?uid={uid}&token={token}',
     'USERNAME_RESET_CONFIRM_URL':
         'username/reset/confirm/?uid={uid}&token={token}',
-    'ACTIVATION_URL': 'activate/?uid={uid}&token={token}',
-    'SEND_ACTIVATION_EMAIL': False,
-    'SEND_CONFIRMATION_EMAIL': True,
+    'ACTIVATION_URL': 'api/v1/activate/?uid={uid}&token={token}',
+    'SEND_ACTIVATION_EMAIL': True,
+    'USER_CREATE_PASSWORD_RETYPE': True,
     'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': True,
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
-    'SERIALIZERS': {},
+    'SERIALIZERS': {
+        'user_create_password_retype': 'api.serializers.CustomUserCreateSerializer',
+        'token_create': 'api.serializers.CustomTokenCreateSerializer',
+        
+    },
+    'EMAIL': {
+        'activation': 'api.config.ActivationEmail'
+    },
 }
 
 SESSION_COOKIE_SECURE = True
@@ -191,7 +221,6 @@ LOGIN_REDIRECT_URL = '/'
 WHITENOISE_AUTOREFRESH = True
 
 AUTHENTICATION_BACKENDS = [
-    'api.backends.EmailOrUsernameModelBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
