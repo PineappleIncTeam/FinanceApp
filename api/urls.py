@@ -39,7 +39,8 @@ from django.conf.urls.static import static
 #)
 
 
-from api.views import activate_users_api_controller
+from api.views import activate_users_api_controller, password_reset_api_controller
+
 router = DefaultRouter()
 urlpatterns = [
     # path(
@@ -220,7 +221,8 @@ urlpatterns = [
 
     path('auth/', include('djoser.urls')),
     re_path(r'^auth/', include('djoser.urls.authtoken')),
-    path('activate/', activate_users_api_controller, name="activate-users")
+    path('activate/', activate_users_api_controller, name="activate-users"),
+    path('password/reset/confirm/', password_reset_api_controller, name="reset-password"),
     # path('api/get-users/', GetUsers.as_view(), name='get-users'),
     # path('api/', include(router.urls)),
     # path('api/registration/', CreateUser.as_view(), name='create-user'),

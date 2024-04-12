@@ -189,19 +189,20 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-DOMAIN = 'freenance.store'
+DOMAIN = '127.0.0.1:8000'
 
 SITE_NAME = 'Freenance App'
 
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL':
-        'password/reset/confirm/?uid={uid}&token={token}',
+        'api/v1/password/reset/confirm/?uid={uid}&token={token}',
     'USERNAME_RESET_CONFIRM_URL':
-        'username/reset/confirm/?uid={uid}&token={token}',
+        'api/v1/username/reset/confirm/?uid={uid}&token={token}',
     'ACTIVATION_URL': 'api/v1/activate/?uid={uid}&token={token}',
     'SEND_ACTIVATION_EMAIL': True,
     'USER_CREATE_PASSWORD_RETYPE': True,
     'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': True,
+    'PASSWORD_RESET_CONFIRM_RETYPE': True,
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
     'SERIALIZERS': {
         'user_create_password_retype': 'api.serializers.CustomUserCreateSerializer',

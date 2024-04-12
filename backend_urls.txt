@@ -43,6 +43,36 @@ http://92.255.79.239:8000/api/v1/auth/token/logout/
        Authorization: Token <token>
 
 
+http://92.255.79.239:8000/api/v1/auth/users/reset_password/
+        POST - to send email to user with password reset link.
+        Request:
+            {
+                "email": ""
+            }
+
+
+http://92.255.79.239:8000/api/v1/password/reset/confirm/?uid={uid}&token={token}
+        GET - to set new password
+        Response:
+            {
+                "uid": "",
+                "token": ""
+            }
+
+
+http://92.255.79.239:8000/api/v1/auth/users/reset_password_confirm/
+        POST - to reset password 
+        Request:
+            {
+                "uid": "",             # from previous url
+                "token": ""            # from previous url
+                "new_password": "",
+                "re_new_password": ""
+            }
+
+
+
+
 !!!РОУТ ПОКА НЕ РАБОТАЕТ:
 http://92.255.79.239:8000/api/get-users/ - GET запрос возвращает список всех пользователей
 JSON:
