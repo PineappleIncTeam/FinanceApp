@@ -170,4 +170,4 @@ spec:
   persistentVolumeReclaimPolicy: Recycle
   storageClassName: local-storage
   hostPath:
-    path: /data/django-pv-test
+    path: /data/freenance/django-pv-dev
