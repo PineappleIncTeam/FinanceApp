@@ -1,6 +1,6 @@
 http://92.255.79.239:8000/api/v1/auth/users/ - 
 
-        POST запрос регистрация пользователя
+        POST  - for user rigistration
             Request:
             {
                 "email": "",
@@ -14,7 +14,7 @@ http://92.255.79.239:8000/api/v1/auth/users/ -
                 "email": ""
             }
 
-        GET запрос (для авторизованного пользователя) возвращает список всех пользователей
+        GET - (for authorizated users) to obtain a list of users
             Response:
             [
                 {
@@ -25,7 +25,7 @@ http://92.255.79.239:8000/api/v1/auth/users/ -
 
 
 http://92.255.79.239:8000/api/v1/auth/token/login/
-        POST запрос - to obtain user authentication token. 
+        POST - to obtain user authentication token. 
         Request:
             {
                 "email": "",
@@ -65,10 +65,78 @@ http://92.255.79.239:8000/api/v1/auth/users/reset_password_confirm/
         Request:
             {
                 "uid": "",             # from previous url
-                "token": ""            # from previous url
+                "token": "",           # from previous url
                 "new_password": "",
                 "re_new_password": ""
             }
+
+
+http://92.255.79.239:8000/api/v1/income_categories/
+        GET - (for authorizated users) to get a list of user's income categories 
+        Response:
+            [
+                {
+                    "id": "",
+                    "email": ""
+                }
+            ]
+
+        POST - (for authorizated users) to create a new income category.
+        Request:
+            {
+                "name": ""
+            }
+        
+        Response:
+            {
+                "id": "",
+                "name": ""
+            }
+
+
+http://92.255.79.239:8000/api/v1/income/<int:pk>/
+        GET - (for authorizated users) to retriev the particular instance
+        Response:
+            {
+                "id": 2,
+                "sum": 3000.0,
+                "category": "подработка",
+                "created_at": "2024-04-01T11:48:19.211000+03:00"
+            }
+
+        PUT - (for authorizated users) for updating an Income instance.
+        Request:
+            {
+                "sum": 3000,
+                "category": 9
+            }
+        
+        Response:
+            {
+                "id": 2,
+                "sum": 3000.0,
+                "category": 9,
+                "created_at": "2024-04-01T11:48:19.211000+03:00"
+            }
+
+
+        PATCH - (for authorizated users) to partial update an Income instance.
+        Request:
+            {
+                "sum": 3000,      # or
+                "category": 9
+            }
+        
+        Response:
+            {
+                "id": 2,
+                "sum": 3000.0,
+                "category": 9,
+                "created_at": "2024-04-01T11:48:19.211000+03:00"
+            }
+
+
+        DELETE - (for authorizated users) to delete an Income instance.
 
 
 
