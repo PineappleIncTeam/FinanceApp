@@ -4,8 +4,6 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.utils.html import escape
 from django.utils.translation import gettext as _
 
-from typing import Optional
-
 from .base import BaseModel
 
 
@@ -50,7 +48,7 @@ class User(BaseModel, AbstractUser):
 
     objects = CustomUserManager()
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS: list[Optional[str]] = []
+    REQUIRED_FIELDS: list[str] = []
 
     class Meta:
         """Describes class metadata."""
