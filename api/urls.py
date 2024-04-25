@@ -3,9 +3,11 @@ from rest_framework.routers import DefaultRouter
 from django.conf import settings
 from django.conf.urls.static import static
 
-#from .views import (
+from api.views import (
 #     GetCreateCategoryAPIView,
-#     GetIncomeCategoriesView,
+    IncomeCategoriesListCreateAPI,
+    IncomesRetrieveUpdateDestroyAPI,
+    IncomeSumInCurrentMonthGetAPI,
 #     GetOutcomeCategoriesView,
 #     GetMoneyBoxCategoriesView,
 #     UpdateCategoryView,
@@ -36,7 +38,7 @@ from django.conf.urls.static import static
 #     UpdateMoneyBoxView,
 #     DeleteMoneyBoxView,
 #     ReportAPIView, RequestDataAIView, AIAnswerTaxDeductionView, AIAnswerSavingMoneyAdvice,
-#)
+)
 
 
 from api.views import activate_users_api_controller, password_reset_api_controller
@@ -50,7 +52,7 @@ urlpatterns = [
     # ),
     # path(
     #     'income-categories/',
-    #     GetIncomeCategoriesView.as_view(),
+    #     IncomeCategoriesListCreateView.as_view(),
     #     name='income-categories'
     # ),
     # path(
@@ -223,6 +225,13 @@ urlpatterns = [
     re_path(r'^auth/', include('djoser.urls.authtoken')),
     path('activate/', activate_users_api_controller, name="activate-users"),
     path('password/reset/confirm/', password_reset_api_controller, name="reset-password"),
+    path('income_categories/', IncomeCategoriesListCreateAPI.as_view(), name='income-categories'),
+    path('income/<int:pk>/', IncomesRetrieveUpdateDestroyAPI.as_view(), name='income-info'),
+    path(
+        'incomes_in_current_month/',
+        IncomeSumInCurrentMonthGetAPI.as_view(),
+        name='income-sum-in-current-month'
+    ),
     # path('api/get-users/', GetUsers.as_view(), name='get-users'),
     # path('api/', include(router.urls)),
     # path('api/registration/', CreateUser.as_view(), name='create-user'),
