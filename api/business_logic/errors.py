@@ -1,2 +1,2 @@
-class InvalidNumberOfItems(Exception):
+class InvalidNumberOfItemsError(Exception):
     ...

@@ -4,12 +4,9 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.utils.html import escape
 from django.utils.translation import gettext as _
 
-from typing import TYPE_CHECKING
+from typing import Optional
 
 from .base import BaseModel
-
-if TYPE_CHECKING:
-    from api.models import User
 
 
 class CustomUserManager(UserManager):
@@ -19,15 +16,15 @@ class CustomUserManager(UserManager):
 
         if not email:
             raise ValueError(_('User must have an email address'))
-        
-        email: str = self.normalize_email(email)
-        user: User = self.model(email=email, **extra_fields)
+
+        user_email: str = self.normalize_email(email)
+        user: User = self.model(email=user_email, **extra_fields)
         password = escape(password)
         user.set_password(password)
         user.save(using=self.db)
         return user
-    
-    def create_superuser(self, email, password, **extra_fields):
+
+    def create_superuser(self, email, password, **extra_fields) -> User:
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
 
@@ -40,15 +37,20 @@ class CustomUserManager(UserManager):
 
 
 class User(BaseModel, AbstractUser):
-    '''Describes the fields and attributes of the User model in the database.'''
-    
+    '''
+    Describes the fields and attributes of the User model in the database.
+    '''
+
     email = models.EmailField(unique=True)
-    username = models.CharField(blank=True, null=True, default="Пользователь FinanceApp")
+    username = models.CharField(
+        blank=True,
+        null=True,
+        default="Пользователь FinanceApp"
+    )
 
     objects = CustomUserManager()
-
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS: list[Optional[str]] = []
 
     class Meta:
         """Describes class metadata."""

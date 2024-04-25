@@ -1,0 +1,14 @@
+repos:
+-   repo: https://github.com/pycqa/flake8
+    rev: 6.1.0
+    hooks:
+    -   id: flake8
+        additional_dependencies: [pep8-naming, flake8-comments, flake8-bugbear, 
+                                  flake8-comprehensions, flake8-eradicate, flake8-print,
+                                  flake8-broken-line, flake8-string-format]
+
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.4.1
+    hooks:
+    -   id: mypy
+        additional_dependencies: []

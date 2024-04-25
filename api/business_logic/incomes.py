@@ -1,9 +1,9 @@
 from __future__ import annotations
 import logging
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Optional
 from api.models import Incomes
-from .errors import InvalidNumberOfItems
+from .errors import InvalidNumberOfItemsError
 
 from django.db.models import Sum
 
@@ -20,15 +20,13 @@ def get_incomes(
         user: User,
         order_by: Optional[str] = None,
         number_of_items: Optional[int] = None
-) -> QuerySet:
+) -> QuerySet[Incomes]:
     """
     Retrieve all user's incomes.
+
     Args:
-        user (User): The instance of User model whose incomes are to be retrieved.
         order_by (str | None): Condition for ordering
         number_of_items (int | None): An amount of objects are to be retrieved.
-    Returns:
-        QuerySet of users's incomes.
     """
 
     if not order_by:
@@ -40,29 +38,25 @@ def get_incomes(
         if number_of_items:
             user_incomes = user_incomes[:number_of_items]
             logger.info(
-            f"The user [ID: {user.pk}, "
-            f"name: {user.email}] successfully received "
-            f"a list of last {number_of_items} the users's Incomecategories."
+                f"The user [ID: {user.pk}, "
+                f"name: {user.email}] successfully received "
+                f"a list of last {number_of_items} the users's Incomes."
             )
     except IndexError:
         logger.error(
             f"The user [ID: {user.pk}, "
             f"name: {user.email}] - invalid parameter 'number_of_items':"
-            f" {number_of_items} - to receive the users's Incomecategories."
-            )
-        raise InvalidNumberOfItems
-    
+            f" {number_of_items} - to receive the users's Incomes."
+        )
+        raise InvalidNumberOfItemsError
+
     return user_incomes
 
 
-def get_sum_of_incomes_in_current_month(user: User) -> Union[float, str]:
+def get_sum_of_incomes_in_current_month(user: User) -> float:
     """
-    Retrieve total amount of yser's incomes in the current month.
-    Args:
-        user (User): The instance of User model whose incomes are to be retrieved.
-    Returns:
-        An amount of user's incomes in the current month. If there is no income in the current month
-        this function returns the string "0.00".
+    Retrieve total amount of user's incomes in the current month.
+    If there is no income in the current month this function returns 0.00.
     """
 
     current_month = datetime.now().month
@@ -71,18 +65,18 @@ def get_sum_of_incomes_in_current_month(user: User) -> Union[float, str]:
         .filter(created_at__month=current_month)
         .aggregate(total_sum=Sum('sum'))
     ).get('total_sum')
-    
+
     if not result:
         logger.info(
             f"The user [ID: {user.pk}, "
             f"name: {user.email}] - there is no incomes in the current month."
         )
-        return "0.00"
-    
+        return float(0)
+
     logger.info(
         f"The user [ID: {user.pk}, "
         f"name: {user.email}] - successfully return a total amount "
         f"of incomes in current month."
     )
-    
-    return result
+
+    return float(result)
