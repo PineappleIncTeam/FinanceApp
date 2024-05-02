@@ -30,7 +30,9 @@ def get_incomes(
     """
 
     if not order_by:
-        user_incomes = Incomes.objects.filter(user=user.pk)
+        user_incomes = Incomes.objects.filter(
+            user=user.pk
+        ).order_by("-created_at")
     else:
         user_incomes = Incomes.objects.filter(user=user.pk).order_by(order_by)
 
@@ -50,7 +52,12 @@ def get_incomes(
         )
         raise InvalidNumberOfItemsError
 
-    return user_incomes
+    return user_incomes.select_related('category').values(
+        'id',
+        'sum',
+        'category__name',
+        'created_at'
+    )
 
 
 def get_sum_of_incomes_in_current_month(user: User) -> float:

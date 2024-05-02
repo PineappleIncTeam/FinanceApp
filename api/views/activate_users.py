@@ -1,5 +1,5 @@
 from __future__ import annotations
-import requests
+import requests                      # type: ignore
 from typing import TYPE_CHECKING
 from django.http import HttpResponseRedirect
 from django.conf import settings

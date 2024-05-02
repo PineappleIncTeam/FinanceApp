@@ -139,6 +139,18 @@ http://92.255.79.239:8000/api/v1/income/<int:pk>/
         DELETE - (for authorizated users) to delete an Income instance.
 
 
+http://92.255.79.239:8000/api/v1/last_incomes/?items=5   # where 5 is number of items to be displayed
+        GET - (for authorizated users) to retriev the particular instance
+        Response:
+        [
+            {
+                "id": 2,
+                "sum": 3000.0,
+                "category": "подработка",
+                "created_at": "2024-04-01T11:48:19.211000+03:00"
+            },
+            ... # 5 items
+        ]
 
 
 !!!РОУТ ПОКА НЕ РАБОТАЕТ:
