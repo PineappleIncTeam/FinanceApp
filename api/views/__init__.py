@@ -1,8 +1,8 @@
 from .activate_users import activate_users_api_controller
-from .password_reset import password_reset_api_controller
-from .incomes import IncomesRetrieveUpdateDestroyAPI, IncomeSumInCurrentMonthGetAPI
 from .income_categories import IncomeCategoriesListCreateAPI
-
+from .incomes import (IncomeCreateAPI, IncomesRetrieveUpdateDestroyAPI,
+                      IncomeSumInCurrentMonthGetAPI)
+from .password_reset import password_reset_api_controller
 
 __all__ = [
     "activate_users_api_controller",
@@ -10,4 +10,5 @@ __all__ = [
     "IncomeCategoriesListCreateAPI",
     "IncomesRetrieveUpdateDestroyAPI",
     "IncomeSumInCurrentMonthGetAPI",
+    "IncomeCreateAPI",
 ]

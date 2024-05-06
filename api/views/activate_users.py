@@ -1,8 +1,10 @@
 from __future__ import annotations
-import requests
+
 from typing import TYPE_CHECKING
-from django.http import HttpResponseRedirect
+
+import requests  # type: ignore
 from django.conf import settings
+from django.http import HttpResponseRedirect
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -17,7 +19,7 @@ def activate_users_api_controller(request: Request) -> Response:
     activation_data = {"uid": uid, "token": token}
     requests.post(
         url="http://" + settings.DOMAIN + "/api/v1/auth/users/activation/",
-        data=activation_data
+        data=activation_data,
     )
     redirect_to = "http://" + settings.DOMAIN + "/api/v1/auth/token/login/"
     return HttpResponseRedirect(redirect_to=redirect_to)
