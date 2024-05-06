@@ -6,8 +6,10 @@ from rest_framework.routers import DefaultRouter
 from api.views import (IncomeCategoriesListCreateAPI, IncomeCreateAPI,
                        IncomesRetrieveUpdateDestroyAPI,
                        IncomeSumInCurrentMonthGetAPI,
+                       LastIncomesGetAPI,
                        activate_users_api_controller,
                        password_reset_api_controller)
+
 
 router = DefaultRouter()
 urlpatterns = [
@@ -200,14 +202,15 @@ urlpatterns = [
     ),
     path("income/", IncomeCreateAPI.as_view(), name="add-income"),
     path(
+        'last_incomes/',
+        LastIncomesGetAPI.as_view(),
+        name='get-last-incomes'
+    ),
+    path(
         "incomes_in_current_month/",
         IncomeSumInCurrentMonthGetAPI.as_view(),
         name="income-sum-in-current-month",
     ),
-    # path('api/get-users/', GetUsers.as_view(), name='get-users'),
-    # path('api/', include(router.urls)),
-    # path('api/registration/', CreateUser.as_view(), name='create-user'),
-    # path('api/drf-auth/', include('rest_framework.urls'))
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
