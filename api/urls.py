@@ -3,13 +3,16 @@ from django.conf.urls.static import static
 from django.urls import include, path, re_path
 from rest_framework.routers import DefaultRouter
 
-from api.views import (IncomeCategoriesListCreateAPI, IncomeCreateAPI,
-                       IncomesRetrieveUpdateDestroyAPI,
-                       IncomeSumInCurrentMonthGetAPI,
-                       LastIncomesGetAPI,
-                       activate_users_api_controller,
-                       password_reset_api_controller)
-
+from api.views import (
+    IncomeCategoriesListCreateAPI,
+    IncomeCreateAPI,
+    IncomesRetrieveUpdateDestroyAPI,
+    IncomeSumInCurrentMonthGetAPI,
+    LastIncomesGetAPI,
+    OutcomeSumInCurrentMonthGetAPI,
+    activate_users_api_controller,
+    password_reset_api_controller,
+)
 
 router = DefaultRouter()
 urlpatterns = [
@@ -201,15 +204,16 @@ urlpatterns = [
         name="income-info",
     ),
     path("income/", IncomeCreateAPI.as_view(), name="add-income"),
-    path(
-        'last_incomes/',
-        LastIncomesGetAPI.as_view(),
-        name='get-last-incomes'
-    ),
+    path("last_incomes/", LastIncomesGetAPI.as_view(), name="get-last-incomes"),
     path(
         "incomes_in_current_month/",
         IncomeSumInCurrentMonthGetAPI.as_view(),
         name="income-sum-in-current-month",
+    ),
+    path(
+        "outcomes_in_current_month/",
+        OutcomeSumInCurrentMonthGetAPI.as_view(),
+        name="outcome-sum-in-current-month",
     ),
 ]
 
