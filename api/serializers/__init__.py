@@ -1,6 +1,10 @@
-from .incomes import (IncomeCategoriesSerializer, IncomeCreateSerializer,
-                      IncomeSerializer)
+from .incomes import (
+    IncomeCategoriesSerializer,
+    IncomeCreateSerializer,
+    IncomeSerializer,
+)
 from .user import CustomTokenCreateSerializer, CustomUserCreateSerializer
+from .outcomes import OutcomeSerializer
 
 __all__ = [
     "CustomTokenCreateSerializer",
@@ -8,4 +12,5 @@ __all__ = [
     "IncomeCategoriesSerializer",
     "IncomeSerializer",
     "IncomeCreateSerializer",
+    "OutcomeSerializer",
 ]
