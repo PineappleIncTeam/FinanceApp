@@ -23,5 +23,5 @@ class IncomeCategoriesListCreateAPI(ListCreateAPIView):
 
     def get_queryset(self) -> QuerySet[IncomeCategories]:
         return get_categories(
-            user=self.request.user, category_instanse=IncomeCategories
+            user=self.request.user, category_model=IncomeCategories
         )

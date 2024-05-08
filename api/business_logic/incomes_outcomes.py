@@ -2,27 +2,27 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Type, Union
 
 from django.db.models import Sum
 
 from .errors import InvalidNumberOfItemsError
 
 if TYPE_CHECKING:
-    from django.db.models import Model, QuerySet
+    from django.db.models import QuerySet
 
-    from api.models import User
+    from api.models import Incomes, Outcomes, User
 
 
 logger = logging.getLogger(__name__)
 
 
-def get_list_of_instances(
-    instance: Model,
+def get_finance(
+    finance_instance: Union[Type[Incomes], Type[Outcomes]],
     user: User,
     order_by: Optional[str] = None,
     number_of_items: Optional[int] = None,
-) -> QuerySet[Model]:
+) -> QuerySet[Union[Incomes, Outcomes]]:
     """
     Retrieve all user's incomes/outcomes.
 
@@ -31,34 +31,33 @@ def get_list_of_instances(
         number_of_items (int | None): An amount of objects are to be retrieved.
     """
 
-    if not order_by:
-        user_instances = instance.objects.filter(user=user.pk).order_by("-created_at")
-    else:
-        user_instances = instance.objects.filter(user=user.pk).order_by(order_by)
+    order_value = order_by if order_by else "-created_at"
+    finances = finance_instance.objects.filter(user=user.pk).order_by(order_value)
 
     try:
         if number_of_items:
-            user_instances = user_instances[:number_of_items]
+            finances = finances[:number_of_items]
             logger.info(
                 f"The user [ID: {user.pk}, "
                 f"name: {user.email}] successfully received "
-                f"a list of last {number_of_items} the users's {instance}."
+                f"a list of last {number_of_items} the users's {finance_instance}."
             )
     except IndexError:
         logger.error(
             f"The user [ID: {user.pk}, "
             f"name: {user.email}] - invalid parameter 'number_of_items':"
-            f" {number_of_items} - to receive the users's {instance}."
+            f" {number_of_items} - to receive the users's {finance_instance}."
         )
         raise InvalidNumberOfItemsError
 
-    return user_instances.select_related("category").values(
+    return finances.select_related("category").values(
         "id", "sum", "category__name", "created_at"
     )
 
 
-def get_sum_of_incomes_or_outcomes_in_current_month(
-    user: User, instance: Model
+def get_sum_of_finance_in_current_month(
+    user: User,
+    finance_instance: Union[Type[Incomes], Type[Outcomes]]
 ) -> float:
     """
     Retrieve total amount of user's incomes/outcomes in the current month.
@@ -67,7 +66,7 @@ def get_sum_of_incomes_or_outcomes_in_current_month(
 
     current_month = datetime.now().month
     result = (
-        get_list_of_instances(user=user, instance=instance)
+        finance_instance(user=user, finance_instance=finance_instance)
         .filter(created_at__month=current_month)
         .aggregate(total_sum=Sum("sum"))
     ).get("total_sum")
@@ -75,14 +74,14 @@ def get_sum_of_incomes_or_outcomes_in_current_month(
     if not result:
         logger.info(
             f"The user [ID: {user.pk}, "
-            f"name: {user.email}] - there is no {instance} in the current month."
+            f"name: {user.email}] - there is no {finance_instance} in the current month."
         )
         return float(0)
 
     logger.info(
         f"The user [ID: {user.pk}, "
         f"name: {user.email}] - successfully return a total amount "
-        f"of {instance} in current month."
+        f"of {finance_instance} in current month."
     )
 
     return float(result)

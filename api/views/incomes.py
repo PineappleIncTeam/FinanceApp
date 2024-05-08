@@ -9,8 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.business_logic import (
-    get_list_of_instances, get_sum_of_incomes_or_outcomes_in_current_month)
+from api.business_logic import get_finance, get_sum_of_finance_in_current_month
 from api.models import Incomes
 from api.serializers import IncomeCreateSerializer, IncomeSerializer
 
@@ -29,8 +28,7 @@ class IncomesRetrieveUpdateDestroyAPI(RetrieveUpdateDestroyAPIView):
     lookup_field = "pk"
 
     def get_queryset(self) -> QuerySet[Incomes]:
-        result = get_list_of_instances(user=self.request.user, instance=Incomes)
-        return result
+        return get_finance(user=self.request.user, finance_instance=Incomes)
 
 
 class IncomeSumInCurrentMonthGetAPI(APIView):
@@ -41,9 +39,8 @@ class IncomeSumInCurrentMonthGetAPI(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request: Request) -> Response:
-        user = request.user
-        total_sum = get_sum_of_incomes_or_outcomes_in_current_month(
-            user=user, instance=Incomes
+        total_sum = get_sum_of_finance_in_current_month(
+            user=request.user, finance_instance=Incomes
         )
         return JsonResponse({"sum_balance": total_sum})
 
@@ -64,10 +61,9 @@ class LastIncomesGetAPI(ListAPIView):
         """
 
         items = int(self.request.GET.get("items"))
-        result = get_list_of_instances(
-            user=self.request.user, instance=Incomes, number_of_items=items
+        return get_finance(
+            user=self.request.user, finance_instance=Incomes, number_of_items=items
         )
-        return result
 
 
 class IncomeCreateAPI(CreateAPIView):
