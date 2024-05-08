@@ -26,7 +26,9 @@ class OutcomeSumInCurrentMonthGetAPI(APIView):
 
     def get(self, request: Request) -> Response:
         user = request.user
-        total_sum = get_sum_of_finance_in_current_month(user=user, instance=Outcomes)
+        total_sum = get_sum_of_finance_in_current_month(
+            user=user, finance_model=Outcomes
+        )
         return JsonResponse({"sum_balance": total_sum})
 
 
@@ -47,6 +49,6 @@ class LastOutcomesGetAPI(ListAPIView):
 
         items = int(self.request.GET.get("items"))
         result = get_finance(
-            user=self.request.user, instance=Outcomes, number_of_items=items
+            user=self.request.user, finance_model=Outcomes, number_of_items=items
         )
         return result

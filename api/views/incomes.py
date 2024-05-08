@@ -31,7 +31,7 @@ class IncomesRetrieveUpdateDestroyAPI(RetrieveUpdateDestroyAPIView):
     lookup_field = "pk"
 
     def get_queryset(self) -> QuerySet:
-        result = get_finance(user=self.request.user, instance=Incomes)
+        result = get_finance(user=self.request.user, finance_model=Incomes)
         return result
 
 
@@ -44,7 +44,9 @@ class IncomeSumInCurrentMonthGetAPI(APIView):
 
     def get(self, request: Request) -> Response:
         user = request.user
-        total_sum = get_sum_of_finance_in_current_month(user=user, instance=Incomes)
+        total_sum = get_sum_of_finance_in_current_month(
+            user=user, finance_model=Incomes
+        )
         return JsonResponse({"sum_balance": total_sum})
 
 
@@ -65,7 +67,7 @@ class LastIncomesGetAPI(ListAPIView):
 
         items = int(self.request.GET.get("items"))
         result = get_finance(
-            user=self.request.user, instance=Incomes, number_of_items=items
+            user=self.request.user, finance_model=Incomes, number_of_items=items
         )
         return result
 
