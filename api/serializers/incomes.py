@@ -36,7 +36,7 @@ class IncomeSerializer(serializers.ModelSerializer):
 
 
 class IncomeCreateSerializer(serializers.ModelSerializer):
-    def create(self, validated_data):
+    def create(self, validated_data: Dict[str, Any]) -> Incomes:
         validated_data["user"] = self.context.get("request").user
         logger.info(
             f"The user [ID: {self.context.get('request').user.pk}, "

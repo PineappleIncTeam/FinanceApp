@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from typing import Dict, Any
-from api.models import Outcomes
+from api.models import Outcomes, OutcomeCategories
 
 
 class OutcomeSerializer(serializers.ModelSerializer):
@@ -21,3 +21,9 @@ class OutcomeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Outcomes
         fields = ["sum", "category", "created_at", "is_hidden"]
+
+
+class OutcomeCategoriesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OutcomeCategories
+        fields = ["id", "name"]

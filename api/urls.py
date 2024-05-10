@@ -9,6 +9,7 @@ from api.views import (
     IncomesRetrieveUpdateDestroyAPI,
     IncomeSumInCurrentMonthGetAPI,
     LastIncomesGetAPI,
+    OutcomeCategoriesListCreateAPI,
     OutcomeSumInCurrentMonthGetAPI,
     LastOutcomesGetAPI,
     activate_users_api_controller,
@@ -217,6 +218,11 @@ urlpatterns = [
         name="outcome-sum-in-current-month",
     ),
     path("last_outcomes/", LastOutcomesGetAPI.as_view(), name="get-last-outcomes"),
+    path(
+        "outcome_categories/",
+        OutcomeCategoriesListCreateAPI.as_view(),
+        name="outcome-categories",
+    ),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

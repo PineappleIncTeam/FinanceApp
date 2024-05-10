@@ -5,13 +5,12 @@ from typing import TYPE_CHECKING
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
 
-from api.business_logic import get_income_categories
+from api.business_logic import get_categories
+from api.models import IncomeCategories
 from api.serializers import IncomeCategoriesSerializer
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
-
-    from api.models import IncomeCategories
 
 
 class IncomeCategoriesListCreateAPI(ListCreateAPIView):
@@ -23,4 +22,6 @@ class IncomeCategoriesListCreateAPI(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self) -> QuerySet[IncomeCategories]:
-        return get_income_categories(user=self.request.user)
+        return get_categories(
+            user=self.request.user, category_model=IncomeCategories
+        )

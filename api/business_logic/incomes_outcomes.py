@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional, Union, Type
+from typing import TYPE_CHECKING, Optional, Type, Union
 
 from django.db.models import Sum
 
@@ -24,17 +24,18 @@ def get_finance(
     number_of_items: Optional[int] = None,
 ) -> QuerySet[Union[Incomes, Outcomes]]:
     """
-    Retrieve all user's incomes or uotcomes.
+    Retrieve all user's incomes/outcomes.
 
     Args:
         order_by (str | None): Condition for ordering
         number_of_items (int | None): An amount of objects are to be retrieved.
     """
+
     order_value = order_by if order_by else "-created_at"
     finances = (
-        finance_model.objects
+        finance_instance
         .select_related("category")
-        .filter(user=user.pk)
+        .objects.filter(user=user.pk)
         .order_by(order_value)
     )
 
@@ -60,7 +61,7 @@ def get_sum_of_finance_in_current_month(
     user: User, finance_model: Union[Type[Incomes], Type[Outcomes]]
 ) -> float:
     """
-    Retrieve total amount of user's incomes or utcomes in the current month.
+    Retrieve total amount of user's incomes/outcomes in the current month.
     If there is no incomes/outcomes in the current month this function returns 0.00.
     """
 

@@ -43,9 +43,8 @@ class IncomeSumInCurrentMonthGetAPI(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request: Request) -> Response:
-        user = request.user
         total_sum = get_sum_of_finance_in_current_month(
-            user=user, finance_model=Incomes
+            user=request.user, finance_instance=Incomes
         )
         return JsonResponse({"sum_balance": total_sum})
 

@@ -1,27 +1,35 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
 repos:
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v2.3.0
-  hooks:
-    - id: flake8
-      args: # arguments to configure flake8
-        # making isort line length compatible with black
-        - "--max-line-length=120"
-        - "--max-complexity=18"
-        - "--select=B,C,E,F,W,T4,B9"
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-yaml
+    -   id: check-added-large-files
+
+-   repo: https://github.com/pycqa/flake8
+    rev: 6.1.0
+    hooks:
+    -   id: flake8
+        additional_dependencies: [pep8-naming, flake8-comments, flake8-bugbear,
+                                  flake8-comprehensions, flake8-eradicate, flake8-print,
+                                  flake8-broken-line, flake8-string-format]
+
+-   repo: https://github.com/PyCQA/isort
+    rev: 5.12.0
+    hooks:
+    - id: isort
+
+# -   repo: https://github.com/ambv/black
+#     rev: 23.7.0
+#     hooks:
+#     - id: black
+#       language_version: python3.8
 
 -   repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.4.1
     hooks:
     -   id: mypy
         additional_dependencies: []
-
-# -   repo: https://github.com/PyCQA/isort
-#     rev: 5.12.0
-#     hooks:
-#     - id: isort
-
--   repo: https://github.com/ambv/black
-    rev: 23.7.0
-    hooks:
-    - id: black
-      language_version: python3.10
