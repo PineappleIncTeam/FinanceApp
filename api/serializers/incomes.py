@@ -35,7 +35,6 @@ class IncomeSerializer(serializers.ModelSerializer):
         fields = ['sum', 'category', 'created_at', 'is_hidden']
 
 
-
 class IncomeCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data["user"] = self.context.get("request").user
