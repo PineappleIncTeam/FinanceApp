@@ -3,8 +3,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from django.http import JsonResponse
-from rest_framework.generics import (CreateAPIView, ListAPIView,
-                                     RetrieveUpdateDestroyAPIView)
+from rest_framework.generics import (
+    CreateAPIView,
+    ListAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -28,7 +31,8 @@ class IncomesRetrieveUpdateDestroyAPI(RetrieveUpdateDestroyAPIView):
     lookup_field = "pk"
 
     def get_queryset(self) -> QuerySet[Incomes]:
-        return get_finance(user=self.request.user, finance_instance=Incomes)
+        result = get_finance(user=self.request.user, finance_model=Incomes)
+        return result
 
 
 class IncomeSumInCurrentMonthGetAPI(APIView):
@@ -61,9 +65,10 @@ class LastIncomesGetAPI(ListAPIView):
         """
 
         items = int(self.request.GET.get("items"))
-        return get_finance(
-            user=self.request.user, finance_instance=Incomes, number_of_items=items
+        result = get_finance(
+            user=self.request.user, finance_model=Incomes, number_of_items=items
         )
+        return result
 
 
 class IncomeCreateAPI(CreateAPIView):

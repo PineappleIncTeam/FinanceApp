@@ -171,6 +171,26 @@ http://92.255.79.239:8000/api/v1/income/
 
 
 
+http://92.255.79.239:8000/api/v1/incomes_in_current_month/
+        GET - (for authorizated users) to apply a total amount of incomes
+              that has been created in the current month.
+        
+        Response:
+            {
+                "sum_balance": 10000.0
+            }  
+
+
+http://92.255.79.239:8000/api/v1/outcomes_in_current_month/
+        GET - (for authorizated users) to apply a total amount of outcomes
+              that has been created in the current month.
+        
+        Response:
+            {
+                "sum_balance": 10000.0
+            }   
+
+
 !!!РОУТ ПОКА НЕ РАБОТАЕТ:
 http://92.255.79.239:8000/api/get-users/ - GET запрос возвращает список всех пользователей
 JSON:

@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 
 
 def get_finance(
-    finance_instance: Union[Type[Incomes], Type[Outcomes]],
     user: User,
+    finance_model: Union[Type[Incomes], Type[Outcomes]],
     order_by: Optional[str] = None,
     number_of_items: Optional[int] = None,
 ) -> QuerySet[Union[Incomes, Outcomes]]:
@@ -45,30 +45,29 @@ def get_finance(
             logger.info(
                 f"The user [ID: {user.pk}, "
                 f"name: {user.email}] successfully received "
-                f"a list of last {number_of_items} the users's {finance_instance}."
+                f"a list of last {number_of_items} the users's {finance_model}."
             )
     except IndexError:
         logger.error(
             f"The user [ID: {user.pk}, "
             f"name: {user.email}] - invalid parameter 'number_of_items':"
-            f" {number_of_items} - to receive the users's {finance_instance}."
+            f" {number_of_items} - to receive the users's {finance_model}."
         )
         raise InvalidNumberOfItemsError
 
     return finances
 
 def get_sum_of_finance_in_current_month(
-    user: User,
-    finance_instance: Union[Type[Incomes], Type[Outcomes]]
+    user: User, finance_model: Union[Type[Incomes], Type[Outcomes]]
 ) -> float:
     """
     Retrieve total amount of user's incomes/outcomes in the current month.
-    If there is no incomes/outcpmes in the current month this function returns 0.00.
+    If there is no incomes/outcomes in the current month this function returns 0.00.
     """
 
     current_month = datetime.now().month
     result = (
-        finance_instance(user=user, finance_instance=finance_instance)
+        get_finance(user=user, finance_model=finance_model)
         .filter(created_at__month=current_month)
         .aggregate(total_sum=Sum("sum"))
     ).get("total_sum")
@@ -76,14 +75,14 @@ def get_sum_of_finance_in_current_month(
     if not result:
         logger.info(
             f"The user [ID: {user.pk}, "
-            f"name: {user.email}] - there is no {finance_instance} in the current month."
+            f"name: {user.email}] - there is no {finance_model} in the current month."
         )
         return float(0)
 
     logger.info(
         f"The user [ID: {user.pk}, "
         f"name: {user.email}] - successfully return a total amount "
-        f"of {finance_instance} in current month."
+        f"of {finance_model} in current month."
     )
 
     return float(result)
