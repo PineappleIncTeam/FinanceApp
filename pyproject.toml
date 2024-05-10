@@ -17,6 +17,7 @@ drf-yasg = "^1.21.5"
 django-cors-headers = "^4.0.0"
 types-requests = "2.31.0.20240406"
 requests = "^2.31.0"
+pre-commit = "3.5.0"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.2.6"
