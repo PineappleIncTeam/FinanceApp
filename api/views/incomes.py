@@ -3,12 +3,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from django.http import JsonResponse
-from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
+from rest_framework.generics import (CreateAPIView, ListAPIView,
+                                     RetrieveUpdateDestroyAPIView)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.business_logic import get_incomes, get_sum_of_incomes_in_current_month
+from api.business_logic import get_finance, get_sum_of_finance_in_current_month
+from api.models import Incomes
 from api.serializers import IncomeCreateSerializer, IncomeSerializer
 
 if TYPE_CHECKING:
@@ -25,9 +27,8 @@ class IncomesRetrieveUpdateDestroyAPI(RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
     lookup_field = "pk"
 
-    def get_queryset(self) -> QuerySet:
-        result = get_incomes(user=self.request.user)
-        return result
+    def get_queryset(self) -> QuerySet[Incomes]:
+        return get_finance(user=self.request.user, finance_instance=Incomes)
 
 
 class IncomeSumInCurrentMonthGetAPI(APIView):
@@ -38,9 +39,10 @@ class IncomeSumInCurrentMonthGetAPI(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request: Request) -> Response:
-        user = request.user
-        total_sum = get_sum_of_incomes_in_current_month(user=user)
-        return JsonResponse({'sum_balance': total_sum})
+        total_sum = get_sum_of_finance_in_current_month(
+            user=request.user, finance_instance=Incomes
+        )
+        return JsonResponse({"sum_balance": total_sum})
 
 
 class LastIncomesGetAPI(ListAPIView):
@@ -51,7 +53,7 @@ class LastIncomesGetAPI(ListAPIView):
     serializer_class = IncomeSerializer
     permission_classes = (IsAuthenticated,)
 
-    def get_queryset(self) -> QuerySet:
+    def get_queryset(self) -> QuerySet[Incomes]:
         """
         To get last user's incomes.
         The amount of income displayed is passed by the items parameter
@@ -59,8 +61,9 @@ class LastIncomesGetAPI(ListAPIView):
         """
 
         items = int(self.request.GET.get("items"))
-        result = get_incomes(user=self.request.user, number_of_items=items)
-        return result
+        return get_finance(
+            user=self.request.user, finance_instance=Incomes, number_of_items=items
+        )
 
 
 class IncomeCreateAPI(CreateAPIView):
