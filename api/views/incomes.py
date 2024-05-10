@@ -30,7 +30,7 @@ class IncomesRetrieveUpdateDestroyAPI(RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
     lookup_field = "pk"
 
-    def get_queryset(self) -> QuerySet:
+    def get_queryset(self) -> QuerySet[Incomes]:
         result = get_finance(user=self.request.user, finance_model=Incomes)
         return result
 
@@ -58,7 +58,7 @@ class LastIncomesGetAPI(ListAPIView):
     serializer_class = IncomeSerializer
     permission_classes = (IsAuthenticated,)
 
-    def get_queryset(self) -> QuerySet:
+    def get_queryset(self) -> QuerySet[Incomes]:
         """
         To get last user's incomes.
         The amount of income displayed is passed by the items parameter

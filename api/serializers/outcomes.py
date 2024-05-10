@@ -1,23 +1,23 @@
 from rest_framework import serializers
-
+from typing import Dict, Any
 from api.models import Outcomes
 
 
 class OutcomeSerializer(serializers.ModelSerializer):
-    def to_representation(self, instance):
+    def to_representation(self, instance: Outcomes) -> Dict[str, Any]:
         """
         Return a dict of object params.
         """
 
         item = {
-            "id": instance.get("id"),
-            "sum": instance.get("sum"),
-            "category": instance.get("category__name"),
-            "created_at": instance.get("created_at"),
+            "id": instance.id,
+            "sum": instance.sum,
+            "category": instance.category.name,
+            "created_at": instance.created_at,
+            "is_hidden": instance.is_hidden
         }
         return item
 
     class Meta:
         model = Outcomes
-        fields = ["id", "sum", "category", "created_at"]
-        depth = 2
+        fields = ["sum", "category", "created_at", "is_hidden"]
