@@ -32,7 +32,12 @@ def get_finance(
     """
 
     order_value = order_by if order_by else "-created_at"
-    finances = finance_instance.objects.filter(user=user.pk).order_by(order_value)
+    finances = (
+        finance_instance
+        .select_related("category")
+        .objects.filter(user=user.pk)
+        .order_by(order_value)
+    )
 
     try:
         if number_of_items:
@@ -50,10 +55,7 @@ def get_finance(
         )
         raise InvalidNumberOfItemsError
 
-    return finances.select_related("category").values(
-        "id", "sum", "category__name", "created_at"
-    )
-
+    return finances
 
 def get_sum_of_finance_in_current_month(
     user: User,

@@ -1,5 +1,5 @@
 import logging
-from typing import Any
+from typing import Any, Dict
 
 from rest_framework import serializers
 
@@ -16,27 +16,27 @@ class IncomeCategoriesSerializer(serializers.ModelSerializer):
 
 class IncomeSerializer(serializers.ModelSerializer):
 
-    def to_representation(self, instance):
+    def to_representation(self, instance: Incomes) -> Dict[str, Any]:
         """
         Return a dict of object params.
         """
 
         item = {
-            "id": instance.get('id'),
-            "sum": instance.get('sum'),
-            "category": instance.get('category__name'),
-            "created_at": instance.get('created_at')
+            "id": instance.id,
+            "sum": instance.sum,
+            "category": instance.category.name,
+            "created_at": instance.created_at,
+            "is_hidden": instance.is_hidden
         }
         return item
 
     class Meta:
         model = Incomes
-        fields = ['id', 'sum', 'category', 'created_at']
-        depth = 2
+        fields = ['sum', 'category', 'created_at', 'is_hidden']
 
 
 class IncomeCreateSerializer(serializers.ModelSerializer):
-    def create(self, validated_data: dict[str, Any]) -> Incomes:
+    def create(self, validated_data: Dict[str, Any]) -> Incomes:
         validated_data["user"] = self.context.get("request").user
         logger.info(
             f"The user [ID: {self.context.get('request').user.pk}, "
