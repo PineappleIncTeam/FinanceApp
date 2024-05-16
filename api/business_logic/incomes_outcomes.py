@@ -28,14 +28,15 @@ def get_finance(
 
     Args:
         order_by (str | None): Condition for ordering
-        number_of_items (int | None): An amount of objects are to be retrieved.
+        number_of_items (int | None): An amount of objects
+        are to be retrieved.
     """
 
     order_value = order_by if order_by else "-created_at"
     finances = (
-        finance_instance
+        finance_model.objects
         .select_related("category")
-        .objects.filter(user=user.pk)
+        .filter(user=user.pk)
         .order_by(order_value)
     )
 
@@ -45,7 +46,8 @@ def get_finance(
             logger.info(
                 f"The user [ID: {user.pk}, "
                 f"name: {user.email}] successfully received "
-                f"a list of last {number_of_items} the users's {finance_model}."
+                f"a list of last {number_of_items} "
+                f"the users's {finance_model}."
             )
     except IndexError:
         logger.error(
@@ -57,12 +59,14 @@ def get_finance(
 
     return finances
 
+
 def get_sum_of_finance_in_current_month(
     user: User, finance_model: Union[Type[Incomes], Type[Outcomes]]
 ) -> float:
     """
     Retrieve total amount of user's incomes/outcomes in the current month.
-    If there is no incomes/outcomes in the current month this function returns 0.00.
+    If there is no incomes/outcomes in the current month this function
+    returns 0.00.
     """
 
     current_month = datetime.now().month
@@ -75,7 +79,8 @@ def get_sum_of_finance_in_current_month(
     if not result:
         logger.info(
             f"The user [ID: {user.pk}, "
-            f"name: {user.email}] - there is no {finance_model} in the current month."
+            f"name: {user.email}] - there is no "
+            f"{finance_model} in the current month."
         )
         return float(0)
 

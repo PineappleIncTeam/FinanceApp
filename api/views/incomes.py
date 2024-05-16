@@ -3,11 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from django.http import JsonResponse
-from rest_framework.generics import (
-    CreateAPIView,
-    ListAPIView,
-    RetrieveUpdateDestroyAPIView,
-)
+from rest_framework.generics import (CreateAPIView, ListAPIView,
+                                     RetrieveUpdateDestroyAPIView)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -44,7 +41,7 @@ class IncomeSumInCurrentMonthGetAPI(APIView):
 
     def get(self, request: Request) -> Response:
         total_sum = get_sum_of_finance_in_current_month(
-            user=request.user, finance_instance=Incomes
+            user=request.user, finance_model=Incomes
         )
         return JsonResponse({"sum_balance": total_sum})
 
@@ -66,7 +63,9 @@ class LastIncomesGetAPI(ListAPIView):
 
         items = int(self.request.GET.get("items"))
         result = get_finance(
-            user=self.request.user, finance_model=Incomes, number_of_items=items
+            user=self.request.user,
+            finance_model=Incomes,
+            number_of_items=items
         )
         return result
 
