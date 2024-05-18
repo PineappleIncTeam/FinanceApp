@@ -14,6 +14,7 @@ from api.views import (
     LastOutcomesGetAPI,
     activate_users_api_controller,
     password_reset_api_controller,
+    OutcomeRetrieveUpdateDestroyView
 )
 
 router = DefaultRouter()
@@ -223,6 +224,7 @@ urlpatterns = [
         OutcomeCategoriesListCreateAPI.as_view(),
         name="outcome-categories",
     ),
+    path("outcomes/<int:pk>/", OutcomeRetrieveUpdateDestroyView.as_view(), name="change-outcome")
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

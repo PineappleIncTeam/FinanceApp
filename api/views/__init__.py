@@ -6,7 +6,7 @@ from .incomes import (
     IncomeSumInCurrentMonthGetAPI,
     LastIncomesGetAPI,
 )
-from .outcomes import OutcomeSumInCurrentMonthGetAPI, LastOutcomesGetAPI
+from .outcomes import OutcomeSumInCurrentMonthGetAPI, LastOutcomesGetAPI, OutcomeRetrieveUpdateDestroyView
 from .outcome_categories import OutcomeCategoriesListCreateAPI
 from .password_reset import password_reset_api_controller
 
@@ -21,4 +21,5 @@ __all__ = [
     "OutcomeSumInCurrentMonthGetAPI",
     "LastOutcomesGetAPI",
     "OutcomeCategoriesListCreateAPI",
+    "OutcomeRetrieveUpdateDestroyView",
 ]

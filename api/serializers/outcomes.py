@@ -27,3 +27,9 @@ class OutcomeCategoriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = OutcomeCategories
         fields = ["id", "name"]
+
+
+class OutcomeRetrieveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Outcomes
+        fields = ["sum", "category", "is_hidden"]
