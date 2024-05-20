@@ -1,5 +1,6 @@
 [flake8]
-exclude = 
+max-line-length = 100
+exclude =
     .git,
     __pycache__,
     venv

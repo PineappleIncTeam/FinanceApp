@@ -15,13 +15,13 @@ logger = logging.getLogger(__name__)
 
 
 def get_categories(
-        user: User,
-        category_model: Union[Type[IncomeCategories], Type[OutcomeCategories]]
+    user: User, category_model: Union[Type[IncomeCategories], Type[OutcomeCategories]]
 ) -> QuerySet[Union[IncomeCategories, OutcomeCategories]]:
     """
     Retrieve all user's incomes/outcomes categories which is not hidden.
     """
-    if isinstance(category_model, IncomeCategories):
+
+    if category_model is IncomeCategories:
         query_result = (
             category_model.objects.prefetch_related("incomes_set")
             .filter(incomes__user=user.pk, incomes__is_hidden=False)
