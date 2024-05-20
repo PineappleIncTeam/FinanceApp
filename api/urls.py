@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path, re_path
-from rest_framework.routers import DefaultRouter
 
 from api.views import (CustomTokenCreateAPI, IncomeCategoriesListCreateAPI,
                        IncomeCreateAPI, IncomesRetrieveUpdateDestroyAPI,
@@ -11,7 +10,6 @@ from api.views import (CustomTokenCreateAPI, IncomeCategoriesListCreateAPI,
                        activate_users_api_controller,
                        password_reset_api_controller)
 
-router = DefaultRouter()
 urlpatterns = [
     path("auth/token/login/", CustomTokenCreateAPI.as_view(), name="login"),
     path("auth/", include("djoser.urls")),
