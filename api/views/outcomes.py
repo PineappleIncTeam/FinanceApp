@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from api.business_logic import get_finance, get_sum_of_finance_in_current_month
 from api.models import Outcomes
-from api.serializers import OutcomeRetrieveSerializer, OutcomeSerializer
+from api.serializers import OutcomeSerializer
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -59,7 +59,7 @@ class OutcomeRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     """Retrieve, update outcomes"""
 
     queryset = Outcomes.objects.all()
-    serializer_class = OutcomeRetrieveSerializer
+    serializer_class = OutcomeSerializer
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self) -> QuerySet[Outcomes]:
