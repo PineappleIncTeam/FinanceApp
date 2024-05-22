@@ -61,3 +61,7 @@ class OutcomeRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     queryset = Outcomes.objects.all()
     serializer_class = OutcomeRetrieveSerializer
     permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self) -> QuerySet[Outcomes]:
+        result = get_finance(user=self.request.user, finance_model=Outcomes)
+        return result
