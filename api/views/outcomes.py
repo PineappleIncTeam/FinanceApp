@@ -58,7 +58,6 @@ class OutcomeRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
 
     """Retrieve, update outcomes"""
 
-    queryset = Outcomes.objects.all()
     serializer_class = OutcomeSerializer
     permission_classes = (IsAuthenticated,)
 
