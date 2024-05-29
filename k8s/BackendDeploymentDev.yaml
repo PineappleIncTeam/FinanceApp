@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: django-deployment-dev
+  name: freenance-deployment-dev
   namespace: {{NAMESPACE}}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: django-backend-dev
+      app: freenance-backend-dev
   template:
     metadata:
       annotations:
         fluentd.active: 'true'
       labels:
-        app: django-backend-dev
+        app: freenance-backend-dev
     spec:
       containers:
-        - name: django
+        - name: freenance
           image: freenance/backend-dev:{{IMAGE_TAG}}
           ports:
             - containerPort: 8000
@@ -40,16 +40,16 @@ spec:
       volumes:
         - name: django-storage
           persistentVolumeClaim:
-            claimName: django-pvc
+            claimName: freenance-pvc-dev
 ---
 apiVersion: v1
 kind: Service
 metadata:
   namespace: {{NAMESPACE}}
-  name: django-app-service-dev
+  name: freenance-app-service-dev
 spec:
   selector:
-    app: django-backend-dev
+    app: freenance-backend-dev
   type: NodePort
   ports:
     - protocol: TCP
@@ -61,7 +61,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   namespace: {{NAMESPACE}}
-  name: django-pvc
+  name: freenance-pvc-dev
 spec:
   accessModes:
     - ReadWriteOnce
@@ -73,7 +73,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: python-pvc-dev
+  name: freenance-pvc-dev
 spec:
   capacity:
     storage: 2Gi
