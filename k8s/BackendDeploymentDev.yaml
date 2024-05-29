@@ -73,7 +73,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: freenance-pvc-dev
+  name: freenance-pv-dev
 spec:
   capacity:
     storage: 2Gi
