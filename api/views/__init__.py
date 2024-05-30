@@ -1,4 +1,5 @@
 from .activate_users import activate_users_api_controller
+from .balance import BalanceGetAPI
 from .generate_token import CustomTokenCreateAPI
 from .income_categories import IncomeCategoriesListCreateAPI
 from .incomes import (IncomeCreateAPI, IncomesRetrieveUpdateDestroyAPI,
@@ -19,4 +20,5 @@ __all__ = [
     "LastOutcomesGetAPI",
     "OutcomeCategoriesListCreateAPI",
     "CustomTokenCreateAPI",
+    "BalanceGetAPI",
 ]
