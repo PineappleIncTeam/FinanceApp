@@ -40,7 +40,7 @@ spec:
       volumes:
         - name: django-storage
           persistentVolumeClaim:
-            claimName: django-pvc
+            claimName: django-pvc-dev
 ---
 apiVersion: v1
 kind: Service
@@ -61,7 +61,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   namespace: {{NAMESPACE}}
-  name: django-pvc
+  name: django-pvc-dev
 spec:
   accessModes:
     - ReadWriteOnce
