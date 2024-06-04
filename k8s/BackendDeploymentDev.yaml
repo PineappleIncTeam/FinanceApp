@@ -31,7 +31,7 @@ spec:
             - secretRef:
                 name: finance-dev-secret
           volumeMounts:
-            - name: django-storage
+            - name: freenance-storage
               mountPath: /app/static
           lifecycle:
             postStart:
