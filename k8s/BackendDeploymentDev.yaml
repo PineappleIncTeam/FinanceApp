@@ -67,8 +67,8 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 2Gi
-  storageClassName: local-storage
+      storage: 1Gi
+  storageClassName: local-storage-dev
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -76,10 +76,10 @@ metadata:
   name: python-pvc-dev
 spec:
   capacity:
-    storage: 2Gi
+    storage: 1Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Recycle
-  storageClassName: local-storage
+  storageClassName: local-storage-dev
   hostPath:
     path: /data/{{NAMESPACE}}
