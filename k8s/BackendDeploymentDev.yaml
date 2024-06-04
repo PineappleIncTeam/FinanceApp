@@ -68,7 +68,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  storageClassName: local-storage-dev
+  storageClassName: local-storage
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -80,6 +80,6 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Recycle
-  storageClassName: local-storage-dev
+  storageClassName: local-storage
   hostPath:
     path: /data/{{NAMESPACE}}
