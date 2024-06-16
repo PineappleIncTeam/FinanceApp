@@ -2,21 +2,32 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path, re_path
 
-from api.views import (CustomTokenCreateAPI, IncomeCategoriesListCreateAPI,
-                       IncomeCreateAPI, IncomesRetrieveUpdateDestroyAPI,
-                       IncomeSumInCurrentMonthGetAPI, LastIncomesGetAPI,
-                       LastOutcomesGetAPI, OutcomeCategoriesListCreateAPI,
-                       OutcomeSumInCurrentMonthGetAPI,
-                       activate_users_api_controller,
-                       password_reset_api_controller,
-                       OutcomeRetrieveUpdateDestroyView)
+from api.views import (
+    CustomTokenCreateAPI,
+    IncomeCategoriesListCreateAPI,
+    IncomeCreateAPI,
+    IncomesRetrieveUpdateDestroyAPI,
+    IncomeSumInCurrentMonthGetAPI,
+    LastIncomesGetAPI,
+    LastOutcomesGetAPI,
+    OutcomeCategoriesListCreateAPI,
+    OutcomeSumInCurrentMonthGetAPI,
+    activate_users_api_controller,
+    password_reset_api_controller,
+    OutcomeRetrieveUpdateDestroyView,
+    user_data,
+    get_countries,
+    get_cities,
+)
 
 urlpatterns = [
     path("auth/token/login/", CustomTokenCreateAPI.as_view(), name="login"),
     path("auth/", include("djoser.urls")),
     re_path(r"^auth/", include("djoser.urls.authtoken")),
     path("activate/", activate_users_api_controller, name="activate-users"),
-    path("password/reset/confirm/", password_reset_api_controller, name="reset-password"),
+    path(
+        "password/reset/confirm/", password_reset_api_controller, name="reset-password"
+    ),
     # INCOMES
     path(
         "income_categories/",
@@ -47,7 +58,14 @@ urlpatterns = [
         OutcomeCategoriesListCreateAPI.as_view(),
         name="outcome-categories",
     ),
-    path("outcomes/<int:pk>/", OutcomeRetrieveUpdateDestroyView.as_view(), name="change-outcomes")
+    path(
+        "outcomes/<int:pk>/",
+        OutcomeRetrieveUpdateDestroyView.as_view(),
+        name="change-outcomes",
+    ),
+    path("user/data/", user_data, name="get_and_update_user_data"),
+    path("user/countries/", get_countries, name="get_countries"),
+    path("countries/<int:country_id>/cities/", get_cities, name="get_cities"),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
