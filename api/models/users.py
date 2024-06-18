@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.utils.html import escape
 from django.utils.translation import gettext as _
+from .supportive import Country, City
 
 from .base import BaseModel
 
@@ -13,7 +14,7 @@ class CustomUserManager(UserManager):
         """Create a new user profile"""
 
         if not email:
-            raise ValueError(_('User must have an email address'))
+            raise ValueError(_("User must have an email address"))
 
         user_email: str = self.normalize_email(email)
         user: User = self.model(email=user_email, **extra_fields)
@@ -35,16 +36,20 @@ class CustomUserManager(UserManager):
 
 
 class User(BaseModel, AbstractUser):
-    '''
+    """
     Describes the fields and attributes of the User model in the database.
-    '''
+    """
+
+    GENDER_CHOICES = (("М", "Мужской"), ("Ж", "Женский"), ("N", "None"))
 
     email = models.EmailField(unique=True)
     username = models.CharField(
-        blank=True,
-        null=True,
-        default="Пользователь FinanceApp"
+        blank=True, null=True, default="Пользователь FinanceApp"
     )
+
+    gender = models.CharField(max_length=32, choices=GENDER_CHOICES, default="None")
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
 
     objects = CustomUserManager()
     USERNAME_FIELD = "email"
