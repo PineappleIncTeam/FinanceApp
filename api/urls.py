@@ -2,8 +2,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path, re_path
 
-from api.views import (CustomTokenCreateAPI, IncomeCategoriesListCreateAPI,
-                       IncomeCreateAPI, IncomesRetrieveUpdateDestroyAPI,
+from api.views import (BalanceGetAPI, CustomTokenCreateAPI,
+                       IncomeCategoriesListCreateAPI, IncomeCreateAPI,
+                       IncomesRetrieveUpdateDestroyAPI,
                        IncomeSumInCurrentMonthGetAPI, LastIncomesGetAPI,
                        LastOutcomesGetAPI, OutcomeCategoriesListCreateAPI,
                        OutcomeSumInCurrentMonthGetAPI,
@@ -17,6 +18,8 @@ urlpatterns = [
     re_path(r"^auth/", include("djoser.urls.authtoken")),
     path("activate/", activate_users_api_controller, name="activate-users"),
     path("password/reset/confirm/", password_reset_api_controller, name="reset-password"),
+    # BALANCE
+    path("balance/", BalanceGetAPI.as_view(), name="balance"),
     # INCOMES
     path(
         "income_categories/",
