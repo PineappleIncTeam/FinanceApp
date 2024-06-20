@@ -1,11 +1,11 @@
-from .incomes import (
-    IncomeCategoriesSerializer,
-    IncomeCreateSerializer,
-    IncomeSerializer,
-)
-from .outcomes import OutcomeCategoriesSerializer
+from .accumulations import (AccumulationCreateSerializer,
+                            AccumulationInfoSerializer, AccumulationSerializer,
+                            AcumulationCategoriesSerializer,
+                            ArchiveAccumulationCategorySerializer)
+from .incomes import (IncomeCategoriesSerializer, IncomeCreateSerializer,
+                      IncomeSerializer)
+from .outcomes import OutcomeCategoriesSerializer, OutcomeSerializer
 from .user import CustomTokenCreateSerializer, CustomUserCreateSerializer
-from .outcomes import OutcomeSerializer
 
 __all__ = [
     "CustomTokenCreateSerializer",
@@ -15,4 +15,9 @@ __all__ = [
     "IncomeCreateSerializer",
     "OutcomeSerializer",
     "OutcomeCategoriesSerializer",
+    "AcumulationCategoriesSerializer",
+    "AccumulationSerializer",
+    "AccumulationCreateSerializer",
+    "AccumulationInfoSerializer",
+    "ArchiveAccumulationCategorySerializer",
 ]

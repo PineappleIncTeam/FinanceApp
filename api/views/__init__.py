@@ -1,3 +1,10 @@
+from .accumulations import (AccumulationCreateAPI,
+                            AccumulationRetrieveUpdateDestroyAPI,
+                            AccumulationsCategoriesArchiveAPI,
+                            AccumulationsCategoriesInfoAPI,
+                            AccumulationsCategoriesListCreateAPI,
+                            AccumulationsInfoGetAPI, LastAccumulationsGetAPI,
+                            TotalAmountAccumulationsGetAPI)
 from .activate_users import activate_users_api_controller
 from .balance import BalanceGetAPI
 from .generate_token import CustomTokenCreateAPI
@@ -20,6 +27,14 @@ __all__ = [
     "LastOutcomesGetAPI",
     "OutcomeCategoriesListCreateAPI",
     "CustomTokenCreateAPI",
+    "TotalAmountAccumulationsGetAPI",
+    "AccumulationsCategoriesListCreateAPI",
+    "AccumulationRetrieveUpdateDestroyAPI",
+    "AccumulationCreateAPI",
+    "LastAccumulationsGetAPI",
+    "AccumulationsInfoGetAPI",
+    "AccumulationsCategoriesInfoAPI",
+    "AccumulationsCategoriesArchiveAPI",
     "BalanceGetAPI",
     "OutcomeRetrieveUpdateDestroyView"
 ]
