@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from django.http import JsonResponse
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView
 
 from api.business_logic import get_sum_of_finance_in_current_month, get_finance
 from api.models import Outcomes
@@ -52,3 +52,16 @@ class LastOutcomesGetAPI(ListAPIView):
             user=self.request.user, finance_model=Outcomes, number_of_items=items
         )
         return result
+
+
+class OutcomeRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+
+    """Retrieve, update outcomes"""
+
+    serializer_class = OutcomeSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self) -> QuerySet[Outcomes]:
+        result = get_finance(user=self.request.user, finance_model=Outcomes)
+        return result
+    

@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: django-deployment-dev
+  name: freenance-deployment-dev
   namespace: {{NAMESPACE}}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: django-backend-dev
+      app: freenance-backend-dev
   template:
     metadata:
       annotations:
         fluentd.active: 'true'
       labels:
-        app: django-backend-dev
+        app: freenance-backend-dev
     spec:
       containers:
-        - name: django
+        - name: freenance
           image: freenance/backend-dev:{{IMAGE_TAG}}
           ports:
             - containerPort: 8000
@@ -31,52 +31,51 @@ spec:
             - secretRef:
                 name: finance-dev-secret
           volumeMounts:
-            - name: django-storage
+            - name: freenance-storage
               mountPath: /app/static
           lifecycle:
             postStart:
               exec:
                 command: ["python", "manage.py", "migrate"]
       volumes:
-        - name: django-storage
+        - name: freenance-storage
           persistentVolumeClaim:
-            claimName: django-pvc
+            claimName: freenance-pvc-dev
 ---
 apiVersion: v1
 kind: Service
 metadata:
   namespace: {{NAMESPACE}}
-  name: django-app-service-dev
+  name: freenance-service-dev
 spec:
   selector:
-    app: django-backend-dev
-  type: NodePort
+    app: freenance-backend-dev
+  type: ClusterIP
   ports:
     - protocol: TCP
       port: 8000
       targetPort: 8000
-      nodePort: 30040
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   namespace: {{NAMESPACE}}
-  name: django-pvc
+  name: freenance-pvc-dev
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 2Gi
+      storage: 1Gi
   storageClassName: local-storage
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: python-pvc-dev
+  name: freenance-pv-dev
 spec:
   capacity:
-    storage: 2Gi
+    storage: 1Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Recycle

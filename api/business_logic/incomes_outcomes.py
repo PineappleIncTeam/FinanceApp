@@ -91,3 +91,39 @@ def get_sum_of_finance_in_current_month(
     )
 
     return float(result)
+
+
+def get_sum_of_finance_on_current_date(
+    user: User,
+    finance_model: Union[Type[Incomes], Type[Outcomes]],
+    date: datetime
+) -> float:
+    """
+    Retrieve total amount of user's incomes/outcomes in the current date.
+    If there is no incomes/outcomes on the current date this function
+    returns 0.00.
+    """
+
+    current_date = date if date else datetime.now()
+
+    result = (
+        get_finance(user=user, finance_model=finance_model)
+        .filter(created_at__lte=current_date)
+        .aggregate(total_sum=Sum("sum"))
+    ).get("total_sum")
+
+    if not result:
+        logger.info(
+            f"The user [ID: {user.pk}, "
+            f"name: {user.email}] - there is no "
+            f"{finance_model} on the current date {current_date}."
+        )
+        return float(0)
+
+    logger.info(
+        f"The user [ID: {user.pk}, "
+        f"name: {user.email}] - successfully return a total amount "
+        f"of {finance_model} on current date {current_date}."
+    )
+
+    return float(result)

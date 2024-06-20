@@ -7,7 +7,9 @@ from api.views import (AccumulationCreateAPI,
                        AccumulationsCategoriesArchiveAPI,
                        AccumulationsCategoriesInfoAPI,
                        AccumulationsCategoriesListCreateAPI,
-                       AccumulationsInfoGetAPI, CustomTokenCreateAPI,
+                       AccumulationsInfoGetAPI,
+                       BalanceGetAPI,
+                       CustomTokenCreateAPI,
                        IncomeCategoriesListCreateAPI, IncomeCreateAPI,
                        IncomesRetrieveUpdateDestroyAPI,
                        IncomeSumInCurrentMonthGetAPI, LastAccumulationsGetAPI,
@@ -16,7 +18,8 @@ from api.views import (AccumulationCreateAPI,
                        OutcomeSumInCurrentMonthGetAPI,
                        TotalAmountAccumulationsGetAPI,
                        activate_users_api_controller,
-                       password_reset_api_controller)
+                       password_reset_api_controller,
+                       OutcomeRetrieveUpdateDestroyView)
 
 urlpatterns = [
     path("auth/token/login/", CustomTokenCreateAPI.as_view(), name="login"),
@@ -24,6 +27,8 @@ urlpatterns = [
     re_path(r"^auth/", include("djoser.urls.authtoken")),
     path("activate/", activate_users_api_controller, name="activate-users"),
     path("password/reset/confirm/", password_reset_api_controller, name="reset-password"),
+    # BALANCE
+    path("balance/", BalanceGetAPI.as_view(), name="balance"),
     # INCOMES
     path(
         "income_categories/",
@@ -54,6 +59,7 @@ urlpatterns = [
         OutcomeCategoriesListCreateAPI.as_view(),
         name="outcome-categories",
     ),
+    path("outcomes/<int:pk>/", OutcomeRetrieveUpdateDestroyView.as_view(), name="change-outcomes"),
     # ACCUMULATIONS
     path(
         "total_amount_of_accumulations/",
@@ -83,7 +89,6 @@ urlpatterns = [
     path("accumulation/", AccumulationCreateAPI.as_view(), name="add-accumulation"),
     path("last_accumulations/", LastAccumulationsGetAPI.as_view(), name="get-last-accumulations"),
     path("accumulations_info/", AccumulationsInfoGetAPI.as_view(), name="all-accumulations-info"),
-
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
