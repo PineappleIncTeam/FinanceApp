@@ -9,7 +9,8 @@ from api.views import (BalanceGetAPI, CustomTokenCreateAPI,
                        LastOutcomesGetAPI, OutcomeCategoriesListCreateAPI,
                        OutcomeSumInCurrentMonthGetAPI,
                        activate_users_api_controller,
-                       password_reset_api_controller)
+                       password_reset_api_controller,
+                       OutcomeRetrieveUpdateDestroyView)
 
 urlpatterns = [
     path("auth/token/login/", CustomTokenCreateAPI.as_view(), name="login"),
@@ -49,6 +50,7 @@ urlpatterns = [
         OutcomeCategoriesListCreateAPI.as_view(),
         name="outcome-categories",
     ),
+    path("outcomes/<int:pk>/", OutcomeRetrieveUpdateDestroyView.as_view(), name="change-outcomes")
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -5,7 +5,7 @@ from .income_categories import IncomeCategoriesListCreateAPI
 from .incomes import (IncomeCreateAPI, IncomesRetrieveUpdateDestroyAPI,
                       IncomeSumInCurrentMonthGetAPI, LastIncomesGetAPI)
 from .outcome_categories import OutcomeCategoriesListCreateAPI
-from .outcomes import LastOutcomesGetAPI, OutcomeSumInCurrentMonthGetAPI
+from .outcomes import LastOutcomesGetAPI, OutcomeSumInCurrentMonthGetAPI, OutcomeRetrieveUpdateDestroyView
 from .password_reset import password_reset_api_controller
 
 __all__ = [
@@ -21,4 +21,5 @@ __all__ = [
     "OutcomeCategoriesListCreateAPI",
     "CustomTokenCreateAPI",
     "BalanceGetAPI",
+    "OutcomeRetrieveUpdateDestroyView"
 ]
