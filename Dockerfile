@@ -9,7 +9,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock ./
+COPY . .
 
 RUN poetry install --no-dev
 
