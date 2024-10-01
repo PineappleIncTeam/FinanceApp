@@ -1,4 +1,4 @@
-FROM python:3.8 as builder
+FROM python:3.8.19 as builder
 
 ENV POETRY_VERSION=1.4.2
 RUN curl -sSL https://install.python-poetry.org | python3 -
