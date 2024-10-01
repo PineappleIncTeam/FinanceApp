@@ -1,14 +1,22 @@
-FROM python:3.8
+FROM python:3.8 as builder
 
-RUN apt-get update && apt-get install -y telnet tcpdump iputils-ping dnsutils
+ENV POETRY_VERSION=1.4.2
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
-WORKDIR /opt/FinanceApp
+ENV PATH="/root/.local/bin:$PATH"
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
 
-COPY . /opt/FinanceApp
+WORKDIR /app
 
-RUN pip install -r /opt/FinanceApp/requirements.txt
+COPY pyproject.toml poetry.lock ./
 
-# RUN python manage.py collectstatic --noinput
+RUN poetry install --no-dev
 
+FROM python:3.8-slim
+
+WORKDIR /app
+
+COPY --from=builder /app ./
 
 CMD ["python", "/manage.py", "runserver", "0.0.0.0:8000"]
