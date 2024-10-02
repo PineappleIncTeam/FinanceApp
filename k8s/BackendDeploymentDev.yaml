@@ -81,4 +81,4 @@ spec:
   persistentVolumeReclaimPolicy: Recycle
   storageClassName: local-storage
   hostPath:
-    path: /data/{{NAMESPACE}}
+    path: /data/{{NAMESPACE}} 
