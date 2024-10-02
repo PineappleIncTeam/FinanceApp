@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from datetime import datetime
 import logging
+from datetime import datetime
 from typing import TYPE_CHECKING, Any, Optional
 
 from django.db.models import Sum
@@ -12,6 +12,7 @@ from .errors import InvalidNumberOfItemsError
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
+
     from api.models import User
 
 
@@ -114,7 +115,7 @@ def get_accumulation_info(user: User) -> QuerySet[Targets]:
 
     logger.info(
         f"name: {user.email}] - successfully return a total amount "
-        f"of accumulations on current date {current_date}."
+        f"of accumulations on current date."
     )
 
     return float(result)

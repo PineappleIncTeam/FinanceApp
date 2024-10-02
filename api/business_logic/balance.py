@@ -4,10 +4,11 @@ import logging
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from api.business_logic import (
-    get_sum_of_finance_on_current_date,
-    get_total_amount_of_accumulations_on_the_current_date)
 from api.models import Incomes, Outcomes
+
+from .accumulations import \
+    get_total_amount_of_accumulations_on_the_current_date  # noqa N400
+from .incomes_outcomes import get_sum_of_finance_on_current_date
 
 if TYPE_CHECKING:
     from api.models import User

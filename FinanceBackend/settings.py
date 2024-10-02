@@ -160,7 +160,7 @@ ALLOWED_HOSTS = [
     "freenance.store",
     "dev.freenance.store",
     "127.0.0.1",
-    "localhost",
+    "localhost"
 ]
 
 CORS_ORIGIN_WHITELIST = [

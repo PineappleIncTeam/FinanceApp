@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 from rest_framework.generics import (CreateAPIView, ListAPIView,
@@ -11,10 +12,9 @@ from rest_framework.status import (HTTP_200_OK, HTTP_202_ACCEPTED,
                                    HTTP_404_NOT_FOUND)
 from rest_framework.views import APIView
 
-from api.business_logic import (archive_accumulation_target,
-                                get_accumulation_info, get_accumulations,
-                                get_categories,
-                                get_total_amount_of_accumulations)
+from api.business_logic import (
+    archive_accumulation_target, get_accumulation_info, get_accumulations,
+    get_categories, get_total_amount_of_accumulations_on_the_current_date)
 from api.business_logic.errors import (InvalidNumberOfItemsError,
                                        TargetDoesNotExistError)
 from api.models import Accumulations, Targets
@@ -37,8 +37,9 @@ class TotalAmountAccumulationsGetAPI(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request: Request) -> Response:
-        total_sum = get_total_amount_of_accumulations(
-            user=request.user
+        total_sum = get_total_amount_of_accumulations_on_the_current_date(
+            user=request.user,
+            date=datetime.now()
         )
         return Response(data={"total_sum": total_sum}, status=HTTP_200_OK)
 
