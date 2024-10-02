@@ -97,5 +97,5 @@ spec:
               cpu: "160m"
       volumes:
         - name: postgresdb-data
-          persistentVolumeClaim:
+          persistentVolumeClaim: 
             claimName: postgresdb-pvc-{{NAMESPACE}}
