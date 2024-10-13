@@ -1,6 +1,7 @@
 from __future__ import annotations
-from django.db import models
+
 from django.contrib.auth.models import AbstractUser, UserManager
+from django.db import models
 from django.utils.html import escape
 from django.utils.translation import gettext as _
 

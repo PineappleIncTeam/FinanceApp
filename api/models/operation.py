@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from api.models import Category, Target
-from api.models.base import BaseModel
+from .base import BaseModel
+from .category import Category
+from .target import Target
 
 INCOME_CATEGORY = "income"
 OUTCOME_CATEGORY = "outcome"
