@@ -1,15 +1,23 @@
-from datetime import datetime
-
 from django.db import models
 
 
 class BaseModel(models.Model):
-    """Describes the fields and attributes of the Base model in the database."""
-
-    created_at = models.DateTimeField(default=datetime.now())
+    created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        """Describes class metadata."""
+        abstract = True
 
+
+class BaseDictionary(BaseModel):
+    name = models.CharField(
+        max_length=255,
+        verbose_name="Наименование"
+    )
+    is_deleted = models.BooleanField(
+        default=False,
+        verbose_name="Признак удаления записи"
+    )
+
+    class Meta:
         abstract = True

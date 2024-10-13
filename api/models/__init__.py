@@ -1,7 +1,10 @@
 from .users import User
 from .accumulations import Targets, Accumulations
 from .incomes import IncomeCategories, Incomes
+from .operation import Operation
 from .outcomes import OutcomeCategories, Outcomes
+from .target import Target
+from .category import Category
 
 
 __all__ = [
@@ -12,4 +15,7 @@ __all__ = [
     "Incomes",
     "OutcomeCategories",
     "Outcomes",
+    "Category",
+    "Target",
+    "Operation"
 ]
