@@ -4,7 +4,6 @@ from .incomes import IncomeCategories, Incomes
 from .operation import Operation
 from .outcomes import OutcomeCategories, Outcomes
 from .target import Target
-from .users import User
 from .category import Category
 
 
