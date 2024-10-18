@@ -5,6 +5,7 @@ from .operation import Operation
 from .outcomes import OutcomeCategories, Outcomes
 from .target import Target
 from .category import Category
+from .countries import Countries
 
 
 __all__ = [
@@ -17,5 +18,6 @@ __all__ = [
     "Outcomes",
     "Category",
     "Target",
-    "Operation"
+    "Operation",
+    "Countries"
 ]

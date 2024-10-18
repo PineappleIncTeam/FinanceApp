@@ -55,3 +55,4 @@ class User(BaseModel, AbstractUser):
         """Describes class metadata."""
 
         db_table = "users"
+
