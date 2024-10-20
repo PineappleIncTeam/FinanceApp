@@ -19,10 +19,6 @@ class Category(BaseDictionary):
         default=False,
         verbose_name="Признак категории расхода"
     )
-    is_fixed = models.BooleanField(
-        default=True,
-        verbose_name="Признак постоянной категории"
-    )
 
     class Meta:
         db_table = "categories"
