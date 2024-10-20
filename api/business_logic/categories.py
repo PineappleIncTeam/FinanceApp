@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Any, Optional, Type, Union
 
-from api.models import IncomeCategories, Targets
+from api.models import Category, IncomeCategories, Targets
 
 from .errors import TargetDoesNotExistError
 
@@ -14,6 +14,45 @@ if TYPE_CHECKING:
 
 
 logger = logging.getLogger(__name__)
+
+
+def get_user_categories(
+    user: User,
+    category_type: str,
+    is_deleted=None
+) -> QuerySet[Category]:
+    """
+    Retrieve all user's categories type which is not hidden
+    according to category.
+    """
+
+    is_income = True if category_type == "income" else False
+    is_outcome = True if category_type == "outcome" else False
+
+    query_result = (
+        Category.objects.filter(
+            user=user.pk,
+            is_income=is_income,
+            is_outcome=is_outcome
+        ).values("name")
+    )
+
+    if is_deleted is not None:
+        query_result = (
+            Category.objects.filter(
+                user=user.pk,
+                is_income=is_income,
+                is_outcome=is_outcome,
+                is_deleted=is_deleted
+            ).values("name")
+        )
+
+    logger.info(
+        f"The user [ID: {user.pk}, "
+        f"name: {user.email}] successfully received "
+        f"a list of the users's {category_type} categories."
+    )
+    return query_result
 
 
 def get_categories(

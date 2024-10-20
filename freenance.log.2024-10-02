@@ -1,0 +1,171 @@
+2024-10-02 10:52:50,859 django.request ERROR log Internal Server Error: /api/v1/auth/users
+Traceback (most recent call last):
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/utils/deprecation.py", line 136, in __call__
+    response = self.process_response(request, response)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/middleware/common.py", line 108, in process_response
+    return self.response_redirect_class(self.get_full_path_with_slash(request))
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/middleware/common.py", line 87, in get_full_path_with_slash
+    raise RuntimeError(
+RuntimeError: You called this URL via POST, but the URL doesn't end in a slash and you have APPEND_SLASH set. Django can't redirect to the slash URL while maintaining POST data. Change your form to point to 127.0.0.1:8000/api/v1/auth/users/ (note the trailing slash), or set APPEND_SLASH=False in your Django settings.
+2024-10-02 10:52:58,173 django.request WARNING log Unauthorized: /api/v1/auth/users/
+2024-10-02 10:54:23,895 django.request ERROR log Internal Server Error: /api/v1/auth/users
+Traceback (most recent call last):
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/utils/deprecation.py", line 136, in __call__
+    response = self.process_response(request, response)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/middleware/common.py", line 108, in process_response
+    return self.response_redirect_class(self.get_full_path_with_slash(request))
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/middleware/common.py", line 87, in get_full_path_with_slash
+    raise RuntimeError(
+RuntimeError: You called this URL via POST, but the URL doesn't end in a slash and you have APPEND_SLASH set. Django can't redirect to the slash URL while maintaining POST data. Change your form to point to 127.0.0.1:8000/api/v1/auth/users/ (note the trailing slash), or set APPEND_SLASH=False in your Django settings.
+2024-10-02 10:54:41,585 django.request ERROR log Internal Server Error: /api/v1/auth/users/
+Traceback (most recent call last):
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+psycopg2.errors.UndefinedTable: relation "users" does not exist
+LINE 1: SELECT 1 AS "a" FROM "users" WHERE "users"."email" = 'ekater...
+                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/views/decorators/csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/viewsets.py", line 124, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/serializers.py", line 223, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/serializers.py", line 442, in run_validation
+    value = self.to_internal_value(data)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/serializers.py", line 499, in to_internal_value
+    validated_value = field.run_validation(primitive_value)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/fields.py", line 757, in run_validation
+    return super().run_validation(data)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/fields.py", line 539, in run_validation
+    self.run_validators(value)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/fields.py", line 551, in run_validators
+    validator(value, self)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/validators.py", line 73, in __call__
+    if qs_exists(queryset):
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/validators.py", line 21, in qs_exists
+    return queryset.exists()
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/models/query.py", line 1241, in exists
+    return self.query.has_results(using=self.db)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/models/sql/query.py", line 598, in has_results
+    return compiler.has_results()
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/models/sql/compiler.py", line 1530, in has_results
+    return bool(self.execute_sql(SINGLE))
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/backends/utils.py", line 102, in execute
+    return super().execute(sql, params)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/backends/utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/backends/utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+django.db.utils.ProgrammingError: relation "users" does not exist
+LINE 1: SELECT 1 AS "a" FROM "users" WHERE "users"."email" = 'ekater...
+                             ^
+
+2024-10-02 10:55:35,571 django.request ERROR log Internal Server Error: /api/v1/auth/users/
+Traceback (most recent call last):
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+psycopg2.errors.UndefinedTable: relation "users" does not exist
+LINE 1: SELECT 1 AS "a" FROM "users" WHERE "users"."email" = 'ekakay...
+                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/views/decorators/csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/viewsets.py", line 124, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/mixins.py", line 18, in create
+    serializer.is_valid(raise_exception=True)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/serializers.py", line 223, in is_valid
+    self._validated_data = self.run_validation(self.initial_data)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/serializers.py", line 442, in run_validation
+    value = self.to_internal_value(data)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/serializers.py", line 499, in to_internal_value
+    validated_value = field.run_validation(primitive_value)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/fields.py", line 757, in run_validation
+    return super().run_validation(data)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/fields.py", line 539, in run_validation
+    self.run_validators(value)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/fields.py", line 551, in run_validators
+    validator(value, self)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/validators.py", line 73, in __call__
+    if qs_exists(queryset):
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/rest_framework/validators.py", line 21, in qs_exists
+    return queryset.exists()
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/models/query.py", line 1241, in exists
+    return self.query.has_results(using=self.db)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/models/sql/query.py", line 598, in has_results
+    return compiler.has_results()
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/models/sql/compiler.py", line 1530, in has_results
+    return bool(self.execute_sql(SINGLE))
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/backends/utils.py", line 102, in execute
+    return super().execute(sql, params)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/backends/utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/backends/utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/home/igor/.cache/pypoetry/virtualenvs/financeapp-4bNmUlQi-py3.8/lib/python3.8/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+django.db.utils.ProgrammingError: relation "users" does not exist
+LINE 1: SELECT 1 AS "a" FROM "users" WHERE "users"."email" = 'ekakay...
+                             ^
+
+2024-10-02 11:56:20,541 django.request WARNING log Unauthorized: /api/v1/auth/users/login/
+2024-10-02 11:56:28,139 django.request WARNING log Unauthorized: /api/v1/auth/users/login/
+2024-10-02 11:59:20,695 django.request WARNING log Bad Request: /api/v1/auth/token/login/
+2024-10-02 11:59:44,331 django.request WARNING log Method Not Allowed: /api/v1/auth/token/login/
+2024-10-02 19:50:06,824 django.request WARNING log Not Found: /
+2024-10-02 19:50:07,415 django.request WARNING log Not Found: /favicon.ico
+2024-10-02 19:50:28,716 django.request WARNING log Not Found: /api/v1/docs/
+2024-10-02 19:50:28,877 django.request WARNING log Not Found: /favicon.ico
