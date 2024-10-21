@@ -20,6 +20,7 @@ from api.views import (AccumulationCreateAPI,
                        activate_users_api_controller,
                        password_reset_api_controller,
                        OutcomeRetrieveUpdateDestroyView)
+from api.views.reports import BudgetView, BudgetByCategoryView
 
 urlpatterns = [
     path("auth/token/login/", CustomTokenCreateAPI.as_view(), name="login"),
@@ -89,6 +90,8 @@ urlpatterns = [
     path("accumulation/", AccumulationCreateAPI.as_view(), name="add-accumulation"),
     path("last_accumulations/", LastAccumulationsGetAPI.as_view(), name="get-last-accumulations"),
     path("accumulations_info/", AccumulationsInfoGetAPI.as_view(), name="all-accumulations-info"),
+    path('reports/budget/', BudgetView.as_view(), name='reports'),
+    path('reports/budget_by_categories', BudgetByCategoryView.as_view(), name='reports'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
