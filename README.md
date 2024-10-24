@@ -84,8 +84,6 @@ git clone https://github.com/PineappleIncTeam/FinanceApp
     EMAIL_HOST_USER=
     EMAIL_HOST_PASSWORD=
     DEFAULT_FROM_EMAIL=
-    
-    DOMAIN=
 ```
 
 1.2 To generate SECRET_KEY run the command:
