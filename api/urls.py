@@ -7,19 +7,19 @@ from api.views import (AccumulationCreateAPI,
                        AccumulationsCategoriesArchiveAPI,
                        AccumulationsCategoriesInfoAPI,
                        AccumulationsCategoriesListCreateAPI,
-                       AccumulationsInfoGetAPI,
-                       BalanceGetAPI,
-                       CustomTokenCreateAPI,
-                       IncomeCategoriesListCreateAPI, IncomeCreateAPI,
-                       IncomesRetrieveUpdateDestroyAPI,
+                       AccumulationsInfoGetAPI, BalanceGetAPI,
+                       CustomTokenCreateAPI, IncomeCategoriesListCreateAPI,
+                       IncomeCreateAPI, IncomesRetrieveUpdateDestroyAPI,
                        IncomeSumInCurrentMonthGetAPI, LastAccumulationsGetAPI,
                        LastIncomesGetAPI, LastOutcomesGetAPI,
+                       OperationListCreateAPI,
+                       OperationRetrieveUpdateDestroyAPI,
                        OutcomeCategoriesListCreateAPI,
+                       OutcomeRetrieveUpdateDestroyView,
                        OutcomeSumInCurrentMonthGetAPI,
                        TotalAmountAccumulationsGetAPI,
                        activate_users_api_controller,
-                       password_reset_api_controller,
-                       OutcomeRetrieveUpdateDestroyView)
+                       password_reset_api_controller)
 
 urlpatterns = [
     path("auth/token/login/", CustomTokenCreateAPI.as_view(), name="login"),
@@ -89,6 +89,12 @@ urlpatterns = [
     path("accumulation/", AccumulationCreateAPI.as_view(), name="add-accumulation"),
     path("last_accumulations/", LastAccumulationsGetAPI.as_view(), name="get-last-accumulations"),
     path("accumulations_info/", AccumulationsInfoGetAPI.as_view(), name="all-accumulations-info"),
+    path("operations/", OperationListCreateAPI.as_view(), name="operations-list-create"),
+    path(
+        "operations/<int:pk>/",
+        OperationRetrieveUpdateDestroyAPI.as_view(),
+        name="operations-detail"
+    ),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
