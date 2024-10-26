@@ -29,9 +29,7 @@ class ProfileApiView(ListCreateAPIView):
         user = User.objects.get(email=username)
         try:
             Profile.objects.create(user=user)
-            print(user.id)
             return Response({"id": f"{user.id}"})
         except IntegrityError:
             user = Profile.objects.get(user=user.id)
-            print(user)
             return Response({"id": f"{user}"})
