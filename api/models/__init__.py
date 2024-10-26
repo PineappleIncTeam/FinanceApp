@@ -6,6 +6,7 @@ from .outcomes import OutcomeCategories, Outcomes
 from .target import Target
 from .category import Category
 from .countries import Countries
+from .profile import Profile
 
 
 __all__ = [
@@ -19,5 +20,6 @@ __all__ = [
     "Category",
     "Target",
     "Operation",
-    "Countries"
+    "Countries",
+    "Profile"
 ]
