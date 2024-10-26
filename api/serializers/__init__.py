@@ -6,6 +6,7 @@ from .incomes import (IncomeCategoriesSerializer, IncomeCreateSerializer,
                       IncomeSerializer)
 from .outcomes import OutcomeCategoriesSerializer, OutcomeSerializer
 from .user import CustomTokenCreateSerializer, CustomUserCreateSerializer
+from .profile import ProfileSerializer
 
 __all__ = [
     "CustomTokenCreateSerializer",
@@ -20,4 +21,5 @@ __all__ = [
     "AccumulationCreateSerializer",
     "AccumulationInfoSerializer",
     "ArchiveAccumulationCategorySerializer",
+    "ProfileSerializer"
 ]

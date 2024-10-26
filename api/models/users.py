@@ -50,6 +50,7 @@ class User(BaseModel, AbstractUser):
     objects = CustomUserManager()
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS: list[str] = []
+    # icon = models.ImageField()
 
     class Meta:
         """Describes class metadata."""

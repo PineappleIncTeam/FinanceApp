@@ -14,6 +14,8 @@ from .incomes import (IncomeCreateAPI, IncomesRetrieveUpdateDestroyAPI,
 from .outcome_categories import OutcomeCategoriesListCreateAPI
 from .outcomes import LastOutcomesGetAPI, OutcomeSumInCurrentMonthGetAPI, OutcomeRetrieveUpdateDestroyView
 from .password_reset import password_reset_api_controller
+from .countries import CountriesApiView
+from .profile import ProfileApiView
 
 __all__ = [
     "activate_users_api_controller",
@@ -36,5 +38,7 @@ __all__ = [
     "AccumulationsCategoriesInfoAPI",
     "AccumulationsCategoriesArchiveAPI",
     "BalanceGetAPI",
-    "OutcomeRetrieveUpdateDestroyView"
+    "OutcomeRetrieveUpdateDestroyView",
+    "CountriesApiView",
+    "ProfileApiView"
 ]

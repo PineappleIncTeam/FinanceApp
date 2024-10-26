@@ -19,7 +19,9 @@ from api.views import (AccumulationCreateAPI,
                        TotalAmountAccumulationsGetAPI,
                        activate_users_api_controller,
                        password_reset_api_controller,
-                       OutcomeRetrieveUpdateDestroyView)
+                       OutcomeRetrieveUpdateDestroyView,
+                       CountriesApiView,
+                       ProfileApiView)
 
 urlpatterns = [
     path("auth/token/login/", CustomTokenCreateAPI.as_view(), name="login"),
@@ -89,6 +91,8 @@ urlpatterns = [
     path("accumulation/", AccumulationCreateAPI.as_view(), name="add-accumulation"),
     path("last_accumulations/", LastAccumulationsGetAPI.as_view(), name="get-last-accumulations"),
     path("accumulations_info/", AccumulationsInfoGetAPI.as_view(), name="all-accumulations-info"),
+    path("countries_list/", CountriesApiView.as_view(), name="all_countries"),
+    path("user_info", ProfileApiView.as_view())
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
