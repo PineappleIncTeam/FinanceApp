@@ -8,8 +8,12 @@ class BudgetSerializer(serializers.Serializer):
     total_savings = serializers.DecimalField(max_digits=19, decimal_places=2)
 
 
-class BudgetQueryParamsSerializer(serializers.Serializer):
-    date = serializers.DateField(
-        required=False,
-        help_text="Дата, на которую нужно рассчитать показатели. Формат: YYYY-MM-DD. Если не указана, будет использована текущая дата."
-    )
+class MonthSumSerializer(serializers.Serializer):
+    month = serializers.CharField()
+    amount = serializers.DecimalField(max_digits=19, decimal_places=2)
+
+
+class CategoryAggregationSerializer(serializers.Serializer):
+    category_id = serializers.IntegerField()
+    category_name = serializers.CharField()
+    month_sums = MonthSumSerializer(many=True)
