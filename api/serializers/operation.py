@@ -17,24 +17,16 @@ class OperationSerializer(serializers.ModelSerializer):
         """
         Validate the category field.
         """
-        if value and not Category.objects.filter(
-            id=value.id, user=self.context["request"].user
-        ).exists():
-            raise serializers.ValidationError(
-                "Category does not exist or does not belong to the current user."
-            )
+        if value and not Category.objects.filter(id=value.id).exists():
+            raise serializers.ValidationError("Category does not exist.")
         return value
 
     def validate_target(self, value):
         """
         Validate the target field.
         """
-        if value and not Target.objects.filter(
-            id=value.id, user=self.context["request"].user
-        ).exists():
-            raise serializers.ValidationError(
-                "Target does not exist or does not belong to the current user."
-            )
+        if value and not Target.objects.filter(id=value.id).exists():
+            raise serializers.ValidationError("Target does not exist.")
         return value
 
     def validate(self, data):
