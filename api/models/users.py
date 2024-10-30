@@ -6,6 +6,7 @@ from django.utils.html import escape
 from django.utils.translation import gettext as _
 
 from .base import BaseModel
+from .countries import Country
 
 
 class CustomUserManager(UserManager):
@@ -50,7 +51,8 @@ class User(BaseModel, AbstractUser):
     objects = CustomUserManager()
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS: list[str] = []
-    # icon = models.ImageField()
+    avatar = models.ImageField(null=True)
+    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
 
     class Meta:
         """Describes class metadata."""

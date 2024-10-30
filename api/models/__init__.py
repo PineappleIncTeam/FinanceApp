@@ -5,7 +5,7 @@ from .operation import Operation
 from .outcomes import OutcomeCategories, Outcomes
 from .target import Target
 from .category import Category
-from .countries import Countries
+from .countries import Country
 from .profile import Profile
 
 
@@ -20,6 +20,6 @@ __all__ = [
     "Category",
     "Target",
     "Operation",
-    "Countries",
+    "Country",
     "Profile"
 ]

@@ -40,5 +40,5 @@ __all__ = [
     "BalanceGetAPI",
     "OutcomeRetrieveUpdateDestroyView",
     "CountriesApiView",
-    "ProfileApiView"
+    "ProfileViewSet"
 ]

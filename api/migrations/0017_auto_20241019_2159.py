@@ -4,7 +4,7 @@ import os
 
 
 def load_data(apps, schema_editor):
-    countries = apps.get_model('api', 'Countries')
+    countries = apps.get_model('api', 'Country')
 
     # Путь к файлу с данными
     file_path = os.path.join(os.path.dirname(__file__), 'data/oksm.json')

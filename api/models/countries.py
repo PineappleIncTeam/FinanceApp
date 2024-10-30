@@ -2,7 +2,7 @@ from .base import BaseModel
 from django.db import models
 
 
-class Countries(models.Model):
+class Country(models.Model):
     code = models.CharField(
         max_length=4,
         verbose_name='Код страны'
