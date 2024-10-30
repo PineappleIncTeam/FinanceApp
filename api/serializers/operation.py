@@ -67,4 +67,4 @@ class OperationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Operation
-        fields = "__all__"
+        fields = ['id', 'type', 'amount', 'date', 'categories', 'target']
