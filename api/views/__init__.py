@@ -7,7 +7,7 @@ from .accumulations import (AccumulationCreateAPI,
                             TotalAmountAccumulationsGetAPI)
 from .activate_users import activate_users_api_controller
 from .balance import BalanceGetAPI
-from .categories import CategoriesListCreateAPI
+from .categories import CategoriesListCreateAPI, CategoryUpdateDestroyAPI
 from .generate_token import CustomTokenCreateAPI
 from .income_categories import IncomeCategoriesListCreateAPI
 from .incomes import (IncomeCreateAPI, IncomesRetrieveUpdateDestroyAPI,
@@ -40,4 +40,5 @@ __all__ = [
     "BalanceGetAPI",
     "OutcomeRetrieveUpdateDestroyView",
     "CategoriesListCreateAPI",
+    "CategoryUpdateDestroyAPI",
 ]

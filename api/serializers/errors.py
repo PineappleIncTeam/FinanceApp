@@ -1,6 +1,0 @@
-class CategoryAlreadyExistError(Exception):
-    ...
-
-
-class InvalidCategoryTypeError(Exception):
-    ...

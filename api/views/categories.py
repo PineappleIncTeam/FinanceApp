@@ -1,31 +1,80 @@
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING
 
-from rest_framework.generics import ListCreateAPIView
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.generics import (DestroyAPIView, ListCreateAPIView,
+                                     UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.status import HTTP_204_NO_CONTENT
 
-from api.business_logic import get_user_categories
+from api.business_logic import (get_categories_with_operations,
+                                get_user_categories)
 from api.models import Category
-from api.serializers import CategoriesSerializer
+from api.serializers import CategoriesSerializer, CategoryDetailSerializer
+from api.views.errors import CategoryWithOperationsError
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
 
 
+logger = logging.getLogger(__name__)
+
+
 class CategoriesListCreateAPI(ListCreateAPIView):
     """
-    To get a list of user's income categories and create a new income category.
+    To get a list of user's categories and create a new category.
     """
 
     serializer_class = CategoriesSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['is_income', 'is_outcome', 'is_deleted']
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self) -> QuerySet[Category]:
-        category_type = self.request.query_params.get('category_type')
-
         return get_user_categories(
-            user=self.request.user,
-            category_type=category_type,
-            is_deleted=False
+            user=self.request.user
         )
+
+
+class CategoryUpdateDestroyAPI(UpdateAPIView, DestroyAPIView):
+    """
+    To delete a category if there are no operations related with this category.
+    To archive a category.
+    """
+
+    serializer_class = CategoryDetailSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self) -> QuerySet[Category]:
+        return get_user_categories(
+            user=self.request.user
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        categories_with_operations = get_categories_with_operations(
+            user=request.user
+        )
+
+        for item in categories_with_operations:
+            if instance == item:
+                logger.error(
+                    f"The user [ID: {request.user.pk}, "
+                    f"name: {request.user.email}] can not delete a category "
+                    f"with existing operations: id {instance.pk}."
+                )
+                raise CategoryWithOperationsError(
+                    'Can not delete category with existing operations.'
+                )
+
+        self.perform_destroy(instance)
+
+        logger.error(
+            f"The user [ID: {request.user.pk}, "
+            f"name: {request.user.email}] has deleted a category: "
+            f"id {instance.pk}, name - {instance.name}."
+        )
+        return Response(status=HTTP_204_NO_CONTENT)
