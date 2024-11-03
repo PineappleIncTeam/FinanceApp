@@ -17,20 +17,12 @@ from api.views import (AccumulationCreateAPI,
                        OutcomeRetrieveUpdateDestroyView,
                        OutcomeSumInCurrentMonthGetAPI,
                        TotalAmountAccumulationsGetAPI,
-                       activate_users_api_controller,
                        password_reset_api_controller)
 
 urlpatterns = [
     path("auth/token/login/", CustomTokenCreateAPI.as_view(), name="login"),
     path("auth/", include("djoser.urls")),
     re_path(r"^auth/", include("djoser.urls.authtoken")),
-    path("activate/", activate_users_api_controller, name="activate-users"),
-    path(
-        "password/reset/confirm/",
-        password_reset_api_controller,
-        name="reset-password"
-    ),
-
     path(
         "categories/",
         CategoriesListCreateAPI.as_view(),
@@ -41,7 +33,7 @@ urlpatterns = [
         CategoryUpdateDestroyAPI.as_view(),
         name="category-info",
     ),
-
+    path("password/reset/confirm/", password_reset_api_controller, name="reset-password"),
     # BALANCE
     path("balance/", BalanceGetAPI.as_view(), name="balance"),
     # INCOMES
