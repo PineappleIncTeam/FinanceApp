@@ -11,18 +11,24 @@ class ProfileApiView(ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
+        """
+        Getting user profile data
+        """
+
         profile = Profile.objects.get(user=self.request.user.id)
         return Response({"username": profile.username,
                          "email": profile.email,
                          "country": profile.country})
 
     def post(self, request):
+        """
+        Save the user to the model profile
+        """
         username = request.user
         user = User.objects.get(email=username)
         us = {"user": user.id,
               "username": user.username,
               "email": user.email,
-              "country": user.country,
               # "avatar": None
               }
         serializer = ProfileSerializer(data=us)
