@@ -12,7 +12,7 @@ def load_data(apps, schema_editor):
     with open(file_path, encoding="utf8") as f:
         data = json.load(f)
         for item in data:
-            item.pop("alfa2")
+            item.pop("code")
             item.pop("alfa3")
             countries.objects.create(**item)
 

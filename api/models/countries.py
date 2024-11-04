@@ -3,10 +3,6 @@ from django.db import models
 
 
 class Country(models.Model):
-    code = models.CharField(
-        max_length=4,
-        verbose_name='Код страны'
-    )
     name = models.CharField(
         max_length=146,
         verbose_name='Краткое название'
@@ -15,6 +11,10 @@ class Country(models.Model):
         max_length=146,
         verbose_name='Полное название',
 
+    )
+    alfa2 = models.CharField(
+        max_length=3,
+        verbose_name='Альфа-2'
     )
 
     class Meta:
