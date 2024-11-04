@@ -5,15 +5,46 @@ from rest_framework import serializers
 
 from api.business_logic import get_user_categories
 from api.models import Category
+from api.serializers.errors import CategoryExistsError
 
 logger = logging.getLogger(__name__)
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
-    is_deleted = serializers.BooleanField(required=False)
 
     def create(self, validated_data: Dict[str, Any]) -> Category:
         validated_data["user"] = self.context.get("request").user
+
+        all_categories = get_user_categories(
+            user=self.context.get('request').user,
+            is_income=validated_data.get("is_income"),
+            is_outcome=validated_data.get("is_outcome")
+        )
+
+        for category in all_categories:
+            if category.name.lower() == validated_data["name"].lower():
+                if category.is_deleted:
+                    category.is_deleted = False
+                    category.save()
+                    logger.info(
+                        f"The user [ID: {self.context.get('request').user.pk},"
+                        f" name: {self.context.get('request').user.email}] "
+                        f"has retrieved a category {validated_data['name']} "
+                        f"from the archive."
+                    )
+                    return category
+
+                else:
+                    logger.error(
+                        f"The user [ID: {self.context.get('request').user.pk},"
+                        f" name: {self.context.get('request').user.email}] "
+                        f"can not add a new category {validated_data['name']} "
+                        f"because of category existance."
+                    )
+
+                    raise CategoryExistsError(
+                        "The category already exists."
+                    )
 
         logger.info(
             f"The user [ID: {self.context.get('request').user.pk}, "
@@ -43,31 +74,12 @@ class CategoriesSerializer(serializers.ModelSerializer):
                 "is_income and is_outcome.)"
             )
 
-        all_categories = get_user_categories(
-            user=self.context.get('request').user,
-            is_income=data.get("is_income"),
-            is_outcome=data.get("is_outcome"),
-            is_deleted=data.get("is_deleted")
-        )
-
-        for category in all_categories:
-            if category.name.lower() == data["name"].lower():
-                logger.error(
-                    f"The user [ID: {self.context.get('request').user.pk}, "
-                    f"name: {self.context.get('request').user.email}] can not "
-                    f"add a new category {data['name']} "
-                    f"because of category existance."
-                )
-
-                raise serializers.ValidationError(
-                    "The category already exists."
-                )
-
         return data
 
     class Meta:
         model = Category
         fields = ['id', 'name', "is_income", "is_outcome", 'is_deleted']
+        read_only_fields = ['is_deleted']
 
 
 class CategoryDetailSerializer(serializers.ModelSerializer):
