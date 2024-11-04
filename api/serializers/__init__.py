@@ -21,5 +21,5 @@ __all__ = [
     "AccumulationCreateSerializer",
     "AccumulationInfoSerializer",
     "ArchiveAccumulationCategorySerializer",
-    "ProfileSerializer"
+    "ProfileSerializer",
 ]

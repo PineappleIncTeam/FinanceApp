@@ -19,7 +19,7 @@ def load_data(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('api', '0016_alter_countries_name'),  # Замените на имя предыдущей миграции
+        ('api', '0014_country_profile'),  # Замените на имя предыдущей миграции
     ]
 
     operations = [

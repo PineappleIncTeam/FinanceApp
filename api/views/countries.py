@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 
-from rest_framework.generics import ListCreateAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 from api.models import Country
-from api.serializers.countries import CountriesSerializer
 
 
-class CountriesApiView(ListCreateAPIView):
-    serializer_class = CountriesSerializer
+class CountriesApiView(APIView):
+    def get(self, request):
+        countries = Country.objects.all().values()
+        return Response(countries)
 
-    def get(self):
-        countries = Country.objects.all()
-        return countries
+

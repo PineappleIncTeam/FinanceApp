@@ -8,7 +8,6 @@ from api.serializers import ProfileSerializer
 
 class ProfileApiView(ListCreateAPIView):
     queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
@@ -26,7 +25,6 @@ class ProfileApiView(ListCreateAPIView):
               "country": user.country,
               # "avatar": None
               }
-        print(us)
         serializer = ProfileSerializer(data=us)
         serializer.is_valid(raise_exception=True)
         serializer.save()

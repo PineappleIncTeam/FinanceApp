@@ -51,8 +51,6 @@ class User(BaseModel, AbstractUser):
     objects = CustomUserManager()
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS: list[str] = []
-    avatar = models.ImageField(null=True)
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
 
     class Meta:
         """Describes class metadata."""
