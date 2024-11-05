@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Any, Optional, Type, Union
 
-from api.models import Category, IncomeCategories, Operation, Targets
+from api.models import Category, IncomeCategories, Targets
 
 from .errors import TargetDoesNotExistError
 
@@ -52,11 +52,6 @@ def get_user_categories(
     )
 
     return query_result
-
-
-def get_categories_with_operations(user: User) -> QuerySet[Operation]:
-    res = Operation.objects.filter(user=user).distinct("categories")
-    return res
 
 
 def get_categories(

@@ -8,10 +8,9 @@ from rest_framework.generics import (DestroyAPIView, ListCreateAPIView,
                                      UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import HTTP_204_NO_CONTENT
+from rest_framework.status import HTTP_200_OK
 
-from api.business_logic import (get_categories_with_operations,
-                                get_user_categories)
+from api.business_logic import get_user_categories
 from api.models import Category
 from api.serializers import CategoriesSerializer, CategoryDetailSerializer
 from api.views.errors import CategoryWithOperationsError
@@ -55,26 +54,23 @@ class CategoryUpdateDestroyAPI(UpdateAPIView, DestroyAPIView):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        categories_with_operations = get_categories_with_operations(
-            user=request.user
-        )
+        if instance.operations.exists():
+            logger.error(
+                f"The user [ID: {request.user.pk}, "
+                f"name: {request.user.email}] can not delete a category "
+                f"with existing operations: id {instance.pk}."
+            )
 
-        for item in categories_with_operations:
-            if instance == item:
-                logger.error(
-                    f"The user [ID: {request.user.pk}, "
-                    f"name: {request.user.email}] can not delete a category "
-                    f"with existing operations: id {instance.pk}."
-                )
-                raise CategoryWithOperationsError(
-                    'Can not delete category with existing operations.'
-                )
+            raise CategoryWithOperationsError()
 
         self.perform_destroy(instance)
 
-        logger.error(
+        logger.info(
             f"The user [ID: {request.user.pk}, "
             f"name: {request.user.email}] has deleted a category: "
-            f"id {instance.pk}, name - {instance.name}."
+            f"id {instance.id}, name - {instance.name}."
         )
-        return Response(status=HTTP_204_NO_CONTENT)
+        return Response(
+            data=CategoriesSerializer(instance).data,
+            status=HTTP_200_OK
+        )

@@ -13,6 +13,11 @@ logger = logging.getLogger(__name__)
 class CategoriesSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data: Dict[str, Any]) -> Category:
+        """
+        Create category inctance if category does not exist
+        or retrieve it from archive.
+        """
+
         validated_data["user"] = self.context.get("request").user
 
         all_categories = get_user_categories(
@@ -42,9 +47,7 @@ class CategoriesSerializer(serializers.ModelSerializer):
                         f"because of category existance."
                     )
 
-                    raise CategoryExistsError(
-                        "The category already exists."
-                    )
+                    raise CategoryExistsError()
 
         logger.info(
             f"The user [ID: {self.context.get('request').user.pk}, "
@@ -56,7 +59,6 @@ class CategoriesSerializer(serializers.ModelSerializer):
     def validate(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Check correct category type usage.
-        Check category existance.
         """
 
         if (data['is_income'] and data['is_outcome']) or (
