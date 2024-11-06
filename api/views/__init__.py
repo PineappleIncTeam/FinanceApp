@@ -6,6 +6,7 @@ from .accumulations import (AccumulationCreateAPI,
                             AccumulationsInfoGetAPI, LastAccumulationsGetAPI,
                             TotalAmountAccumulationsGetAPI)
 from .balance import BalanceGetAPI
+from .categories import CategoriesListCreateAPI, CategoryUpdateDestroyAPI
 from .generate_token import CustomTokenCreateAPI
 from .income_categories import IncomeCategoriesListCreateAPI
 from .incomes import (IncomeCreateAPI, IncomesRetrieveUpdateDestroyAPI,
@@ -35,5 +36,7 @@ __all__ = [
     "AccumulationsCategoriesInfoAPI",
     "AccumulationsCategoriesArchiveAPI",
     "BalanceGetAPI",
-    "OutcomeRetrieveUpdateDestroyView"
+    "OutcomeRetrieveUpdateDestroyView",
+    "CategoriesListCreateAPI",
+    "CategoryUpdateDestroyAPI",
 ]

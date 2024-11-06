@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "drf_spectacular_sidecar",
     "whitenoise.runserver_nostatic",
+    "django_filters",
 ]
 
 MIDDLEWARE = [

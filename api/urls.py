@@ -8,11 +8,11 @@ from api.views import (AccumulationCreateAPI,
                        AccumulationsCategoriesInfoAPI,
                        AccumulationsCategoriesListCreateAPI,
                        AccumulationsInfoGetAPI, BalanceGetAPI,
-                       CustomTokenCreateAPI, IncomeCategoriesListCreateAPI,
+                       CategoriesListCreateAPI, CategoryUpdateDestroyAPI,
+                       CustomTokenCreateAPI,
                        IncomeCreateAPI, IncomesRetrieveUpdateDestroyAPI,
                        IncomeSumInCurrentMonthGetAPI, LastAccumulationsGetAPI,
                        LastIncomesGetAPI, LastOutcomesGetAPI,
-                       OutcomeCategoriesListCreateAPI,
                        OutcomeRetrieveUpdateDestroyView,
                        OutcomeSumInCurrentMonthGetAPI,
                        TotalAmountAccumulationsGetAPI,
@@ -22,15 +22,19 @@ urlpatterns = [
     path("auth/token/login/", CustomTokenCreateAPI.as_view(), name="login"),
     path("auth/", include("djoser.urls")),
     re_path(r"^auth/", include("djoser.urls.authtoken")),
+    path(
+        "categories/",
+        CategoriesListCreateAPI.as_view(),
+        name="categories",
+    ),
+    path(
+        "categories/<int:pk>/",
+        CategoryUpdateDestroyAPI.as_view(),
+        name="category-info",
+    ),
     path("password/reset/confirm/", password_reset_api_controller, name="reset-password"),
     # BALANCE
     path("balance/", BalanceGetAPI.as_view(), name="balance"),
-    # INCOMES
-    path(
-        "income_categories/",
-        IncomeCategoriesListCreateAPI.as_view(),
-        name="income-categories",
-    ),
     path(
         "income/<int:pk>/",
         IncomesRetrieveUpdateDestroyAPI.as_view(),
@@ -50,11 +54,6 @@ urlpatterns = [
         name="outcome-sum-in-current-month",
     ),
     path("last_outcomes/", LastOutcomesGetAPI.as_view(), name="get-last-outcomes"),
-    path(
-        "outcome_categories/",
-        OutcomeCategoriesListCreateAPI.as_view(),
-        name="outcome-categories",
-    ),
     path("outcomes/<int:pk>/", OutcomeRetrieveUpdateDestroyView.as_view(), name="change-outcomes"),
     # ACCUMULATIONS
     path(
