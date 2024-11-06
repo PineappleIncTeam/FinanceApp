@@ -258,3 +258,5 @@ LOGGING = {
         },
     },
 }
+
+MAX_OPERATIONS_COUNT = 5

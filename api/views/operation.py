@@ -8,6 +8,7 @@ from rest_framework.generics import (ListCreateAPIView,
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from FinanceBackend.settings import MAX_OPERATIONS_COUNT
 from api.models import Operation
 from api.serializers import OperationSerializer
 
@@ -41,11 +42,11 @@ class OperationListCreateAPI(ListCreateAPIView):
         if operation_type:
             queryset = queryset.filter(type=operation_type)
 
-        last_five = self.request.query_params.get("last_five", None)
+        last_five = self.request.query_params.get("last_five", "true")
         if last_five and last_five.lower() == "true":
-            queryset = queryset.order_by("-created_at")[:5]
+            queryset = queryset.order_by("-date", "-id")[:MAX_OPERATIONS_COUNT]
         else:
-            queryset = queryset.order_by("-created_at")
+            queryset = queryset.order_by("-date", "-id")
 
         return queryset
 

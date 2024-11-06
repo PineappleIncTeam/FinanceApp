@@ -2,12 +2,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path, re_path
 
-from api.views import (BalanceGetAPI, CustomTokenCreateAPI,
+from api.views import (CustomTokenCreateAPI,
                        CategoriesListCreateAPI, 
                        CategoryUpdateDestroyAPI,
                        OperationListCreateAPI,
                        OperationRetrieveUpdateDestroyAPI,
-                       activate_users_api_controller,
                        password_reset_api_controller)
 
 urlpatterns = [
@@ -28,8 +27,6 @@ urlpatterns = [
         CategoryUpdateDestroyAPI.as_view(),
         name="category-info",
     ),
-    # BALANCE
-    path("balance/", BalanceGetAPI.as_view(), name="balance"),
     # OPERATIONS
     path(
         "operations/", OperationListCreateAPI.as_view(), name="operations-list-create"
