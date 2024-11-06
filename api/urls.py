@@ -9,11 +9,10 @@ from api.views import (AccumulationCreateAPI,
                        AccumulationsCategoriesListCreateAPI,
                        AccumulationsInfoGetAPI, BalanceGetAPI,
                        CategoriesListCreateAPI, CategoryUpdateDestroyAPI,
-                       CustomTokenCreateAPI, IncomeCategoriesListCreateAPI,
+                       CustomTokenCreateAPI,
                        IncomeCreateAPI, IncomesRetrieveUpdateDestroyAPI,
                        IncomeSumInCurrentMonthGetAPI, LastAccumulationsGetAPI,
                        LastIncomesGetAPI, LastOutcomesGetAPI,
-                       OutcomeCategoriesListCreateAPI,
                        OutcomeRetrieveUpdateDestroyView,
                        OutcomeSumInCurrentMonthGetAPI,
                        TotalAmountAccumulationsGetAPI,
@@ -36,12 +35,6 @@ urlpatterns = [
     path("password/reset/confirm/", password_reset_api_controller, name="reset-password"),
     # BALANCE
     path("balance/", BalanceGetAPI.as_view(), name="balance"),
-    # INCOMES
-    path(
-        "income_categories/",
-        IncomeCategoriesListCreateAPI.as_view(),
-        name="income-categories",
-    ),
     path(
         "income/<int:pk>/",
         IncomesRetrieveUpdateDestroyAPI.as_view(),
@@ -61,11 +54,6 @@ urlpatterns = [
         name="outcome-sum-in-current-month",
     ),
     path("last_outcomes/", LastOutcomesGetAPI.as_view(), name="get-last-outcomes"),
-    path(
-        "outcome_categories/",
-        OutcomeCategoriesListCreateAPI.as_view(),
-        name="outcome-categories",
-    ),
     path("outcomes/<int:pk>/", OutcomeRetrieveUpdateDestroyView.as_view(), name="change-outcomes"),
     # ACCUMULATIONS
     path(

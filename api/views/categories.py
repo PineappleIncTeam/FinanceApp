@@ -8,7 +8,7 @@ from rest_framework.generics import (DestroyAPIView, ListCreateAPIView,
                                      UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK
+from rest_framework.status import HTTP_204_NO_CONTENT
 
 from api.business_logic import get_user_categories
 from api.models import Category
@@ -70,7 +70,4 @@ class CategoryUpdateDestroyAPI(UpdateAPIView, DestroyAPIView):
             f"name: {request.user.email}] has deleted a category: "
             f"id {instance.id}, name - {instance.name}."
         )
-        return Response(
-            data=CategoriesSerializer(instance).data,
-            status=HTTP_200_OK
-        )
+        return Response(status=HTTP_204_NO_CONTENT)
