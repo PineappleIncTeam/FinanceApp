@@ -2,6 +2,7 @@ from .accumulations import (AccumulationCreateSerializer,
                             AccumulationInfoSerializer, AccumulationSerializer,
                             AcumulationCategoriesSerializer,
                             ArchiveAccumulationCategorySerializer)
+from .category import CategoriesSerializer, CategoryDetailSerializer
 from .incomes import (IncomeCategoriesSerializer, IncomeCreateSerializer,
                       IncomeSerializer)
 from .operation import OperationSerializer
@@ -21,5 +22,7 @@ __all__ = [
     "AccumulationCreateSerializer",
     "AccumulationInfoSerializer",
     "ArchiveAccumulationCategorySerializer",
+    "CategoriesSerializer",
+    "CategoryDetailSerializer",
     "OperationSerializer",
 ]
