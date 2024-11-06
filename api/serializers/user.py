@@ -1,7 +1,6 @@
 from django.contrib.auth import authenticate, get_user_model
 from django.utils.html import escape
-from djoser.serializers import (TokenCreateSerializer,
-                                UserCreatePasswordRetypeSerializer)
+from djoser.serializers import TokenCreateSerializer, UserCreatePasswordRetypeSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings

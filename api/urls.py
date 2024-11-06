@@ -2,8 +2,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path, re_path
 
-from api.views import (CategoriesListCreateAPI, CategoryUpdateDestroyAPI,
-                       CustomTokenCreateAPI, OperationListCreateAPI,
+from api.views import (CategoriesListCreateAPI,
+                       CategoryUpdateDestroyAPI,
+                       CustomTokenCreateAPI,
+                       OperationListCreateAPI,
                        OperationRetrieveUpdateDestroyAPI,
                        password_reset_api_controller)
 
