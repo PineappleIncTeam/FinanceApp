@@ -11,6 +11,8 @@ from .generate_token import CustomTokenCreateAPI
 from .income_categories import IncomeCategoriesListCreateAPI
 from .incomes import (IncomeCreateAPI, IncomesRetrieveUpdateDestroyAPI,
                       IncomeSumInCurrentMonthGetAPI, LastIncomesGetAPI)
+from .operation import (OperationListCreateAPI,
+                        OperationRetrieveUpdateDestroyAPI)
 from .outcome_categories import OutcomeCategoriesListCreateAPI
 from .outcomes import (LastOutcomesGetAPI, OutcomeRetrieveUpdateDestroyView,
                        OutcomeSumInCurrentMonthGetAPI)
@@ -37,6 +39,8 @@ __all__ = [
     "AccumulationsCategoriesArchiveAPI",
     "BalanceGetAPI",
     "OutcomeRetrieveUpdateDestroyView",
+    "OperationListCreateAPI",
+    "OperationRetrieveUpdateDestroyAPI",
     "CategoriesListCreateAPI",
     "CategoryUpdateDestroyAPI",
 ]
