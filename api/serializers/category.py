@@ -3,7 +3,7 @@ from typing import Any, Dict
 
 from rest_framework import serializers
 
-from api.business_logic import get_user_categories
+from api.utils import get_user_categories
 from api.models import Category
 from api.serializers.errors import CategoryExistsError
 
@@ -14,7 +14,7 @@ class CategoriesSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data: Dict[str, Any]) -> Category:
         """
-        Create category inctance if category does not exist
+        Create category instance if category does not exist
         or retrieve it from archive.
         """
 

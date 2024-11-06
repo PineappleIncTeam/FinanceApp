@@ -36,9 +36,9 @@ class CustomUserManager(UserManager):
 
 
 class User(BaseModel, AbstractUser):
-    '''
+    """
     Describes the fields and attributes of the User model in the database.
-    '''
+    """
 
     email = models.EmailField(unique=True)
     username = models.CharField(

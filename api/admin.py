@@ -1,18 +1,11 @@
 from django.contrib import admin
-from django.contrib.auth import get_user_model # Categories, IncomeCash, OutcomeCash, MoneyBox
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
-@admin.register(get_user_model())
+@admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('id', 'username', 'email',)
     ordering = ('email',)
     search_fields = ('username', 'email',)
-
-
-# admin.site.register(
-#     (
-#         Categories,
-#         IncomeCash,
-#         OutcomeCash,
-#         MoneyBox,)
-# )

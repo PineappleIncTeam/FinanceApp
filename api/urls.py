@@ -3,18 +3,30 @@ from django.conf.urls.static import static
 from django.urls import include, path, re_path
 
 from api.views import (CustomTokenCreateAPI,
-                       CategoriesListCreateAPI, 
+                       CategoriesListCreateAPI,
                        CategoryUpdateDestroyAPI,
                        OperationListCreateAPI,
                        OperationRetrieveUpdateDestroyAPI,
                        password_reset_api_controller)
 
 urlpatterns = [
-    path("auth/token/login/", CustomTokenCreateAPI.as_view(), name="login"),
-    path("auth/", include("djoser.urls")),
-    re_path(r"^auth/", include("djoser.urls.authtoken")),
     path(
-        "password/reset/confirm/", password_reset_api_controller, name="reset-password"
+        "auth/token/login/",
+        CustomTokenCreateAPI.as_view(),
+        name="login",
+    ),
+    path(
+        "auth/",
+        include("djoser.urls"),
+    ),
+    re_path(
+        r"^auth/",
+        include("djoser.urls.authtoken"),
+    ),
+    path(
+        "password/reset/confirm/",
+        password_reset_api_controller,
+        name="reset-password",
     ),
     # CATEGORIES
     path(
@@ -29,7 +41,9 @@ urlpatterns = [
     ),
     # OPERATIONS
     path(
-        "operations/", OperationListCreateAPI.as_view(), name="operations-list-create"
+        "operations/",
+        OperationListCreateAPI.as_view(),
+        name="operations-list-create",
     ),
     path(
         "operations/<int:pk>/",

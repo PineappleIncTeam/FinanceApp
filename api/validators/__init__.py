@@ -7,5 +7,4 @@ __all__ = [
     "EnglishLettersSymbolsPasswordValidator",
     "MaximumLengthValidator",
     "validate_user_email",
-
 ]

@@ -4,7 +4,6 @@ Custom migration that populate OutcomeCategories table with default values.
 
 from typing import Any
 
-from api.models import OutcomeCategories
 from django.db import migrations
 
 
@@ -19,16 +18,17 @@ DEFAULT_OUTCOME_CATEGORIES = (
 
 def populate_outcome_categories_table(apps: Any, schema_editor: Any) -> None:
     """Populates table with default values."""
-
-    outcome_categories_list = [OutcomeCategories(name=category) for category in DEFAULT_OUTCOME_CATEGORIES]
-    OutcomeCategories.objects.bulk_create(outcome_categories_list, ignore_conflicts=True)
+    outcome_categories = apps.get_model('api', 'OutcomeCategories')
+    outcome_categories_list = [outcome_categories(name=category) for category in DEFAULT_OUTCOME_CATEGORIES]
+    outcome_categories.objects.bulk_create(outcome_categories_list, ignore_conflicts=True)
 
 
 def reverse_outcome_categories_table_population(apps: Any, schema_editor: Any) -> None:
     """Reverse table population."""
+    outcome_categories = apps.get_model('api', 'OutcomeCategories')
 
     for category in DEFAULT_OUTCOME_CATEGORIES:
-        OutcomeCategories.objects.get(name=category).delete()
+        outcome_categories.objects.get(name=category).delete()
 
 
 class Migration(migrations.Migration):

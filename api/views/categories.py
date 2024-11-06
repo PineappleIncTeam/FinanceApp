@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import HTTP_204_NO_CONTENT
 
-from api.business_logic import get_user_categories
+from api.utils import get_user_categories
 from api.models import Category
 from api.serializers import CategoriesSerializer, CategoryDetailSerializer
 from api.views.errors import CategoryWithOperationsError

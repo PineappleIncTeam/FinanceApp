@@ -8,7 +8,7 @@ def validate_local_name(
         max_length=50,
         allowed_characters="!=#$%&';+-.?^_{}`~"
 ) -> None:
-    '''
+    """
         Local name is the first part in email (before @).
         It must consist of only:
         - english letters (lower or upper case);
@@ -16,7 +16,7 @@ def validate_local_name(
         - allowed characters.
         Length should be from min_length to max_length
 
-    '''
+    """
     if not min_length <= len(local_name) <= max_length:
         raise ValidationError(_("Email local name length must be from %(min_length)d to %(max_length)d." % {"max_length": max_length, "min_length": min_length}))
     for item in local_name.lower():
@@ -32,7 +32,7 @@ def validate_domain(
         min_length_second_part=2,
         max_length_second_part=7,
 ) -> None:
-    '''
+    """
         Domain name is the second part in email (after @).
         It must consist of only:
         - english letters (lower or upper case);
@@ -41,7 +41,7 @@ def validate_domain(
         Domain name must not end with "-".
         Length of two parts of domainname should be from min_length to max_length
 
-    '''
+    """
     domain_list= domain.split(".")
     if len(domain_list) != 2 or domain.endswith("-"):
         raise ValidationError(_("Invalid domain name."))
