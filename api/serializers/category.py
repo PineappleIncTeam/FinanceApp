@@ -3,9 +3,9 @@ from typing import Any, Dict
 
 from rest_framework import serializers
 
-from api.utils import get_user_categories
 from api.models import Category
 from api.serializers.errors import CategoryExistsError
+from api.utils import get_user_categories
 
 logger = logging.getLogger(__name__)
 

@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from FinanceBackend.settings import MAX_OPERATIONS_COUNT
 from rest_framework import filters, status
 from rest_framework.generics import (ListCreateAPIView,
                                      RetrieveUpdateDestroyAPIView)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from FinanceBackend.settings import MAX_OPERATIONS_COUNT
 from api.models import Operation
 from api.serializers import OperationSerializer
 

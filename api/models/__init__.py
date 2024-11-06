@@ -1,8 +1,7 @@
 from .users import User
+from .category import Category
 from .operation import Operation
 from .target import Target
-from .category import Category
-
 
 __all__ = [
     "User",

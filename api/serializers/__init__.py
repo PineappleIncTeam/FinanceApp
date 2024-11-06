@@ -1,5 +1,4 @@
 from .category import CategoriesSerializer, CategoryDetailSerializer
-
 from .operation import OperationSerializer
 from .user import CustomTokenCreateSerializer, CustomUserCreateSerializer
 

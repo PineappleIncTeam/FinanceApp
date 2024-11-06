@@ -1,5 +1,5 @@
-from rest_framework.exceptions import ValidationError
 from django.utils.translation import gettext as _
+from rest_framework.exceptions import ValidationError
 
 
 class MaximumLengthValidator:

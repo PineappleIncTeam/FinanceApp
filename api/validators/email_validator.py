@@ -1,5 +1,5 @@
-from rest_framework.exceptions import ValidationError
 from django.utils.translation import gettext as _
+from rest_framework.exceptions import ValidationError
 
 
 def validate_local_name(
@@ -18,9 +18,11 @@ def validate_local_name(
 
     """
     if not min_length <= len(local_name) <= max_length:
-        raise ValidationError(_("Email local name length must be from %(min_length)d to %(max_length)d." % {"max_length": max_length, "min_length": min_length}))
+        raise ValidationError(
+            _("Email local name length must be from %(min_length)d to %(max_length)d." % {"max_length": max_length,
+                                                                                          "min_length": min_length}))
     for item in local_name.lower():
-        if 48 <= ord(item) <= 57 or  97 <= ord(item) <= 122 or item in allowed_characters:
+        if 48 <= ord(item) <= 57 or 97 <= ord(item) <= 122 or item in allowed_characters:
             continue
         raise ValidationError(_("Email contains invalid characters."))
 
@@ -40,9 +42,8 @@ def validate_domain(
         - "-" or ".".
         Domain name must not end with "-".
         Length of two parts of domainname should be from min_length to max_length
-
     """
-    domain_list= domain.split(".")
+    domain_list = domain.split(".")
     if len(domain_list) != 2 or domain.endswith("-"):
         raise ValidationError(_("Invalid domain name."))
     if not min_length_first_part <= len(domain_list[0]) <= max_length_first_part:
@@ -51,7 +52,7 @@ def validate_domain(
         raise ValidationError(_("Invalid domain name length."))
     for item in domain.lower():
         if ord(item) < 48 or 57 < ord(item) < 97 or ord(item) > 122:
-            if item  in ("-", "."):
+            if item in ("-", "."):
                 continue
             raise ValidationError(_("Domain name contains invalid characters."))
 

@@ -5,7 +5,7 @@ from typing import Optional
 
 from django.db.models import QuerySet
 
-from api.models import User, Category
+from api.models import Category, User
 
 logger = logging.getLogger(__name__)
 
@@ -20,9 +20,7 @@ def get_user_categories(
     Retrieve user's categories.
     """
 
-    query_result = Category.objects.filter(
-        user=user.pk
-    )
+    query_result = Category.objects.filter(user=user.pk)
 
     if is_income is not None:
         query_result = query_result.filter(
