@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model # Categories, IncomeCash, OutcomeCash, MoneyBox
+
 from api.models.countries import Country
 
 
@@ -19,5 +20,5 @@ class UserAdmin(admin.ModelAdmin):
 # )
 
 admin.site.register(
-    Country,
+    Country
 )
