@@ -11,14 +11,6 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ('username', 'email',)
 
 
-# admin.site.register(
-#     (
-#         Categories,
-#         IncomeCash,
-#         OutcomeCash,
-#         MoneyBox,)
-# )
-
 admin.site.register(
     Country
 )
