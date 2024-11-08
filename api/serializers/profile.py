@@ -1,9 +1,9 @@
 from rest_framework import serializers
 from api.models import Profile
 
-
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = "__all__"
+        fields = ['first_name', 'last_name', 'gender', 'country', 'avatar']
+
 

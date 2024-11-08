@@ -7,12 +7,7 @@ class Country(models.Model):
         max_length=146,
         verbose_name='Краткое название'
     )
-    full_name = models.CharField(
-        max_length=146,
-        verbose_name='Полное название',
-
-    )
-    alfa2 = models.CharField(
+    code = models.CharField(
         max_length=3,
         verbose_name='Альфа-2'
     )
