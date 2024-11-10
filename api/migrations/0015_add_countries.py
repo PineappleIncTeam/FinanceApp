@@ -16,6 +16,11 @@ def load_data(apps, schema_editor):
             countries.objects.create(**country)
 
 
+def reverse_table_population(apps, schema_editor) -> None:
+    """Reverse table population."""
+    country = apps.get_model('api', 'Country')
+    countries = country.objects.all()
+    countries.delete()
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -23,5 +28,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(load_data),
+        migrations.RunPython(load_data, reverse_table_population),
     ]
