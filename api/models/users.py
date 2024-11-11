@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
+from django.db.models import SET_NULL
 from django.utils.html import escape
 from django.utils.translation import gettext as _
 
@@ -22,7 +23,7 @@ class CustomUserManager(UserManager):
         password = escape(password)
         user.set_password(password)
         user.save(using=self.db)
-        Profile.objects.create(user=user, first_name="Пользователь FinanceApp", last_name="", country="RU", avatar=None)
+        Profile.objects.create(user=user, first_name="Пользователь FinanceApp", last_name="", avatar=None)
         return user
 
     def create_superuser(self, email, password, **extra_fields) -> User:
@@ -64,7 +65,7 @@ class Profile(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     gender = models.CharField(max_length=10, choices=[('M', 'Male'), ('F', 'Female')])
-    country = models.CharField(max_length=50)
+    country = models.ForeignKey(Country, on_delete=SET_NULL, default=185, null=True)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
 
     def __str__(self):

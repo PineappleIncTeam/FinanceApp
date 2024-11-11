@@ -29,21 +29,10 @@ class ProfileApiView(ListCreateAPIView):
         """
         Save the user to the model profile
         """
-        # try:
         post_new = Profile.objects.filter(user = self.request.user.id).update(
             first_name = request.data["first_name"],
             last_name = request.data["last_name"],
             gender = request.data["gender"],
             country = request.data["country"]
         )
-        # except model.DoesNotExist:
-        #     post_new = Profile.objects.create(
-        #         user=self.request.user.id,
-        #         first_name=request.data["first_name"],
-        #         last_name=request.data["last_name"],
-        #         gender=request.data["genger"],
-        #         country=request.data["country"]
-        #     )
-
-
         return Response({"post": post_new})
