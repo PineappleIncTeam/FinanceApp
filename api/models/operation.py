@@ -7,10 +7,12 @@ from .target import Target
 
 INCOME_CATEGORY = "income"
 OUTCOME_CATEGORY = "outcome"
+FROM_TARGETS = "targets"
 
 OPERATION_TYPES = [
     (INCOME_CATEGORY, "Категория доходов"),
     (OUTCOME_CATEGORY, "Категория расходов"),
+    (FROM_TARGETS, "Из накоплений"),
 ]
 
 

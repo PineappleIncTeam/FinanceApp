@@ -3,6 +3,8 @@ from .generate_token import CustomTokenCreateAPI
 from .operation import (OperationListCreateAPI,
                         OperationRetrieveUpdateDestroyAPI)
 from .password_reset import password_reset_api_controller
+from .targets import (TargetMoneyReturnAPI, TargetsListCreateAPI,
+                      TargetUpdateDestroyAPI)
 
 __all__ = [
     "password_reset_api_controller",
@@ -11,4 +13,7 @@ __all__ = [
     "OperationRetrieveUpdateDestroyAPI",
     "CategoriesListCreateAPI",
     "CategoryUpdateDestroyAPI",
+    "TargetsListCreateAPI",
+    "TargetUpdateDestroyAPI",
+    "TargetMoneyReturnAPI",
 ]

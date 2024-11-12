@@ -1,11 +1,14 @@
-from .users import User
 from .category import Category
-from .operation import Operation
-from .target import Target
+from .operation import FROM_TARGETS, Operation
+from .target import ACHIEVED, IN_PROGRESS, Target
+from .users import User
 
 __all__ = [
     "User",
     "Category",
     "Target",
-    "Operation"
+    "Operation",
+    "FROM_TARGETS",
+    "ACHIEVED",
+    "IN_PROGRESS",
 ]

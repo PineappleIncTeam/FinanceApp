@@ -22,6 +22,8 @@ drf-spectacular-sidecar = "2023.10.1"
 psycopg2-binary = "2.9.9"
 rich = "^13.0"
 django-filter = "^24.3"
+django-stubs = "4.2.7"
+djangorestframework-stubs = {version = "1.7.0", extras = ["compatible-mypy"]}
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.2.6"
