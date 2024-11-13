@@ -15,8 +15,7 @@ from api.models import IN_PROGRESS
 from api.serializers import TargetsSerializer
 from api.utils import get_user_targets, return_money_from_target_to_incomes
 
-from .errors import (NoMoneyToReturnError, TargetInProgressError,
-                     TargetIsClosedError)
+from .errors import TargetInProgressError, TargetIsClosedError
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -72,7 +71,7 @@ class TargetUpdateDestroyAPI(UpdateAPIView, DestroyAPIView):
             instance.save()
         except IntegrityError:
             return Response(
-                "Can not return money from target to oncomes.",
+                "Can not return money from a target to incomes.",
                 status=HTTP_400_BAD_REQUEST
             )
 
@@ -100,35 +99,3 @@ class TargetMoneyReturnAPI(DestroyAPIView):
         return get_user_targets(
             user=self.request.user
         )
-
-    def destroy(self, request, *args, **kwargs) -> Response:
-        instance: Target = self.get_object()
-        if instance.is_deleted:
-            raise TargetIsClosedError()
-        if instance.current_sum == 0:
-            raise NoMoneyToReturnError()
-        try:
-            returened_operation = return_money_from_target_to_incomes(
-                user=request.user,
-                target=instance
-            )
-
-            instance.current_sum = 0
-            instance.save()
-
-            logger.info(
-                f"The user [ID: {request.user.pk}, "
-                f"name: {request.user.email}] returned a target amount"
-                f" of money: id - {instance.id}, name - {instance.name}, "
-                f"amount - {returened_operation.amount}."
-            )
-
-            return Response(
-                data=TargetsSerializer(instance).data,
-                status=HTTP_200_OK
-            )
-        except IntegrityError:
-            return Response(
-                "Can not return money from target to incomes.",
-                status=HTTP_400_BAD_REQUEST
-            )
