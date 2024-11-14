@@ -10,9 +10,6 @@ def load_data(apps, schema_editor):
         profile.objects.get_or_create(user=us)
 
 
-
-
-
 class Migration(migrations.Migration):
     dependencies = [
         ('api', '0018_alter_profile_country_alter_profile_first_name'),

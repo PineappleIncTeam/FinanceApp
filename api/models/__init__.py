@@ -6,7 +6,6 @@ from .outcomes import OutcomeCategories, Outcomes
 from .target import Target
 from .category import Category
 from .countries import Country
-# from .profile import Profile
 
 
 __all__ = [
