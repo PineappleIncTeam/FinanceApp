@@ -1,15 +1,13 @@
-from django.forms import model_to_dict
-from oauthlib.uri_validate import query
-from rest_framework import viewsets, permissions
-from rest_framework.generics import ListCreateAPIView
+from rest_framework import permissions
 from rest_framework.parsers import FormParser,  MultiPartParser
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from api.models import Profile, User
 from api.serializers import ProfileSerializer
 
 
-class ProfileApiView(ListCreateAPIView):
+class ProfileApiView(APIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
