@@ -22,7 +22,8 @@ class ProfileApiView(APIView):
         return Response({"first_name": profile.first_name,
                          "last_name": profile.last_name,
                          "gender": profile.gender,
-                         "country": profile.country.code,
+                         "country": profile.country.id,
+                         "country_name": profile.country.name,
                          # "avatar": profile.avatar,
                          })
 
