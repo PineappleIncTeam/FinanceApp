@@ -15,7 +15,9 @@ repos:
         additional_dependencies: [pep8-naming, flake8-comments, flake8-bugbear,
                                   flake8-comprehensions, flake8-eradicate, flake8-print,
                                   flake8-broken-line, flake8-string-format]
-        args: [--max-line-length=100]
+        args:
+            - --max-line-length=120
+            - --exclude=./.git,__pycache__,venv,*/migrations/*,staticfiles/*
 
 -   repo: https://github.com/PyCQA/isort
     rev: 5.13.2

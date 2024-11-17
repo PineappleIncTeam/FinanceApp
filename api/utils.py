@@ -1,37 +1,46 @@
-import os
+from __future__ import annotations
 
-from dotenv import load_dotenv
+import logging
+from typing import Optional
 
-from langchain.schema import HumanMessage, SystemMessage
-from langchain.chat_models.gigachat import GigaChat
+from django.db.models import QuerySet
 
-MONTH_NAMES = {
-    1: 'Январь',
-    2: 'Февраль',
-    3: 'Март',
-    4: 'Апрель',
-    5: 'Май',
-    6: 'Июнь',
-    7: 'Июль',
-    8: 'Август',
-    9: 'Сентябрь',
-    10: 'Октябрь',
-    11: 'Ноябрь',
-    12: 'Декабрь',
-}
+from api.models import Category, User
+
+logger = logging.getLogger(__name__)
 
 
-def ai_question(question) -> str:
-    load_dotenv()
-    chat = GigaChat(credentials=os.environ.get('GIGA_CHAT_TOKEN'), verify_ssl_certs=False)
-    messages = [
-        SystemMessage(
-            content="Ты финансовый аналитик, который понятно и доступно может дать совет любому человеку."
-        ),
-        HumanMessage(
-            content=question
-        ),
-    ]
+def get_user_categories(
+        user: User,
+        is_income: Optional[bool] = None,
+        is_outcome: Optional[bool] = None,
+        is_deleted: Optional[bool] = None
+) -> QuerySet[Category]:
+    """
+    Retrieve user's categories.
+    """
 
-    res = chat(messages)
-    return res.content
+    query_result = Category.objects.filter(user=user.pk)
+
+    if is_income is not None:
+        query_result = query_result.filter(
+            is_income=is_income
+        )
+
+    if is_outcome is not None:
+        query_result = query_result.filter(
+            is_outcome=is_outcome
+        )
+
+    if is_deleted is not None:
+        query_result = query_result.filter(
+            is_deleted=is_deleted
+        )
+
+    logger.info(
+        f"The user [ID: {user.pk}, "
+        f"name: {user.email}] successfully received "
+        f"a list of the users's categories."
+    )
+
+    return query_result
