@@ -23,6 +23,7 @@ psycopg2-binary = "2.9.9"
 rich = "^13.0"
 django-filter = "^24.3"
 drf-extra-fields = "^3.7.0"
+Pillow = "^10.4.0"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.2.6"
