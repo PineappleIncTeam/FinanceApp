@@ -1,15 +1,11 @@
 from __future__ import annotations
 
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from rest_framework.generics import ListAPIView
 
 from api.models import Country
+from api.serializers.country import CountrySerializer
 
 
-class CountriesApiView(APIView):
-    def get(self, request):
-        countries = Country.objects.all().values()
-        return Response(countries)
-
-
+class CountriesApiView(ListAPIView):
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer

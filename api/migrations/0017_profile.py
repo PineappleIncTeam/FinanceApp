@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 
+import api.models.users
 
 def load_data(apps, schema_editor):
     profile = apps.get_model('api', 'Profile')
@@ -43,7 +44,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "avatar",
-                    models.ImageField(blank=True, null=True, upload_to="avatars/"),
+                    models.ImageField(blank=True, null=True, upload_to=api.models.users.upload_to),
                 ),
                 (
                     "country",

@@ -9,3 +9,7 @@ htmlcov/
 
 Cache_files/*
 db.sqlite3
+
+# папки со статикой и медиа
+static/
+media/

@@ -123,3 +123,4 @@ virtualenv==20.24.6
 whitenoise==6.4.0
 yarl==1.9.2
 zipp==3.17.0
+drf-extra-fields==3.7.0

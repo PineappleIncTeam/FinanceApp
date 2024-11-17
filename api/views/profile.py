@@ -1,8 +1,7 @@
-from rest_framework import permissions, status
-from rest_framework.parsers import FormParser, MultiPartParser
-from rest_framework.response import Response
-from rest_framework.generics import RetrieveUpdateAPIView
 from django.shortcuts import get_object_or_404
+from rest_framework import permissions, status
+from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.response import Response
 
 from api.models import Profile
 from api.serializers import ProfileSerializer
@@ -11,13 +10,10 @@ from api.serializers import ProfileSerializer
 class ProfileApiView(RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
-    parser_classes = (FormParser, MultiPartParser)
 
-    # Разрешенные методы
     http_method_names = ['get', 'patch', 'head', 'options']
 
     def get_object(self):
-        # Получаем профиль текущего пользователя
         return get_object_or_404(Profile, user=self.request.user)
 
     def get(self, request, *args, **kwargs):
