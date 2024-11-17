@@ -7,7 +7,7 @@ from api.models import Profile
 
 class ProfileSerializer(serializers.ModelSerializer):
     country_name = serializers.SerializerMethodField()
-    avatar = Base64ImageField(required=False)
+    avatar = Base64ImageField(required=False, allow_null=True)
 
     class Meta:
         model = Profile
@@ -19,10 +19,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         return obj.country.name if obj.country else None
 
     def update(self, instance, validated_data):
-        new_avatar = validated_data.get('avatar', None)
-
-        if new_avatar is None and instance.avatar:
-            if instance.avatar:
-                instance.avatar.delete(save=False)
+        if instance.avatar:
+            instance.avatar.delete(save=False)
 
         return super().update(instance, validated_data)
