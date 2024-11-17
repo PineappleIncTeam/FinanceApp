@@ -6,14 +6,16 @@ import os
 def load_data(apps, schema_editor):
     countries = apps.get_model('api', 'Country')
 
-    # Путь к файлу с данными
     file_path = os.path.join(os.path.dirname(__file__), 'data/oksm.json')
 
     with open(file_path, encoding="utf8") as f:
         data = json.load(f)
-        for item in data:
-            country = {"name": item.get("name"), "code": item.get("alfa2")}
-            countries.objects.create(**country)
+
+        country_objects = [
+            countries(name=item.get("name"), code=item.get("alfa2"))
+            for item in data
+        ]
+        countries.objects.bulk_create(country_objects, batch_size=1000)
 
 
 def reverse_table_population(apps, schema_editor) -> None:
@@ -24,7 +26,7 @@ def reverse_table_population(apps, schema_editor) -> None:
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('api', '0014_country_profile'),  # Замените на имя предыдущей миграции
+        ('api', '0014_country_profile'),
     ]
 
     operations = [

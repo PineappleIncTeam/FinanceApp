@@ -19,26 +19,34 @@ class ProfileApiView(APIView):
         """
 
         profile = Profile.objects.get(user=self.request.user.id)
-        return Response({"first_name": profile.first_name,
-                         "last_name": profile.last_name,
-                         "gender": profile.gender,
-                         "country": profile.country.id,
-                         "country_name": profile.country.name,
-                         # "avatar": profile.avatar,
-                         })
+        return Response(
+            {
+                "first_name": profile.first_name,
+                "last_name": profile.last_name,
+                "gender": profile.gender,
+                "country": profile.country.id,
+                "country_name": profile.country.name,
+            }
+        )
 
     def patch(self, request):
         """
         Save the user to the model profile
         """
-        Profile.objects.filter(user = self.request.user.id).update(
-            first_name = request.data["first_name"],
-            last_name = request.data["last_name"],
-            gender = request.data["gender"],
-            country = request.data["country"],
-            avatar = request.data["avatar"]
+        Profile.objects.filter(user=self.request.user.id).update(
+            first_name=request.data["first_name"],
+            last_name=request.data["last_name"],
+            gender=request.data["gender"],
+            country=request.data["country"],
+            avatar=request.data["avatar"]
         )
-        return Response({"post": {"first_name": request.data["first_name"],
-                         "last_name": request.data["last_name"],
-                         "gender": request.data["gender"],
-                         "country": request.data["country"]}})
+        return Response(
+            {
+                "post": {
+                    "first_name": request.data["first_name"],
+                    "last_name": request.data["last_name"],
+                    "gender": request.data["gender"],
+                    "country": request.data["country"]
+                }
+            }
+        )
