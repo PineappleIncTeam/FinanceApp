@@ -1,52 +1,36 @@
-from rest_framework import permissions
-from rest_framework.parsers import FormParser,  MultiPartParser
+from rest_framework import permissions, status
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.generics import RetrieveUpdateAPIView
+from django.shortcuts import get_object_or_404
 
-from api.models import Profile, User
+from api.models import Profile
 from api.serializers import ProfileSerializer
 
 
-class ProfileApiView(APIView):
-    queryset = Profile.objects.all()
+class ProfileApiView(RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = (FormParser, MultiPartParser)
 
-    def get(self, request):
-        """
-        Getting user profile data
-        """
+    # Разрешенные методы
+    http_method_names = ['get', 'patch', 'head', 'options']
 
-        profile = Profile.objects.get(user=self.request.user.id)
-        return Response(
-            {
-                "first_name": profile.first_name,
-                "last_name": profile.last_name,
-                "gender": profile.gender,
-                "country": profile.country.id,
-                "country_name": profile.country.name,
-            }
-        )
+    def get_object(self):
+        # Получаем профиль текущего пользователя
+        return get_object_or_404(Profile, user=self.request.user)
 
-    def patch(self, request):
-        """
-        Save the user to the model profile
-        """
-        Profile.objects.filter(user=self.request.user.id).update(
-            first_name=request.data["first_name"],
-            last_name=request.data["last_name"],
-            gender=request.data["gender"],
-            country=request.data["country"],
-            avatar=request.data["avatar"]
-        )
-        return Response(
-            {
-                "post": {
-                    "first_name": request.data["first_name"],
-                    "last_name": request.data["last_name"],
-                    "gender": request.data["gender"],
-                    "country": request.data["country"]
-                }
-            }
-        )
+    def get(self, request, *args, **kwargs):
+        profile = self.get_object()
+        serializer = self.get_serializer(profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', True)
+        profile = self.get_object()
+        serializer = self.get_serializer(profile, data=request.data, partial=partial)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

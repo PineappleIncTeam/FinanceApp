@@ -13,6 +13,8 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ('username', 'email',)
 
 
-admin.site.register(
-    Country
-)
+@admin.register(Country)
+class CountryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'code',)
+    ordering = ('id',)
+    search_fields = ('name', 'code',)

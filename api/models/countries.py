@@ -14,6 +14,8 @@ class Country(models.Model):
 
     class Meta:
         db_table = "api_countries"
+        verbose_name = 'Страна'
+        verbose_name_plural = 'Страны'
 
     def __str__(self):
         return self.name
