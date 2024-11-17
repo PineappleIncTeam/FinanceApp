@@ -2,10 +2,13 @@ from __future__ import annotations
 
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
+from django.db.models import SET_NULL
 from django.utils.html import escape
 from django.utils.translation import gettext as _
+from select import select
 
 from .base import BaseModel
+from .countries import Country
 
 
 class CustomUserManager(UserManager):
@@ -21,6 +24,7 @@ class CustomUserManager(UserManager):
         password = escape(password)
         user.set_password(password)
         user.save(using=self.db)
+        Profile.objects.create(user=user)
         return user
 
     def create_superuser(self, email, password, **extra_fields) -> User:
@@ -55,3 +59,15 @@ class User(BaseModel, AbstractUser):
         """Describes class metadata."""
 
         db_table = "users"
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    first_name = models.CharField(max_length=30, null=True)
+    last_name = models.CharField(max_length=30, null=True)
+    gender = models.CharField(max_length=10, null=True, choices=[('M', 'Male'), ('F', 'Female')])
+    country = models.ForeignKey(Country, on_delete=SET_NULL, null=True)
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.first_name} Profile'

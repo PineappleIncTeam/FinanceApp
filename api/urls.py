@@ -7,7 +7,9 @@ from api.views import (CategoriesListCreateAPI,
                        CustomTokenCreateAPI,
                        OperationListCreateAPI,
                        OperationRetrieveUpdateDestroyAPI,
-                       password_reset_api_controller)
+                       password_reset_api_controller,
+                       CountriesApiView,
+                       ProfileApiView)
 
 urlpatterns = [
     path(
@@ -50,6 +52,14 @@ urlpatterns = [
         OperationRetrieveUpdateDestroyAPI.as_view(),
         name="operations-detail",
     ),
+    path(
+        "countries/",
+        CountriesApiView.as_view()
+    ),
+    path(
+        "profile/",
+        ProfileApiView.as_view()
+    )
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
