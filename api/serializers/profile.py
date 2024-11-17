@@ -12,6 +12,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ["first_name", "last_name", "gender", "country", "country_name", "avatar"]
+        read_only_fields = ["country_name"]
 
     @extend_schema_field(serializers.CharField())
     def get_country_name(self, obj):
