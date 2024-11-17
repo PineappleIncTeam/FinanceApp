@@ -2,9 +2,7 @@
 import json
 import os
 
-from django.conf import settings
 from django.db import migrations, models
-import django.db.models.deletion
 
 
 def load_data(apps, schema_editor):

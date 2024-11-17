@@ -19,7 +19,7 @@ class CustomUserManager(UserManager):
         """Create a new user profile"""
 
         if not email:
-            raise ValueError(_('User must have an email address'))
+            raise ValueError(_("User must have an email address"))
 
         user_email: str = self.normalize_email(email)
         user: User = self.model(email=user_email, **extra_fields)
@@ -64,18 +64,18 @@ class User(BaseModel, AbstractUser):
 
 
 def upload_to(instance, filename):
-    ext = filename.split('.')[-1]
+    ext = filename.split(".")[-1]
     unique_filename = f"{uuid.uuid4()}.{ext}"
-    return os.path.join('avatars/', unique_filename)
+    return os.path.join("avatars/", unique_filename)
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     first_name = models.CharField(max_length=30, null=True)
     last_name = models.CharField(max_length=30, null=True)
-    gender = models.CharField(max_length=10, null=True, choices=[('M', 'Male'), ('F', 'Female')])
+    gender = models.CharField(max_length=10, choices=[("M", "Male"), ("F", "Female")], null=True)
     country = models.ForeignKey(Country, on_delete=SET_NULL, null=True)
     avatar = models.ImageField(upload_to=upload_to, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.first_name} Profile'
+        return f"{self.first_name} Profile"
