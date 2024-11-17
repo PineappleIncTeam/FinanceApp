@@ -2,14 +2,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path, re_path
 
-from api.views import (CategoriesListCreateAPI,
-                       CategoryUpdateDestroyAPI,
-                       CustomTokenCreateAPI,
+from api.views import (CategoriesListCreateAPI, CategoryUpdateDestroyAPI,
+                       CountriesApiView, CustomTokenCreateAPI,
                        OperationListCreateAPI,
-                       OperationRetrieveUpdateDestroyAPI,
-                       password_reset_api_controller,
-                       CountriesApiView,
-                       ProfileApiView)
+                       OperationRetrieveUpdateDestroyAPI, ProfileApiView,
+                       password_reset_api_controller)
 
 urlpatterns = [
     path(
