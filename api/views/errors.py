@@ -20,7 +20,19 @@ class TargetInProgressError(APIException):
     default_code = "target_in_progress"
 
 
-class NoMoneyToReturnError(APIException):
+class ExceedingTargetAmountError(APIException):
     status_code = HTTP_400_BAD_REQUEST
-    default_detail = "There is no money to return."
-    default_code = "no_money_to_return"
+    default_detail = "The target amount has been exceeded."
+    default_code = "target_amount_exceeding"
+
+
+class InvalidTargetOperationDateError(APIException):
+    status_code = HTTP_400_BAD_REQUEST
+    default_detail = "Can't create target operation before creating the target."
+    default_code = "invalid_target_operation_date"
+
+
+class TargetArchievedError(APIException):
+    status_code = HTTP_400_BAD_REQUEST
+    default_detail = "Can't create operation for an archieved target."
+    default_code = "target_archieved"

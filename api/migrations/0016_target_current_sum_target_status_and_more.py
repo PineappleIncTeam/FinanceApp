@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0014_remove_category_is_fixed'),
+        ('api', '0015_remove_incomes_category_remove_incomes_user_and_more'),
     ]
 
     operations = [

@@ -56,11 +56,17 @@ class OperationSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     "Category must be an outcome category for outcome operations."
                 )
+            if type_operation == "targets" and any(
+                (category.is_outcome, category.is_income)
+            ):
+                raise serializers.ValidationError(
+                    "Category type can't be outcome or income for targets operations."
+                )
 
         if target:
-            if type_operation != "income":
+            if type_operation != "targets":
                 raise serializers.ValidationError(
-                    "Target can only be specified for income operations."
+                    "Targets operations can't be specified as incomes or outcomes."
                 )
 
         return data

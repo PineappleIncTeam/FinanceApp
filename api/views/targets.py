@@ -68,6 +68,7 @@ class TargetUpdateDestroyAPI(UpdateAPIView, DestroyAPIView):
                 target=instance
             )
             instance.is_deleted = True
+            instance.current_sum = 0
             instance.save()
         except IntegrityError:
             return Response(

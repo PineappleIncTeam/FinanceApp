@@ -2,17 +2,12 @@ from __future__ import annotations
 
 import logging
 from datetime import date
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 from django.db import transaction
+from django.db.models import QuerySet
 
-from api.models import FROM_TARGETS, Category, Operation, Target
-
-if TYPE_CHECKING:
-    from django.db.models import QuerySet
-
-    from api.models import User
-
+from api.models import TARGETS, Category, Operation, Target, User
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +57,7 @@ def get_user_targets(
 
     query_result = Target.objects.filter(
         user=user.pk
-    )
+    ).order_by("-status", "name")
 
     logger.info(
         f"The user [ID: {user.pk}, "
@@ -95,7 +90,7 @@ def return_money_from_target_to_incomes(
         )
         returned_operation = Operation.objects.create(
             user=user,
-            type=FROM_TARGETS,
+            type=TARGETS,
             categories=category[0],
             amount=target.current_sum,
             date=date.today()

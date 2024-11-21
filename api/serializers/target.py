@@ -43,5 +43,5 @@ class TargetsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Target
-        fields = ['id', 'name', 'amount']
-        read_only_fields = ['is_deleted', 'status']
+        fields = ['id', 'name', 'amount', 'current_sum', 'status']
+        read_only_fields = ['is_deleted', 'status', 'current_sum']
