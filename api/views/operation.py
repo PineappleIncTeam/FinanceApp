@@ -116,16 +116,22 @@ class OperationRetrieveUpdateDestroyAPI(RetrieveUpdateDestroyAPIView):
                 target_instance = Target.objects.get(
                     id=operation_instance.target.pk
                 )
-                target_instance.current_sum -= (
-                    operation_instance.amount - request.data['amount'])
+                if request.data.get("amount"):
+                    target_instance.current_sum -= (
+                        operation_instance.amount - request.data['amount'])
 
-                if target_instance.current_sum > target_instance.amount:
-                    raise ExceedingTargetAmountError()
-                elif target_instance.current_sum == target_instance.amount:
-                    target_instance.status = ACHIEVED
-                else:
-                    target_instance.status = IN_PROGRESS
+                    if target_instance.current_sum > target_instance.amount:
+                        raise ExceedingTargetAmountError()
+                    elif target_instance.current_sum == target_instance.amount:
+                        target_instance.status = ACHIEVED
+                    else:
+                        target_instance.status = IN_PROGRESS
+                    target_instance.save()
 
-                target_instance.save()
+                elif request.data.get("date"):
+                    if datetime.strptime(
+                        request.data["date"], "%Y-%m-%d"
+                    ).replace(tzinfo=None) < target_instance.created_at.replace(tzinfo=None):
+                        raise InvalidTargetOperationDateError()
 
         return self.partial_update(request, *args, **kwargs)
