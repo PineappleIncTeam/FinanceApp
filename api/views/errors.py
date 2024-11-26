@@ -36,3 +36,9 @@ class TargetArchievedError(APIException):
     status_code = HTTP_400_BAD_REQUEST
     default_detail = "Can't create operation for an archieved target."
     default_code = "target_archieved"
+
+
+class ReturnMoneyCategoryOperationError(APIException):
+    status_code = HTTP_400_BAD_REQUEST
+    default_detail = "Can't delete or update return money operation."
+    default_code = "return_money_operation"

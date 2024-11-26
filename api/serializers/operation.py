@@ -74,3 +74,18 @@ class OperationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Operation
         fields = ['id', 'type', 'amount', 'date', 'categories', 'target']
+
+
+class OperationInfoSerializer(serializers.ModelSerializer):
+    def validate_amount(self, value):
+        """
+        Validate that the operation amount is not negative.
+        """
+        if value < 0:
+            raise serializers.ValidationError("Operation amount cannot be negative.")
+        return value
+
+    class Meta:
+        model = Operation
+        fields = ['id', 'amount', 'date', 'categories', 'target']
+        read_only_fields = ['categories', 'target']

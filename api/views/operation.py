@@ -10,12 +10,13 @@ from rest_framework.generics import (ListCreateAPIView,
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from api.models import ACHIEVED, TARGETS, Operation, Target
-from api.serializers import OperationSerializer
+from api.models import ACHIEVED, IN_PROGRESS, TARGETS, Operation, Target
+from api.serializers import OperationInfoSerializer, OperationSerializer
 from FinanceBackend.settings import MAX_OPERATIONS_COUNT
 
 from .errors import (ExceedingTargetAmountError,
-                     InvalidTargetOperationDateError, TargetArchievedError,
+                     InvalidTargetOperationDateError,
+                     ReturnMoneyCategoryOperationError, TargetArchievedError,
                      TargetIsClosedError)
 
 
@@ -35,7 +36,7 @@ class OperationListCreateAPI(ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
 
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             if request.data["type"] == TARGETS:
                 target = Target.objects.get(id=request.data["target"])
                 current_sum = target.current_sum + Decimal(request.data["amount"])
@@ -81,9 +82,50 @@ class OperationRetrieveUpdateDestroyAPI(RetrieveUpdateDestroyAPIView):
     by its unique identifier (`pk`).
     """
 
-    serializer_class = OperationSerializer
+    serializer_class = OperationInfoSerializer
     permission_classes = (IsAuthenticated,)
     lookup_field = "pk"
 
     def get_queryset(self) -> QuerySet[Operation]:
         return Operation.objects.filter(user=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        operation_instance: Operation = self.get_object()
+        if operation_instance.type == TARGETS:
+            if operation_instance.categories:
+                raise ReturnMoneyCategoryOperationError()
+
+            target_instance = Target.objects.get(
+                id=operation_instance.target.pk
+            )
+            target_instance.current_sum -= operation_instance.amount
+            target_instance.status = IN_PROGRESS
+            target_instance.save()
+        return self.destroy(request, *args, **kwargs)
+
+    def patch(self, request, *args, **kwargs):
+        operation_instance: Operation = self.get_object()
+        serializer = self.get_serializer(
+            operation_instance, data=request.data, partial=True)
+
+        if serializer.is_valid(raise_exception=True):
+            if operation_instance.type == TARGETS:
+                if operation_instance.categories:
+                    raise ReturnMoneyCategoryOperationError()
+
+                target_instance = Target.objects.get(
+                    id=operation_instance.target.pk
+                )
+                target_instance.current_sum -= (
+                    operation_instance.amount - request.data['amount'])
+
+                if target_instance.current_sum > target_instance.amount:
+                    raise ExceedingTargetAmountError()
+                elif target_instance.current_sum == target_instance.amount:
+                    target_instance.status = ACHIEVED
+                else:
+                    target_instance.status = IN_PROGRESS
+
+                target_instance.save()
+
+        return self.partial_update(request, *args, **kwargs)
