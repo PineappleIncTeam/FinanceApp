@@ -1,7 +1,7 @@
 from .users import User, Profile
 from .category import Category
-from .operation import Operation
-from .target import Target
+from .operation import TARGETS, Operation
+from .target import ACHIEVED, IN_PROGRESS, Target
 from .countries import Country
 
 
@@ -11,5 +11,8 @@ __all__ = [
     "Country",
     "Target",
     "Operation",
-    "Profile"
+    "Profile",
+    "TARGETS",
+    "ACHIEVED",
+    "IN_PROGRESS",
 ]

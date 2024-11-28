@@ -6,7 +6,8 @@ from api.views import (CategoriesListCreateAPI, CategoryUpdateDestroyAPI,
                        CountriesApiView, CustomTokenCreateAPI,
                        OperationListCreateAPI,
                        OperationRetrieveUpdateDestroyAPI, ProfileApiView,
-                       password_reset_api_controller)
+                       TargetMoneyReturnAPI, TargetsListCreateAPI,
+                       TargetUpdateDestroyAPI, password_reset_api_controller)
 
 urlpatterns = [
     path(
@@ -26,6 +27,17 @@ urlpatterns = [
         "password/reset/confirm/",
         password_reset_api_controller,
         name="reset-password",
+    ),
+    path("targets/", TargetsListCreateAPI.as_view(), name="targets"),
+    path(
+        "targets/<int:pk>/",
+        TargetUpdateDestroyAPI.as_view(),
+        name="target-info",
+    ),
+    path(
+        "targets/<int:pk>/return_money/",
+        TargetMoneyReturnAPI.as_view(),
+        name="target-money-return"
     ),
     # CATEGORIES
     path(

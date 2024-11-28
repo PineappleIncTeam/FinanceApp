@@ -5,6 +5,8 @@ from .operation import (OperationListCreateAPI,
 from .password_reset import password_reset_api_controller
 from .countries import CountriesApiView
 from .profile import ProfileApiView
+from .targets import (TargetMoneyReturnAPI, TargetsListCreateAPI,
+                      TargetUpdateDestroyAPI)
 
 __all__ = [
     "password_reset_api_controller",
@@ -14,5 +16,8 @@ __all__ = [
     "CategoriesListCreateAPI",
     "CategoryUpdateDestroyAPI",
     "CountriesApiView",
-    "ProfileApiView"
+    "ProfileApiView",
+    "TargetsListCreateAPI",
+    "TargetUpdateDestroyAPI",
+    "TargetMoneyReturnAPI",
 ]
