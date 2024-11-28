@@ -47,8 +47,8 @@ class OperationListCreateAPI(ListCreateAPIView):
                 elif current_sum > target.amount:
                     raise ExceedingTargetAmountError()
                 elif datetime.strptime(
-                    request.data["date"], "%Y-%m-%d"
-                ).replace(tzinfo=None) < target.created_at.replace(tzinfo=None):
+                        request.data["date"], "%Y-%m-%d"
+                ).date() < target.created_at.date():
                     raise InvalidTargetOperationDateError()
                 elif current_sum == target.amount:
                     target.status = ACHIEVED

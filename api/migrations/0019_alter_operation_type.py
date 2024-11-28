@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0016_target_current_sum_target_status_and_more'),
+        ('api', '0018_target_current_sum_target_status_and_more'),
     ]
 
     operations = [
