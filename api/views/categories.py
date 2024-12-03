@@ -33,9 +33,10 @@ class CategoriesListCreateAPI(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self) -> QuerySet[Category]:
-        return get_user_categories(
-            user=self.request.user
-        )
+        if getattr(self, "swagger_fake_view", False):
+            return Category.objects.none()
+
+        return get_user_categories(user=self.request.user)
 
 
 class CategoryUpdateDestroyAPI(UpdateAPIView, DestroyAPIView):
