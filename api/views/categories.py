@@ -33,9 +33,10 @@ class CategoriesListCreateAPI(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self) -> QuerySet[Category]:
-        return get_user_categories(
-            user=self.request.user
-        )
+        if not self.request.user.is_authenticated:
+            return Category.objects.none()
+
+        return get_user_categories(user=self.request.user)
 
 
 class CategoryUpdateDestroyAPI(UpdateAPIView, DestroyAPIView):
