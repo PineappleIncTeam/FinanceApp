@@ -1,20 +1,22 @@
 from __future__ import annotations
 
 import logging
+from datetime import date
 from typing import Optional
 
+from django.db import transaction
 from django.db.models import QuerySet
 
-from api.models import Category, User
+from api.models import TARGETS, Category, Operation, Target, User
 
 logger = logging.getLogger(__name__)
 
 
 def get_user_categories(
-        user: User,
-        is_income: Optional[bool] = None,
-        is_outcome: Optional[bool] = None,
-        is_deleted: Optional[bool] = None
+    user: User,
+    is_income: Optional[bool] = None,
+    is_outcome: Optional[bool] = None,
+    is_deleted: Optional[bool] = None
 ) -> QuerySet[Category]:
     """
     Retrieve user's categories.
@@ -44,3 +46,53 @@ def get_user_categories(
     )
 
     return query_result
+
+
+def get_user_targets(
+    user: User
+) -> QuerySet[Target]:
+    """
+    Retrieve user's targets.
+    """
+
+    query_result = Target.objects.filter(
+        user=user.pk
+    ).order_by("-status", "name")
+
+    logger.info(
+        f"The user [ID: {user.pk}, "
+        f"name: {user.email}] successfully received "
+        f"a list of the users's targets."
+    )
+
+    return query_result
+
+
+def get_total_target_amount(
+    target: Target
+) -> int:
+    """
+    Return total amount of user's particular target.
+    """
+    result = Operation.objects.filter(target=target.pk).aggregate("amount")
+    return result["amount"]
+
+
+def return_money_from_target_to_incomes(
+    user: User, target: Target
+) -> Operation:
+    with transaction.atomic():
+        category = Category.objects.get_or_create(
+            user=user,
+            name="из накоплений",
+            is_income=False,
+            is_outcome=False
+        )
+        returned_operation = Operation.objects.create(
+            user=user,
+            type=TARGETS,
+            categories=category[0],
+            amount=target.current_sum,
+            date=date.today()
+        )
+    return returned_operation

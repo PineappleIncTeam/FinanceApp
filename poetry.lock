@@ -523,6 +523,7 @@ files = [
 ]
 
 [package.dependencies]
+"backports.zoneinfo" = {version = "*", markers = "python_version < \"3.9\""}
 django = ">=4.2"
 
 [[package]]
