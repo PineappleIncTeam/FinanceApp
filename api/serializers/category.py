@@ -1,3 +1,4 @@
+
 import logging
 from typing import Any, Dict
 
@@ -21,9 +22,9 @@ class CategoriesSerializer(serializers.ModelSerializer):
         validated_data["user"] = self.context.get("request").user
 
         all_categories = get_user_categories(
-            user=self.context.get('request').user,
+            user=self.context.get("request").user,
             is_income=validated_data.get("is_income"),
-            is_outcome=validated_data.get("is_outcome")
+            is_outcome=validated_data.get("is_outcome"),
         )
 
         for category in all_categories:
@@ -61,8 +62,8 @@ class CategoriesSerializer(serializers.ModelSerializer):
         Check correct category type usage.
         """
 
-        if (data['is_income'] and data['is_outcome']) or (
-            not data['is_income'] and not data['is_outcome']
+        if (data["is_income"] and data["is_outcome"]) or (
+            not data["is_income"] and not data["is_outcome"]
         ):
             logger.error(
                 f"The user [ID: {self.context.get('request').user.pk}, "
@@ -80,11 +81,26 @@ class CategoriesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ['id', 'name', "is_income", "is_outcome", 'is_deleted']
-        read_only_fields = ['is_deleted']
+
+    fields = [
+        "id",
+        "name",
+        "is_income",
+        "is_outcome",
+        "is_visibility",
+        "is_system",
+        "is_deleted",
+    ]
+    read_only_fields = ["is_deleted"]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if not instance.is_visibility:
+            return {}
+        return representation
 
 
 class CategoryDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['is_deleted']
+        fields = ["is_deleted"]
