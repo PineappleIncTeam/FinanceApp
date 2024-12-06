@@ -8,6 +8,7 @@ from api.serializers import ProfileSerializer
 
 
 class ProfileApiView(RetrieveUpdateAPIView):
+
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -17,11 +18,18 @@ class ProfileApiView(RetrieveUpdateAPIView):
         return get_object_or_404(Profile, user=self.request.user)
 
     def get(self, request, *args, **kwargs):
+        """
+        получение профиля пользователя
+        """
         profile = self.get_object()
         serializer = self.get_serializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
     def patch(self, request, *args, **kwargs):
+        """
+        изменение профиля пользователя
+        """
         partial = kwargs.pop('partial', True)
         profile = self.get_object()
         serializer = self.get_serializer(profile, data=request.data, partial=partial)

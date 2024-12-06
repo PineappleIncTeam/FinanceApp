@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 class TargetsListCreateAPI(ListCreateAPIView):
     """
-    To get a list of user's accumulations and create a new target.
+    получение списка накоплений пользователя и создание новой цели
     """
 
     serializer_class = TargetsSerializer
@@ -44,8 +44,7 @@ class TargetsListCreateAPI(ListCreateAPIView):
 
 class TargetUpdateDestroyAPI(UpdateAPIView, DestroyAPIView):
     """
-    To close a target.
-    To change name or target amount.
+    закрытие цели. изменение названия или суммы
     """
 
     serializer_class = TargetsSerializer
@@ -91,7 +90,7 @@ class TargetUpdateDestroyAPI(UpdateAPIView, DestroyAPIView):
 
 class TargetMoneyReturnAPI(DestroyAPIView):
     """
-    To return target money to incomes.
+    возврат цели в доходы
     """
     serializer_class = TargetsSerializer
     permission_classes = (IsAuthenticated,)

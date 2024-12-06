@@ -22,9 +22,8 @@ from .errors import (ExceedingTargetAmountError,
 
 class OperationListCreateAPI(ListCreateAPIView):
     """
-    View for retrieving a list of operations for the current user and creating new operations.
+    получение списка операций для текущего пользователя
     """
-
     serializer_class = OperationSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = (filters.BaseFilterBackend,)
@@ -34,6 +33,9 @@ class OperationListCreateAPI(ListCreateAPIView):
         return Operation.objects.filter(user=self.request.user)
 
     def post(self, request, *args, **kwargs):
+        """
+        создание новой операции
+        """
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
@@ -77,19 +79,20 @@ class OperationListCreateAPI(ListCreateAPIView):
 
 
 class OperationRetrieveUpdateDestroyAPI(RetrieveUpdateDestroyAPIView):
-    """
-    View for retrieving, updating, and deleting an operation
-    by its unique identifier (`pk`).
-    """
-
     serializer_class = OperationInfoSerializer
     permission_classes = (IsAuthenticated,)
     lookup_field = "pk"
 
     def get_queryset(self) -> QuerySet[Operation]:
+        """
+        получение операции по ее уникальному идентификатору
+        """
         return Operation.objects.filter(user=self.request.user)
 
     def delete(self, request, *args, **kwargs):
+        """
+        удаление операции по ее уникальному идентификатору
+        """
         operation_instance: Operation = self.get_object()
         if operation_instance.type == TARGETS:
             if operation_instance.categories:
@@ -104,6 +107,9 @@ class OperationRetrieveUpdateDestroyAPI(RetrieveUpdateDestroyAPIView):
         return self.destroy(request, *args, **kwargs)
 
     def patch(self, request, *args, **kwargs):
+        """
+        обновление операции по ее уникальному идентификатору
+        """
         operation_instance: Operation = self.get_object()
         serializer = self.get_serializer(
             operation_instance, data=request.data, partial=True)

@@ -7,5 +7,8 @@ from api.serializers.country import CountrySerializer
 
 
 class CountriesApiView(ListAPIView):
+    """
+    получение списка стран
+    """
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
