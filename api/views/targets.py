@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from django.db import IntegrityError
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.generics import (DestroyAPIView, ListCreateAPIView,
                                      UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
@@ -94,7 +95,11 @@ class TargetMoneyReturnAPI(DestroyAPIView):
     """
     serializer_class = TargetsSerializer
     permission_classes = (IsAuthenticated,)
+    @swagger_auto_schema(
+        operation_id='возврат цели в доходы',
+        operation_description='возврат цели в доходы'
 
+    )
     def get_queryset(self) -> QuerySet[Target]:
         return get_user_targets(
             user=self.request.user
