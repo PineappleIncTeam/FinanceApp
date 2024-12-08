@@ -95,11 +95,6 @@ class TargetMoneyReturnAPI(DestroyAPIView):
     """
     serializer_class = TargetsSerializer
     permission_classes = (IsAuthenticated,)
-    @swagger_auto_schema(
-        operation_id='возврат цели в доходы',
-        operation_description='возврат цели в доходы'
-
-    )
     def get_queryset(self) -> QuerySet[Target]:
         return get_user_targets(
             user=self.request.user
