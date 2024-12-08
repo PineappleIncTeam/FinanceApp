@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
+from Tools.scripts.make_ctype import method
 from django.db import IntegrityError
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
@@ -36,7 +37,6 @@ class TargetsListCreateAPI(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['is_deleted']
     permission_classes = (IsAuthenticated,)
-
     def get_queryset(self) -> QuerySet[Target]:
         return get_user_targets(
             user=self.request.user
@@ -55,6 +55,7 @@ class TargetUpdateDestroyAPI(UpdateAPIView, DestroyAPIView):
         return get_user_targets(
             user=self.request.user
         )
+
 
     def destroy(self, request, *args, **kwargs) -> Response:
         instance: Target = self.get_object()

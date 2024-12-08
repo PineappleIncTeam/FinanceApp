@@ -62,6 +62,9 @@ class OperationListCreateAPI(ListCreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def filter_queryset(self, queryset):
+        """
+        получение операции по ее уникальному идентификатору
+        """
         operation_type = self.request.query_params.get("type", None)
         if operation_type:
             if operation_type == TARGETS:
@@ -84,9 +87,6 @@ class OperationRetrieveUpdateDestroyAPI(RetrieveUpdateDestroyAPIView):
     lookup_field = "pk"
 
     def get_queryset(self) -> QuerySet[Operation]:
-        """
-        получение операции по ее уникальному идентификатору
-        """
         return Operation.objects.filter(user=self.request.user)
 
     def delete(self, request, *args, **kwargs):
