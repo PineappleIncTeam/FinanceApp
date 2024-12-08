@@ -1,4 +1,3 @@
-from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -44,7 +43,7 @@ class ReportStatisticsView(APIView):
         })
 
 
-class ReportCategoriesView(GenericAPIView):
+class ReportCategoriesView(APIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = ReportCategorySerializer
 
