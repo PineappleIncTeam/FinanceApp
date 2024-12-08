@@ -1,10 +1,12 @@
 from .categories import CategoriesListCreateAPI, CategoryUpdateDestroyAPI
+from .countries import CountriesApiView
 from .generate_token import CustomTokenCreateAPI
 from .operation import (OperationListCreateAPI,
                         OperationRetrieveUpdateDestroyAPI)
 from .password_reset import password_reset_api_controller
-from .countries import CountriesApiView
 from .profile import ProfileApiView
+from .reports import (ReportBalanceView, ReportCategoriesView,
+                      ReportStatisticsView)
 from .targets import (TargetMoneyReturnAPI, TargetsListCreateAPI,
                       TargetUpdateDestroyAPI)
 
@@ -20,4 +22,7 @@ __all__ = [
     "TargetsListCreateAPI",
     "TargetUpdateDestroyAPI",
     "TargetMoneyReturnAPI",
+    "ReportBalanceView",
+    "ReportStatisticsView",
+    "ReportCategoriesView"
 ]

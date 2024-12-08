@@ -6,8 +6,10 @@ from api.views import (CategoriesListCreateAPI, CategoryUpdateDestroyAPI,
                        CountriesApiView, CustomTokenCreateAPI,
                        OperationListCreateAPI,
                        OperationRetrieveUpdateDestroyAPI, ProfileApiView,
-                       TargetMoneyReturnAPI, TargetsListCreateAPI,
-                       TargetUpdateDestroyAPI, password_reset_api_controller)
+                       ReportBalanceView, ReportCategoriesView,
+                       ReportStatisticsView, TargetMoneyReturnAPI,
+                       TargetsListCreateAPI, TargetUpdateDestroyAPI,
+                       password_reset_api_controller)
 
 urlpatterns = [
     path(
@@ -63,12 +65,29 @@ urlpatterns = [
     ),
     path(
         "countries/",
-        CountriesApiView.as_view()
+        CountriesApiView.as_view(),
+        name="countries",
     ),
     path(
         "profile/",
-        ProfileApiView.as_view()
-    )
+        ProfileApiView.as_view(),
+        name="profile"
+    ),
+    path(
+        "reports/balance/",
+        ReportBalanceView.as_view(),
+        name="report-balance"
+    ),
+    path(
+        "reports/categories/",
+        ReportCategoriesView.as_view(),
+        name="report-categories"
+    ),
+    path(
+        "reports/statistics/",
+        ReportStatisticsView.as_view(),
+        name="report-statistics"
+    ),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

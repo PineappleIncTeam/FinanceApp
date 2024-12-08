@@ -49,6 +49,9 @@ class Operation(BaseModel):
 
     class Meta:
         db_table = "operations"
+        indexes = [
+            models.Index(fields=['type', 'date']),
+        ]
 
     def __str__(self):
         return f"{self.categories} {self.date}"
