@@ -23,3 +23,9 @@ class ProfileSerializer(serializers.ModelSerializer):
             instance.avatar.delete(save=False)
 
         return super().update(instance, validated_data)
+
+
+
+class ErrorSerializer(serializers.Serializer):
+    error_code = serializers.IntegerField()
+    error_message = serializers.CharField()

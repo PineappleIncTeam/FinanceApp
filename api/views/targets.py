@@ -3,9 +3,9 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
-from Tools.scripts.make_ctype import method
 from django.db import IntegrityError
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.generics import (DestroyAPIView, ListCreateAPIView,
                                      UpdateAPIView)
@@ -18,6 +18,7 @@ from api.serializers import TargetsSerializer
 from api.utils import get_user_targets, return_money_from_target_to_incomes
 
 from .errors import TargetInProgressError, TargetIsClosedError
+from ..serializers.profile import ErrorSerializer
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -57,6 +58,17 @@ class TargetUpdateDestroyAPI(UpdateAPIView, DestroyAPIView):
         )
 
 
+    @swagger_auto_schema(
+        operation_id='Получение профиля пользователя',
+        operation_description='получение профиля пользователя',
+    responses = {
+        200: openapi.Response(description="Профиль успешно получен", schema=TargetsSerializer),
+        401: openapi.Response(description="Неавторизованный запрос", schema=ErrorSerializer),
+        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+        409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации", schema=ErrorSerializer),
+        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
+    })
     def destroy(self, request, *args, **kwargs) -> Response:
         instance: Target = self.get_object()
         if instance.is_deleted:
