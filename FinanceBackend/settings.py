@@ -194,7 +194,7 @@ DOMAIN = os.getenv("DOMAIN", "127.0.0.1:8000")
 SITE_NAME = "Freenance App"
 
 DJOSER = {
-    "PASSWORD_RESET_CONFIRM_URL": "api/v1/password/reset/confirm/?uid={uid}&token={token}",
+    "PASSWORD_RESET_CONFIRM_URL": "changePassword/?uid={uid}&token={token}",
     "USERNAME_RESET_CONFIRM_URL": "api/v1/username/reset/confirm/?uid={uid}&token={token}",
     "ACTIVATION_URL": "activate/?uid={uid}&token={token}",
     "SEND_ACTIVATION_EMAIL": True,
