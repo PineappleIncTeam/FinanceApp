@@ -33,6 +33,23 @@ rich = "^13.5.2"
 setuptools = "*"
 pre-commit = "3.5.0"
 
+[tool.mypy]
+mypy_path = "src/jobboard_app"
+disallow_untyped_defs = true
+check_untyped_defs = true
+strict_optional = true
+no_implicit_optional = true
+warn_return_any = true
+show_error_codes = true
+warn_unused_ignores = true
+
+[tool.black]
+skip-string-normalization = false
+line-length = 120
+
+[tool.isort]
+profile = "black"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

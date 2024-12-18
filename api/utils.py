@@ -1,17 +1,15 @@
 import logging
 from datetime import date, datetime, timedelta
-from typing import Optional
+from typing import Any, Optional
 
 from django.db import transaction
-from django.db.models import (Case, DecimalField, F, Q, QuerySet, Sum, Value,
-                              When)
+from django.db.models import Case, DecimalField, F, Q, QuerySet, Sum, Value, When
 from django.db.models.functions import TruncMonth
 from rest_framework.exceptions import ValidationError
 
 from api.models import TARGETS, Category, Operation, Target, User
 from api.models.operation import INCOME_CATEGORY, OUTCOME_CATEGORY
-from FinanceBackend.settings import (DEFAULT_DATE_FORMAT_STR,
-                                     DEFAULT_MONTH_FORMAT_STR)
+from FinanceBackend.settings import DEFAULT_DATE_FORMAT_STR, DEFAULT_MONTH_FORMAT_STR
 
 logger = logging.getLogger(__name__)
 
@@ -102,11 +100,11 @@ def return_money_from_target_to_incomes(
     return returned_operation
 
 
-def get_first_day_of_current_month():
+def get_first_day_of_current_month() -> date:
     return date.today().replace(day=1)
 
 
-def get_last_day_of_current_month():
+def get_last_day_of_current_month() -> date:
     start_of_next_month = get_first_day_of_current_month()
     if start_of_next_month.month == 12:
         start_of_next_month = date(start_of_next_month.year + 1, 1, 1)
@@ -123,12 +121,21 @@ def convert_str_to_date(date_str: str) -> date:
         raise ValidationError("Invalid date format. Use YYYY-MM-DD.")
 
 
-def get_category_report_data(operation_type: str, end_date: date,  start_date: date) -> dict:
-    operations = Operation.objects.filter(
-        type=operation_type,
-        date__range=[start_date, end_date],
-        categories__isnull=False,
-    ).filter(~Q(categories__is_income=False, categories__is_outcome=False))
+def get_category_report_data(
+    operation_type: str, end_date: date, start_date: date
+) -> dict[int, dict[str, Any]]:
+    operations = (
+        Operation.objects
+        .select_related("categories")
+        .filter(
+            type=operation_type,
+            date__range=[start_date, end_date],
+            categories__isnull=False,
+        ).filter(
+            ~Q(categories__is_income=False, categories__is_outcome=False)
+        )
+    )
+
     aggregated_data = operations.annotate(
         month=TruncMonth("date")
     ).values("categories__id", "categories__name", "month").annotate(
@@ -175,7 +182,11 @@ def get_and_check_date_params(start_date_str: str, end_date_str: str) -> tuple:
 
 
 def get_summary_data(user, start_date=None, end_date=None):
-    data = Operation.objects.filter(user=user)
+    data = (
+        Operation.objects
+        .filter(user=user)
+        .select_related("categories", "target")
+    )
 
     if start_date and end_date:
         data = data.filter(
@@ -185,7 +196,10 @@ def get_summary_data(user, start_date=None, end_date=None):
     return data.aggregate(
         total_expenses=Sum(
             Case(
-                When(categories__isnull=False, type=OUTCOME_CATEGORY, then=F("amount")),
+                When(
+                    Q(type=OUTCOME_CATEGORY) | Q(type=TARGETS, categories__id=None),
+                    then=F("amount")
+                ),
                 default=Value(0),
                 output_field=DecimalField()
             )
