@@ -7,6 +7,7 @@ from django.db import IntegrityError
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status
 from rest_framework.generics import (DestroyAPIView, ListCreateAPIView,
                                      UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
@@ -59,47 +60,51 @@ class TargetUpdateDestroyAPI(UpdateAPIView, DestroyAPIView):
 
 
     @swagger_auto_schema(
-        operation_id='Получение профиля пользователя',
-        operation_description='получение профиля пользователя',
-    responses = {
-        200: openapi.Response(description="Профиль успешно получен", schema=TargetsSerializer),
-        401: openapi.Response(description="Неавторизованный запрос", schema=ErrorSerializer),
-        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
-        409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации", schema=ErrorSerializer),
-        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
-        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
-    })
+        operation_id='Закрытие профиля пользователя',
+        operation_description='Закрытие профиля пользователя и возврат средств.',
+        responses={
+            200: openapi.Response(description="Профиль успешно закрыт", schema=TargetsSerializer),
+            400: openapi.Response(description="Ошибка при возврате денег", schema=ErrorSerializer),
+            401: openapi.Response(description="Неавторизованный запрос", schema=ErrorSerializer),
+            403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+            404: openapi.Response(description="Объект не найден", schema=ErrorSerializer),
+            409: openapi.Response(description="Конфликт при обработке запроса", schema=ErrorSerializer),
+            500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+            503: openapi.Response(description="Сервер не готов обработать запрос в данный момент",
+                                  schema=ErrorSerializer),
+        }
+    )
     def destroy(self, request, *args, **kwargs) -> Response:
         instance: Target = self.get_object()
+
+        # Проверка статуса целевого объекта
         if instance.is_deleted:
-            raise TargetIsClosedError()
+            return Response({"detail": "Цель уже закрыта."}, status=status.HTTP_404_NOT_FOUND)
+
         if instance.status == IN_PROGRESS:
-            raise TargetInProgressError()
+            return Response({"detail": "Цель находится в процессе."}, status=status.HTTP_409_CONFLICT)
+
         try:
-            returned_operation = return_money_from_target_to_incomes(
-                user=request.user,
-                target=instance
-            )
+            # Возврат средств
+            returned_operation = return_money_from_target_to_incomes(user=request.user, target=instance)
+
+            # Обновление состояния объекта
             instance.is_deleted = True
             instance.current_sum = 0
             instance.save()
-        except IntegrityError:
-            return Response(
-                "Can not return money from a target to incomes.",
-                status=HTTP_400_BAD_REQUEST
+
+            logger.info(
+                f"The user [ID: {request.user.pk}, name: {request.user.email}] closed a target: "
+                f"id {instance.id}, name - {instance.name}, returned amount - {returned_operation.amount}."
             )
 
-        logger.info(
-            f"The user [ID: {request.user.pk}, "
-            f"name: {request.user.email}] closed a target: "
-            f"id {instance.id}, name - {instance.name},"
-            f"returned amount - {returned_operation.amount}."
-        )
+            return Response(data=TargetsSerializer(instance).data, status=status.HTTP_200_OK)
 
-        return Response(
-            data=TargetsSerializer(instance).data,
-            status=HTTP_200_OK
-        )
+        except IntegrityError:
+            return Response({"detail": "Не удалось вернуть деньги с цели на доходы."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class TargetMoneyReturnAPI(DestroyAPIView):

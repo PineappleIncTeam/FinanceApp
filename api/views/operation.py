@@ -4,6 +4,8 @@ from datetime import datetime
 from decimal import Decimal
 
 from django.db.models import QuerySet
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import filters, status
 from rest_framework.generics import (ListCreateAPIView,
                                      RetrieveUpdateDestroyAPIView)
@@ -18,6 +20,7 @@ from .errors import (ExceedingTargetAmountError,
                      InvalidTargetOperationDateError,
                      ReturnMoneyCategoryOperationError, TargetArchievedError,
                      TargetIsClosedError)
+from ..serializers.profile import ErrorSerializer, ProfileSerializer
 
 
 class OperationListCreateAPI(ListCreateAPIView):
@@ -32,10 +35,20 @@ class OperationListCreateAPI(ListCreateAPIView):
     def get_queryset(self) -> QuerySet[Operation]:
         return Operation.objects.filter(user=self.request.user)
 
+    @swagger_auto_schema(
+        operation_id='Создание новой операции',
+        operation_description='Создание новой операции',
+        responses={
+            200: openapi.Response(description="Операция успешно создана", schema=OperationSerializer),
+            401: openapi.Response(description="Неавторизованный запрос",
+                                  schema=ErrorSerializer),
+            403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+            409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации",
+                                  schema=ErrorSerializer),
+            500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+        })
     def post(self, request, *args, **kwargs):
-        """
-        создание новой операции
-        """
+
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
@@ -62,9 +75,6 @@ class OperationListCreateAPI(ListCreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def filter_queryset(self, queryset):
-        """
-        получение операции по ее уникальному идентификатору
-        """
         operation_type = self.request.query_params.get("type", None)
         if operation_type:
             if operation_type == TARGETS:
@@ -89,10 +99,19 @@ class OperationRetrieveUpdateDestroyAPI(RetrieveUpdateDestroyAPIView):
     def get_queryset(self) -> QuerySet[Operation]:
         return Operation.objects.filter(user=self.request.user)
 
+    @swagger_auto_schema(
+        operation_id='Удаление операции по ее уникальному идентификатору',
+        operation_description='Удаление операции по ее уникальному идентификатору',
+    responses = {
+        200: openapi.Response(description="Операция успешно удалена", schema=OperationInfoSerializer),
+        401: openapi.Response(description="Неавторизованный запрос",
+                              schema=ErrorSerializer),
+        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+        409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации", schema=ErrorSerializer),
+        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
+    })
     def delete(self, request, *args, **kwargs):
-        """
-        удаление операции по ее уникальному идентификатору
-        """
         operation_instance: Operation = self.get_object()
         if operation_instance.type == TARGETS:
             if operation_instance.categories:
@@ -106,10 +125,20 @@ class OperationRetrieveUpdateDestroyAPI(RetrieveUpdateDestroyAPIView):
             target_instance.save()
         return self.destroy(request, *args, **kwargs)
 
+
+    @swagger_auto_schema(
+        operation_id='Обновление операции по ее уникальному идентификатору',
+        operation_description='Обновление операции по ее уникальному идентификатору',
+    responses = {
+        200: openapi.Response(description="Операция успешно обновлена", schema=OperationInfoSerializer),
+        401: openapi.Response(description="Неавторизованный запрос",
+                              schema=ErrorSerializer),
+        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+        409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации", schema=ErrorSerializer),
+        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
+    })
     def patch(self, request, *args, **kwargs):
-        """
-        обновление операции по ее уникальному идентификатору
-        """
         operation_instance: Operation = self.get_object()
         serializer = self.get_serializer(
             operation_instance, data=request.data, partial=True)
