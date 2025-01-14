@@ -12,13 +12,11 @@ from rest_framework.generics import (DestroyAPIView, ListCreateAPIView,
                                      UpdateAPIView)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
 from api.models import IN_PROGRESS
 from api.serializers import TargetsSerializer
 from api.utils import get_user_targets, return_money_from_target_to_incomes
 
-from .errors import TargetInProgressError, TargetIsClosedError
 from ..serializers.profile import ErrorSerializer
 
 if TYPE_CHECKING:
@@ -87,7 +85,6 @@ class TargetUpdateDestroyAPI(UpdateAPIView, DestroyAPIView):
         try:
             # Возврат средств
             returned_operation = return_money_from_target_to_incomes(user=request.user, target=instance)
-
             # Обновление состояния объекта
             instance.is_deleted = True
             instance.current_sum = 0
