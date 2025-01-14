@@ -16,9 +16,6 @@ if TYPE_CHECKING:
 )
 @api_view(http_method_names=["GET"])
 def password_reset_api_controller(request: Request) -> Response:
-    # """
-    # подтверждение восстановления пароля
-    # """
     uid = request.query_params.get("uid")
     token = request.query_params.get("token")
     data = {"uid": uid, "token": token}
