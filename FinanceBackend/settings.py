@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "api.apps.ApiConfig",
     "drf_spectacular",
     "drf_spectacular_sidecar",
+    "drf_yasg",
     "whitenoise.runserver_nostatic",
     "django_filters",
 ]

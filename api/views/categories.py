@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 class CategoriesListCreateAPI(ListCreateAPIView):
     """
-    To get a list of user's categories and create a new category.
+    получение списка категорий пользователя и создание новой категории
     """
 
     serializer_class = CategoriesSerializer
@@ -41,8 +41,7 @@ class CategoriesListCreateAPI(ListCreateAPIView):
 
 class CategoryUpdateDestroyAPI(UpdateAPIView, DestroyAPIView):
     """
-    To delete a category if there are no operations related with this category.
-    To archive a category.
+    удаление категории, если с этой категорией не выполняются никакие операции. архивирование категории.
     """
 
     serializer_class = CategoryDetailSerializer
