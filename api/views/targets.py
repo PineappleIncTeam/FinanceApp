@@ -1,15 +1,13 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING
 
 from django.db import IntegrityError
-from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.generics import (DestroyAPIView, ListCreateAPIView,
-                                     UpdateAPIView)
+from rest_framework.exceptions import NotFound
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -18,64 +16,110 @@ from api.serializers import TargetsSerializer
 from api.utils import get_user_targets, return_money_from_target_to_incomes
 
 from ..serializers.profile import ErrorSerializer
+from rest_framework.generics import GenericAPIView
 
-if TYPE_CHECKING:
-    from django.db.models import QuerySet
-
-    from api.models import Target
+from api.models import Target
 
 
 logger = logging.getLogger(__name__)
 
 
-class TargetsListCreateAPI(ListCreateAPIView):
-    """
-    получение списка накоплений пользователя и создание новой цели
-    """
-
-    serializer_class = TargetsSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['is_deleted']
+class TargetsListCreateAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
-    def get_queryset(self) -> QuerySet[Target]:
-        return get_user_targets(
-            user=self.request.user
-        )
-
-
-class TargetUpdateDestroyAPI(UpdateAPIView, DestroyAPIView):
-    """
-    закрытие цели. изменение названия или суммы
-    """
-
     serializer_class = TargetsSerializer
-    permission_classes = (IsAuthenticated,)
-
-    def get_queryset(self) -> QuerySet[Target]:
-        return get_user_targets(
-            user=self.request.user
-        )
 
 
     @swagger_auto_schema(
-        operation_id='Закрытие профиля пользователя',
-        operation_description='Закрытие профиля пользователя и возврат средств.',
-        responses={
-            200: openapi.Response(description="Профиль успешно закрыт", schema=TargetsSerializer),
-            400: openapi.Response(description="Ошибка при возврате денег", schema=ErrorSerializer),
-            401: openapi.Response(description="Неавторизованный запрос", schema=ErrorSerializer),
-            403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
-            404: openapi.Response(description="Объект не найден", schema=ErrorSerializer),
-            409: openapi.Response(description="Конфликт при обработке запроса", schema=ErrorSerializer),
-            500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
-            503: openapi.Response(description="Сервер не готов обработать запрос в данный момент",
-                                  schema=ErrorSerializer),
-        }
-    )
-    def destroy(self, request, *args, **kwargs) -> Response:
-        instance: Target = self.get_object()
+        operation_id='Получение списка целей пользователя',
+        operation_description='Получение списка целей пользователя',
+    responses = {
+        200: openapi.Response(description="Список целей успешно получен", schema=TargetsSerializer),
+        401: openapi.Response(description="Неавторизованный запрос",
+                              schema=ErrorSerializer),
+        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+        409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации", schema=ErrorSerializer),
+        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
+    })
+    def get(self, request, *args, **kwargs):
+        queryset = get_user_targets(user=request.user)
 
-        # Проверка статуса целевого объекта
+        is_deleted = request.query_params.get('is_deleted')
+        if is_deleted is not None:
+            queryset = queryset.filter(is_deleted=is_deleted)
+
+        serializer = TargetsSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    @swagger_auto_schema(
+        operation_id='Создание новой цели',
+        operation_description='создание новой цели',
+    responses = {
+        200: openapi.Response(description="Цель успешно создана", schema=TargetsSerializer),
+        401: openapi.Response(description="Неавторизованный запрос",
+                              schema=ErrorSerializer),
+        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+        409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации", schema=ErrorSerializer),
+        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
+    })
+    def post(self, request, *args, **kwargs):
+        serializer = TargetsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TargetUpdateDestroyAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TargetsSerializer
+
+    def get_object(self, pk):
+        try:
+            return get_user_targets(self.request.user).get(pk=pk)
+        except Target.DoesNotExist:
+            raise NotFound(detail="Цель не найдена")
+
+
+    @swagger_auto_schema(
+        operation_id='Изменение цели',
+        operation_description='Изменение цели по уникальному индентификатору',
+    responses = {
+        200: openapi.Response(description="Цель успешно изменена", schema=TargetsSerializer),
+        401: openapi.Response(description="Неавторизованный запрос",
+                              schema=ErrorSerializer),
+        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+        409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации", schema=ErrorSerializer),
+        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
+    })
+    def put(self, request, *args, **kwargs):
+        instance = self.get_object(kwargs['pk'])
+        serializer = TargetsSerializer(instance, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @swagger_auto_schema(
+        operation_id='Закрытие цели',
+        operation_description='Закрытие цели по уникальному индентификатору',
+    responses = {
+        200: openapi.Response(description="Цель успешно закрыта", schema=TargetsSerializer),
+        401: openapi.Response(description="Неавторизованный запрос",
+                              schema=ErrorSerializer),
+        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+        409: openapi.Response(description="Цель находится в процессе", schema=ErrorSerializer),
+        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
+    })
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object(kwargs['pk'])
+
         if instance.is_deleted:
             return Response({"detail": "Цель уже закрыта."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -83,9 +127,7 @@ class TargetUpdateDestroyAPI(UpdateAPIView, DestroyAPIView):
             return Response({"detail": "Цель находится в процессе."}, status=status.HTTP_409_CONFLICT)
 
         try:
-            # Возврат средств
             returned_operation = return_money_from_target_to_incomes(user=request.user, target=instance)
-            # Обновление состояния объекта
             instance.is_deleted = True
             instance.current_sum = 0
             instance.save()
@@ -104,13 +146,29 @@ class TargetUpdateDestroyAPI(UpdateAPIView, DestroyAPIView):
             return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class TargetMoneyReturnAPI(DestroyAPIView):
-    """
-    возврат цели в доходы
-    """
-    serializer_class = TargetsSerializer
+class TargetMoneyReturnAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
-    def get_queryset(self) -> QuerySet[Target]:
-        return get_user_targets(
-            user=self.request.user
-        )
+
+    def get_queryset(self):
+        return get_user_targets(user=self.request.user)
+
+
+    @swagger_auto_schema(
+        operation_id='Удаление цели',
+        operation_description='Удаление цели по уникальному индентификатору',
+    responses = {
+        200: openapi.Response(description="Цель успешно удалена", schema=TargetsSerializer),
+        401: openapi.Response(description="Неавторизованный запрос",
+                              schema=ErrorSerializer),
+        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+        404: openapi.Response(description="Нет цели с таким id", schema=ErrorSerializer),
+        409: openapi.Response(description="Цель находится в процессе", schema=ErrorSerializer),
+        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
+    })
+    def delete(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        target = get_object_or_404(queryset, pk=kwargs['pk'])
+        target.delete()
+        return Response({"detail": "Цель успешно удалена"}, status=status.HTTP_200_OK)
+
