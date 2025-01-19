@@ -1,4 +1,5 @@
 from .category import CategoriesSerializer, CategoryDetailSerializer
+from .country import CountrySerializer
 from .operation import OperationInfoSerializer, OperationSerializer
 from .target import TargetsSerializer
 from .user import CustomTokenCreateSerializer, CustomUserCreateSerializer
@@ -13,4 +14,5 @@ __all__ = [
     "ProfileSerializer",
     "OperationInfoSerializer",
     "TargetsSerializer",
+    "CountrySerializer",
 ]

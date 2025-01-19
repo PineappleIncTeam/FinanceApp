@@ -1,73 +1,145 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING
+from drf_yasg import openapi
 
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.generics import (DestroyAPIView, ListCreateAPIView,
-                                     UpdateAPIView)
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status
+from rest_framework.exceptions import NotFound
+from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import HTTP_204_NO_CONTENT
+
 
 from api.models import Category
 from api.serializers import CategoriesSerializer, CategoryDetailSerializer
+from api.serializers.profile import ErrorSerializer
 from api.utils import get_user_categories
 from api.views.errors import CategoryWithOperationsError
-
-if TYPE_CHECKING:
-    from django.db.models import QuerySet
 
 
 logger = logging.getLogger(__name__)
 
 
-class CategoriesListCreateAPI(ListCreateAPIView):
-    """
-    получение списка категорий пользователя и создание новой категории
-    """
-
+class CategoriesListCreateAPI(GenericAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = CategoriesSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['is_income', 'is_outcome', 'is_deleted']
-    permission_classes = (IsAuthenticated,)
 
-    def get_queryset(self) -> QuerySet[Category]:
-        if getattr(self, "swagger_fake_view", False):
-            return Category.objects.none()
 
+    @swagger_auto_schema(
+        operation_id='Получение списка категорий пользователя',
+        operation_description='Получение списка категорий пользователя',
+    responses = {
+        200: openapi.Response(description="Список категорий пользователя успешно получен", schema=CategoriesSerializer),
+        401: openapi.Response(description="Неавторизованный запрос",
+                              schema=ErrorSerializer),
+        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+        409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации", schema=ErrorSerializer),
+        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
+    })
+    def get(self, request, *args, **kwargs):
+        categories = Category.objects.filter(user=request.user, is_deleted=False)
+        serializer = CategoriesSerializer(categories, many=True)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        operation_id='Создание новой категории',
+        operation_description='Создание новой категории',
+    responses = {
+        200: openapi.Response(description="Категория успешно создана", schema=CategoriesSerializer),
+        401: openapi.Response(description="Неавторизованный запрос",
+                              schema=ErrorSerializer),
+        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+        409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации", schema=ErrorSerializer),
+        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
+    })
+    def post(self, request, *args, **kwargs):
+        serializer = CategoriesSerializer(data=request.data, context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CategoryUpdateDestroyAPI(GenericAPIView):
+    serializer_class = CategoryDetailSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
         return get_user_categories(user=self.request.user)
 
+    def get_object(self):
+        queryset = self.get_queryset()
+        category_id = self.kwargs.get('pk')
+        try:
+            category = queryset.get(id=category_id)
+        except Category.DoesNotExist:
+            raise NotFound("Категория не найдена")
+        return category
 
-class CategoryUpdateDestroyAPI(UpdateAPIView, DestroyAPIView):
-    """
-    удаление категории, если с этой категорией не выполняются никакие операции. архивирование категории.
-    """
 
-    serializer_class = CategoryDetailSerializer
-    permission_classes = (IsAuthenticated,)
+    @swagger_auto_schema(
+        operation_id='Архивирование категории',
+        operation_description='Архивирование категории по уникальному идентификатору',
+    responses = {
+        200: openapi.Response(description="Категория успешно архивирована", schema=CategoryDetailSerializer),
+        401: openapi.Response(description="Неавторизованный запрос",
+                              schema=ErrorSerializer),
+        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+        404: openapi.Response(description="Категория не найдена", schema=ErrorSerializer),
+        409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации", schema=ErrorSerializer),
+        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
+    })
+    def put(self, request, *args, **kwargs):
+        category = self.get_object()
+        serializer = self.get_serializer(category, data=request.data, partial=True)
 
-    def get_queryset(self) -> QuerySet[Category]:
-        return get_user_categories(
-            user=self.request.user
-        )
+        if serializer.is_valid():
+            serializer.save()
+            logger.info(
+                f"The user [ID: {request.user.pk}, "
+                f"name: {request.user.email}] has updated a category: "
+                f"id {category.id}, name - {category.name}."
+            )
+            return Response(serializer.data)
 
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        if instance.operations.exists():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @swagger_auto_schema(
+        operation_id='Удаление категории',
+        operation_description='Удаление категории по уникальному идентификатору, если с этой категорией не выполняются никакие операции',
+    responses = {
+        200: openapi.Response(description="Категория успешно удалена", schema=CategoryDetailSerializer),
+        401: openapi.Response(description="Неавторизованный запрос",
+                              schema=ErrorSerializer),
+        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+        404: openapi.Response(description="Категория не найдена", schema=ErrorSerializer),
+        409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации", schema=ErrorSerializer),
+        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
+    })
+    def delete(self, request, *args, **kwargs):
+        category = self.get_object()
+        if category.operations.exists():
             logger.error(
                 f"The user [ID: {request.user.pk}, "
-                f"name: {request.user.email}] can not delete a category "
-                f"with existing operations: id {instance.pk}."
+                f"name: {request.user.email}] cannot delete a category "
+                f"with existing operations: id {category.pk}."
             )
-
             raise CategoryWithOperationsError()
 
-        self.perform_destroy(instance)
+        category.is_deleted = True
+        category.save()
 
         logger.info(
             f"The user [ID: {request.user.pk}, "
-            f"name: {request.user.email}] has deleted a category: "
-            f"id {instance.id}, name - {instance.name}."
+            f"name: {request.user.email}] has archived category: "
+            f"id {category.id}, name - {category.name}."
         )
-        return Response(status=HTTP_204_NO_CONTENT)
+        return Response({"detail": "Категория успешна удалена"},status=status.HTTP_200_OK)

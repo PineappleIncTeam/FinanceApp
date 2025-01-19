@@ -17,13 +17,15 @@ class TargetsSerializer(serializers.ModelSerializer):
         or retrieve it from archive.
         """
 
-        validated_data["user"] = self.context.get("request").user
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
 
-        logger.info(
-            f"The user [ID: {self.context.get('request').user.pk}, "
-            f"name: {self.context.get('request').user.email}] "
-            f"successfully added a new category {validated_data['name']}."
-        )
+        # logger.info(
+        #     f"The user [ID: {self.context.get('request').user.pk}, "
+        #     f"name: {self.context.get('request').user.email}] "
+        #     f"successfully added a new category {validated_data['name']}."
+        # )
         return super().create(validated_data)
 
     def validate_amount(self, value: float) -> float:
@@ -43,5 +45,5 @@ class TargetsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Target
-        fields = ['id', 'name', 'amount', 'current_sum', 'status']
+        fields = ['id', 'name', 'user_id', 'amount', 'current_sum', 'status']
         read_only_fields = ['is_deleted', 'status', 'current_sum']
