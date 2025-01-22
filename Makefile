@@ -19,3 +19,11 @@ test:
 
 secretkey:
 	python -c 'from django.utils.crypto import get_random_string; print(get_random_string(40))'
+
+celery-worker:
+	celery -A FinanceBackend worker --loglevel=info
+
+celery-beat:
+	celery -A FinanceBackend beat --loglevel=info
+
+start-all: server celery-worker celery-beat

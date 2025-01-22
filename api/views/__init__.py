@@ -9,6 +9,7 @@ from .reports import (ReportBalanceView, ReportCategoriesView,
                       ReportStatisticsView)
 from .targets import (TargetMoneyReturnAPI, TargetsListCreateAPI,
                       TargetUpdateDestroyAPI)
+from .currency import CurrencyDataView
 
 __all__ = [
     "password_reset_api_controller",
@@ -24,5 +25,6 @@ __all__ = [
     "TargetMoneyReturnAPI",
     "ReportBalanceView",
     "ReportStatisticsView",
-    "ReportCategoriesView"
+    "ReportCategoriesView",
+    "CurrencyDataView",
 ]

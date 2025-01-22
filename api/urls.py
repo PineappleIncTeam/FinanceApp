@@ -9,7 +9,7 @@ from api.views import (CategoriesListCreateAPI, CategoryUpdateDestroyAPI,
                        ReportBalanceView, ReportCategoriesView,
                        ReportStatisticsView, TargetMoneyReturnAPI,
                        TargetsListCreateAPI, TargetUpdateDestroyAPI,
-                       password_reset_api_controller)
+                       password_reset_api_controller, CurrencyDataView)
 
 urlpatterns = [
     path(
@@ -87,6 +87,11 @@ urlpatterns = [
         "reports/statistics/",
         ReportStatisticsView.as_view(),
         name="report-statistics"
+    ),
+    path(
+        "currency/",
+        CurrencyDataView.as_view(),
+        name="exchange-rates"
     ),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

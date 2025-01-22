@@ -4,6 +4,7 @@ from .operation import OperationInfoSerializer, OperationSerializer
 from .target import TargetsSerializer
 from .user import CustomTokenCreateSerializer, CustomUserCreateSerializer
 from .profile import ProfileSerializer
+from .currency import CurrencyDataSerializer
 
 __all__ = [
     "CustomTokenCreateSerializer",
@@ -15,4 +16,5 @@ __all__ = [
     "OperationInfoSerializer",
     "TargetsSerializer",
     "CountrySerializer",
+    "CurrencyDataSerializer",
 ]

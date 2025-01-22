@@ -3,9 +3,10 @@ from .category import Category
 from .operation import TARGETS, Operation
 from .target import ACHIEVED, IN_PROGRESS, Target
 from .countries import Country
+from .currency import CurrencyData
 
 
-__all__ = [
+all = [
     "User",
     "Category",
     "Country",
@@ -15,4 +16,5 @@ __all__ = [
     "TARGETS",
     "ACHIEVED",
     "IN_PROGRESS",
+    "CurrencyData",
 ]
