@@ -268,8 +268,10 @@ MAX_OPERATIONS_COUNT = 5
 DEFAULT_DATE_FORMAT_STR = "%Y-%m-%d"
 DEFAULT_MONTH_FORMAT_STR = "%Y-%m"
 
-CELERY_BROKER_URL = 'redis://localhost:6379/1'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/2'
+redis_address = os.getenv("REDIS_ADR")
+
+CELERY_BROKER_URL = f'redis://{redis_address}:6379/1'
+CELERY_RESULT_BACKEND = f'redis://{redis_address}:6379/2'
 CELERY_TASK_DEFAULT_QUEUE = 'celery'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
@@ -280,7 +282,7 @@ CELERY_TIMEZONE = 'Europe/Moscow'
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://localhost:6379/0',
+        'LOCATION': f'redis://{redis_address}:6379/0',
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
