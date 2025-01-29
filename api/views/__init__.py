@@ -1,14 +1,12 @@
 from .categories import CategoriesListCreateAPI, CategoryUpdateDestroyAPI
 from .countries import CountriesApiView
 from .generate_token import CustomTokenCreateAPI
-from .operation import (OperationListCreateAPI,
-                        OperationRetrieveUpdateDestroyAPI)
+from .operation import OperationListCreateAPI, OperationRetrieveUpdateDestroyAPI
 from .password_reset import password_reset_api_controller
 from .profile import ProfileApiView
-from .reports import (ReportBalanceView, ReportCategoriesView,
-                      ReportStatisticsView)
-from .targets import (TargetMoneyReturnAPI, TargetsListCreateAPI,
-                      TargetUpdateDestroyAPI)
+from .reports import ReportBalanceView, ReportCategoriesView, ReportStatisticsView
+from .targets import TargetMoneyReturnAPI, TargetsListCreateAPI, TargetUpdateDestroyAPI
+from .vkauth import VKOAuth2View
 
 __all__ = [
     "password_reset_api_controller",
@@ -24,5 +22,6 @@ __all__ = [
     "TargetMoneyReturnAPI",
     "ReportBalanceView",
     "ReportStatisticsView",
-    "ReportCategoriesView"
+    "ReportCategoriesView",
+    "VKOAuth2View",
 ]
