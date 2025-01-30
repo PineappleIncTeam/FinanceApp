@@ -26,6 +26,10 @@ types-requests = "2.32.0.20241016"
 whitenoise = "6.8.2"
 django-stubs = "4.2.7"
 djangorestframework-stubs = {version = "1.7.0", extras = ["compatible-mypy"]}
+celery = "5.4.0"
+django-celery-beat = "2.7.0"
+django-redis = "5.4.0"
+
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.2.6"
