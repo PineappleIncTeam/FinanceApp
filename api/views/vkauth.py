@@ -15,7 +15,7 @@ load_dotenv()
 
 class VKOAuth2View(APIView):
     @swagger_auto_schema(
-        operation_description="Обмен кода авторизации на токены VK.",
+        operation_description="Обмен кода авторизации на токены VK и получение личных данных пользователя.",
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             required=["code", "code_verifier", "device_id"],
@@ -35,6 +35,17 @@ class VKOAuth2View(APIView):
                         "access_token": "vk2.a.access_token_example",
                         "refresh_token": "vk2.a.refresh_token_example",
                         "id_token": "id_token_example",
+                        "user_info": {
+                            "user_id": "1234567890",
+                            "first_name": "Ivan",
+                            "last_name": "Ivanov",
+                            "phone": "79991234567",
+                            "avatar": "https://pp.userapi.com/60tZWMo4SmwcploUVl9XEt8ufnTTvDUmQ6Bj1g/mmv1pcj63C4.png",
+                            "email": "ivan_i123@vk.com",
+                            "sex": 2,
+                            "verified": False,
+                            "birthday": "01.01.2000"
+                        }
                     }
                 },
             ),
@@ -50,7 +61,7 @@ class VKOAuth2View(APIView):
         if not code or not code_verifier or not device_id:
             return Response({"error": "Missing parameters"}, status=status.HTTP_400_BAD_REQUEST)
 
-        vk_api_url = "https://id.vk.com/oauth2/auth"
+        vk_api_url = "https://id.vk.com/oauth2/token"
         payload = {
             "grant_type": "authorization_code",
             "code": code,
@@ -67,13 +78,30 @@ class VKOAuth2View(APIView):
             return Response({"error": "Failed to exchange code"}, status=response.status_code)
 
         tokens = response.json()
-        print("Response from VK API:", tokens)
+        access_token = tokens.get("access_token")
+
+        if not access_token:
+            return Response({"error": "No access token received"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # Получение личных данных пользователя
+        user_info_url = "https://id.vk.com/oauth2/user_info"
+        user_info_payload = {
+            "access_token": access_token,
+            "client_id": os.getenv("CLIENT_ID")
+        }
+        user_info_response = requests.post(user_info_url, data=user_info_payload)
+
+        if user_info_response.status_code != 200:
+            return Response({"error": "Failed to fetch user info"}, status=user_info_response.status_code)
+
+        user_info = user_info_response.json()
 
         return Response(
             {
-                "access_token": tokens["access_token"],
+                "access_token": access_token,
                 "refresh_token": tokens["refresh_token"],
                 "id_token": tokens["id_token"],
+                "user_info": user_info,
             },
             status=status.HTTP_200_OK,
         )
