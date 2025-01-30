@@ -1,17 +1,20 @@
 from __future__ import annotations
 
 import logging
+
+from django.db.models import QuerySet
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg import openapi
 
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, ListAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 
-from api.models import Category
+from api.models import Category, Operation
 from api.serializers import CategoriesSerializer, CategoryDetailSerializer
 from api.serializers.profile import ErrorSerializer
 from api.utils import get_user_categories
@@ -25,36 +28,67 @@ class CategoriesListCreateAPI(GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CategoriesSerializer
 
-
     @swagger_auto_schema(
         operation_id='Получение списка категорий пользователя',
-        operation_description='Получение списка категорий пользователя',
-    responses = {
-        200: openapi.Response(description="Список категорий пользователя успешно получен", schema=CategoriesSerializer),
-        401: openapi.Response(description="Неавторизованный запрос",
-                              schema=ErrorSerializer),
-        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
-        409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации", schema=ErrorSerializer),
-        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
-        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
-    })
+        operation_description='Фильтрация по типу категории (расход/доход)',
+        manual_parameters=[
+            openapi.Parameter(
+                name="is_outcome",
+                in_=openapi.IN_QUERY,
+                description="Фильтр по расходам (True/False)",
+                type=openapi.TYPE_BOOLEAN
+            ),
+            openapi.Parameter(
+                name="is_income",
+                in_=openapi.IN_QUERY,
+                description="Фильтр по доходам (True/False)",
+                type=openapi.TYPE_BOOLEAN
+            )
+        ],
+        responses={
+            200: openapi.Response(description="Список категорий успешно получен", schema=CategoriesSerializer(many=True)),
+            401: openapi.Response(description="Неавторизованный запрос", schema=ErrorSerializer),
+            403: openapi.Response(description="Доступ запрещен", schema=ErrorSerializer),
+            409: openapi.Response(description="Ошибка при получении данных", schema=ErrorSerializer),
+            500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+            503: openapi.Response(description="Сервер временно недоступен", schema=ErrorSerializer),
+        }
+    )
     def get(self, request, *args, **kwargs):
-        categories = Category.objects.filter(user=request.user, is_deleted=False)
-        serializer = CategoriesSerializer(categories, many=True)
+        """Фильтрация категорий по типу (доход/расход)"""
+        queryset = Category.objects.filter(user=request.user, is_deleted=False)
+
+        # Получаем query параметры
+        is_outcome = request.GET.get("is_outcome")
+        is_income = request.GET.get("is_income")
+
+        # Конвертируем строковые параметры в булевые значения
+        def str_to_bool(value):
+            return str(value).lower() in ["true", "1", "yes"]
+
+        if is_outcome is not None:
+            queryset = queryset.filter(is_outcome=str_to_bool(is_outcome))
+
+        if is_income is not None:
+            queryset = queryset.filter(is_income=str_to_bool(is_income))
+
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
     @swagger_auto_schema(
         operation_id='Создание новой категории',
         operation_description='Создание новой категории',
-    responses = {
-        200: openapi.Response(description="Категория успешно создана", schema=CategoriesSerializer),
-        401: openapi.Response(description="Неавторизованный запрос",
-                              schema=ErrorSerializer),
-        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
-        409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации", schema=ErrorSerializer),
-        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
-        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
-    })
+        responses={
+            200: openapi.Response(description="Категория успешно создана", schema=CategoriesSerializer),
+            401: openapi.Response(description="Неавторизованный запрос",
+                                  schema=ErrorSerializer),
+            403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+            409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации",
+                                  schema=ErrorSerializer),
+            500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+            503: openapi.Response(description="Сервер не готов обработать запрос в данный момент",
+                                  schema=ErrorSerializer),
+        })
     def post(self, request, *args, **kwargs):
         serializer = CategoriesSerializer(data=request.data, context={'request': request})
 
@@ -63,7 +97,6 @@ class CategoriesListCreateAPI(GenericAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class CategoryUpdateDestroyAPI(GenericAPIView):
     serializer_class = CategoryDetailSerializer
