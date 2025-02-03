@@ -18,10 +18,10 @@ app.conf.update(
 app.conf.beat_schedule = {
     "fetch_currency_data_daily": {
         "task": "api.tasks.fetch_currency_data",
-        "schedule": crontab(hour=17, minute=34),  # Запуск каждый день в 10:00
+        "schedule": crontab(hour=10, minute=10),  # Запуск каждый день в 10:10
     },
     "update_redis_hourly": {
         "task": "api.tasks.update_redis",
-        "schedule": crontab(minute=35),  # Запуск каждый час
+        "schedule": crontab(minute=30),  # Запуск каждый час
     },
 }

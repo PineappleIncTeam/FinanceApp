@@ -23,11 +23,14 @@ secretkey:
 celery-worker:
 	celery -A FinanceBackend worker --loglevel=info
 
+celery-solo-worker:
+	celery -A FinanceBackend worker --pool=solo --loglevel=info
+
 celery-beat:
 	celery -A FinanceBackend beat --loglevel=info
 
 start-all:
 	poetry run python manage.py runserver 127.0.0.1:8000 &
-	celery -A FinanceBackend worker -n worker1@%h --loglevel=info &
+	celery -A FinanceBackend worker -n workerсurrancy@%h --pool=solo --loglevel=info &
 	celery -A FinanceBackend beat --loglevel=info &
 	wait
