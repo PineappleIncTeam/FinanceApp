@@ -2,14 +2,23 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path, re_path
 
-from api.views import (CategoriesListCreateAPI, CategoryUpdateDestroyAPI,
-                       CountriesApiView, CustomTokenCreateAPI,
-                       OperationListCreateAPI,
-                       OperationRetrieveUpdateDestroyAPI, ProfileApiView,
-                       ReportBalanceView, ReportCategoriesView,
-                       ReportStatisticsView, TargetMoneyReturnAPI,
-                       TargetsListCreateAPI, TargetUpdateDestroyAPI,
-                       password_reset_api_controller)
+from api.views import (
+    CategoriesListCreateAPI,
+    CategoryUpdateDestroyAPI,
+    CountriesApiView,
+    CustomTokenCreateAPI,
+    OperationListCreateAPI,
+    OperationRetrieveUpdateDestroyAPI,
+    ProfileApiView,
+    ReportBalanceView,
+    ReportCategoriesView,
+    ReportStatisticsView,
+    TargetMoneyReturnAPI,
+    TargetsListCreateAPI,
+    TargetUpdateDestroyAPI,
+    password_reset_api_controller,
+    VKOAuth2View,
+)
 
 urlpatterns = [
     path(
@@ -36,11 +45,7 @@ urlpatterns = [
         TargetUpdateDestroyAPI.as_view(),
         name="target-info",
     ),
-    path(
-        "targets/<int:pk>/return_money/",
-        TargetMoneyReturnAPI.as_view(),
-        name="target-money-return"
-    ),
+    path("targets/<int:pk>/return_money/", TargetMoneyReturnAPI.as_view(), name="target-money-return"),
     # CATEGORIES
     path(
         "categories/",
@@ -68,25 +73,10 @@ urlpatterns = [
         CountriesApiView.as_view(),
         name="countries",
     ),
-    path(
-        "profile/",
-        ProfileApiView.as_view(),
-        name="profile"
-    ),
-    path(
-        "reports/balance/",
-        ReportBalanceView.as_view(),
-        name="report-balance"
-    ),
-    path(
-        "reports/categories/",
-        ReportCategoriesView.as_view(),
-        name="report-categories"
-    ),
-    path(
-        "reports/statistics/",
-        ReportStatisticsView.as_view(),
-        name="report-statistics"
-    ),
+    path("profile/", ProfileApiView.as_view(), name="profile"),
+    path("reports/balance/", ReportBalanceView.as_view(), name="report-balance"),
+    path("reports/categories/", ReportCategoriesView.as_view(), name="report-categories"),
+    path("reports/statistics/", ReportStatisticsView.as_view(), name="report-statistics"),
+    path("vkauth/", VKOAuth2View.as_view(), name="vkauth"),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
