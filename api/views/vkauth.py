@@ -39,9 +39,7 @@ class VKOAuth2View(APIView):
                             "user_id": "1234567890",
                             "first_name": "Ivan",
                             "last_name": "Ivanov",
-                            "phone": "79991234567",
                             "avatar": "https://pp.userapi.com/60tZWMo4SmwcploUVl9XEt8ufnTTvDUmQ6Bj1g/mmv1pcj63C4.png",
-                            "email": "ivan_i123@vk.com",
                             "sex": 2,
                             "verified": False,
                             "birthday": "01.01.2000"
@@ -61,7 +59,7 @@ class VKOAuth2View(APIView):
         if not code or not code_verifier or not device_id:
             return Response({"error": "Missing parameters"}, status=status.HTTP_400_BAD_REQUEST)
 
-        vk_api_url = "https://id.vk.com/oauth2/token"
+        vk_api_url = "https://id.vk.com/oauth2/auth"
         payload = {
             "grant_type": "authorization_code",
             "code": code,
