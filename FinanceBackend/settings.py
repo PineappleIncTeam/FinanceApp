@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     "whitenoise.runserver_nostatic",
     "django_filters",
+    "django_celery_beat",
 ]
 
 MIDDLEWARE = [
@@ -266,3 +267,24 @@ LOGGING = {
 MAX_OPERATIONS_COUNT = 5
 DEFAULT_DATE_FORMAT_STR = "%Y-%m-%d"
 DEFAULT_MONTH_FORMAT_STR = "%Y-%m"
+
+redis_address = os.getenv("REDIS_ADR")
+
+CELERY_BROKER_URL = f'redis://{redis_address}:6379/1'
+CELERY_RESULT_BACKEND = f'redis://{redis_address}:6379/2'
+CELERY_TASK_DEFAULT_QUEUE = 'celery'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Moscow'
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f'redis://{redis_address}:6379/0',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
