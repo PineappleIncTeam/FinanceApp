@@ -9,7 +9,7 @@ class OperationSerializer(serializers.ModelSerializer):
         """
         Validate that the operation amount is not negative.
         """
-        if value < 0:
+        if value > 0:
             raise serializers.ValidationError("Operation amount cannot be negative.")
         return value
 

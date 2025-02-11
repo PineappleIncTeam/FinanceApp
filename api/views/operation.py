@@ -82,29 +82,26 @@ class OperationListCreateAPI(GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
 
-
         if serializer.is_valid(raise_exception=True):
-            if request.data["type"] == "TARGETS":
+            if request.data["type"] == TARGETS:
                 target = Target.objects.get(id=request.data["target"])
                 current_sum = target.current_sum + Decimal(request.data["amount"])
-
-                if target.status == "ACHIEVED":
+                if target.status == ACHIEVED:
                     raise TargetArchievedError()
                 elif target.is_deleted:
                     raise TargetIsClosedError()
                 elif current_sum > target.amount:
                     raise ExceedingTargetAmountError()
-                elif datetime.strptime(request.data["date"], "%Y-%m-%d").date() < target.created_at.date():
+                elif datetime.strptime(
+                        request.data["date"], "%Y-%m-%d"
+                ).date() < target.created_at.date():
                     raise InvalidTargetOperationDateError()
                 elif current_sum == target.amount:
-                    target.status = "ACHIEVED"
-
+                    target.status = ACHIEVED
                 target.current_sum = current_sum
                 target.save()
-
             serializer.save(user=self.request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
