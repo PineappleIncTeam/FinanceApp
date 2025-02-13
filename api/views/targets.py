@@ -52,9 +52,6 @@ class TargetsListCreateAPI(GenericAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-
-
-
     @swagger_auto_schema(
         operation_id='Создание новой цели',
         operation_description='создание новой цели',
@@ -84,7 +81,6 @@ class TargetUpdateDestroyAPI(GenericAPIView):
             return get_user_targets(self.request.user).get(pk=pk)
         except Target.DoesNotExist:
             raise NotFound(detail="Цель не найдена")
-
 
 
     @swagger_auto_schema(
@@ -210,4 +206,3 @@ class TargetMoneyReturnAPI(GenericAPIView):
         target = get_object_or_404(queryset, pk=kwargs['pk'])
         target.delete()
         return Response({"detail": "Цель успешно удалена"}, status=status.HTTP_200_OK)
-
