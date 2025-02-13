@@ -145,6 +145,41 @@ class TargetUpdateDestroyAPI(GenericAPIView):
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @swagger_auto_schema(
+        operation_id='Получить цель',
+        operation_description='Получить цель по уникальному идентификатору',
+        responses={
+            200: openapi.Response(description="Цель успешно получена ", schema=TargetsSerializer),
+            401: openapi.Response(description="Неавторизованный запрос",
+                                  schema=ErrorSerializer),
+            403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+            409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации",
+                                  schema=ErrorSerializer),
+            500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+            503: openapi.Response(description="Сервер не готов обработать запрос в данный момент",
+                                  schema=ErrorSerializer),
+        })
+    def get(self, request, *args, **kwargs):
+        # Получаем id из kwargs (если он передан в URL)
+        target_id = kwargs.get('id')
+
+        if target_id:
+            # Если id передан, возвращаем одну запись
+            queryset = get_user_targets(user=request.user)
+            target = get_object_or_404(queryset, id=target_id)
+            serializer = TargetsSerializer(target)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            # Если id не передан, возвращаем список записей с фильтрацией
+            queryset = get_user_targets(user=request.user)
+
+            is_deleted = request.query_params.get('is_deleted')
+            if is_deleted is not None:
+                queryset = queryset.filter(is_deleted=is_deleted)
+
+            serializer = TargetsSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class TargetMoneyReturnAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
@@ -171,4 +206,3 @@ class TargetMoneyReturnAPI(GenericAPIView):
         target = get_object_or_404(queryset, pk=kwargs['pk'])
         target.delete()
         return Response({"detail": "Цель успешно удалена"}, status=status.HTTP_200_OK)
-

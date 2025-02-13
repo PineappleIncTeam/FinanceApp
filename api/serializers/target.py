@@ -34,11 +34,11 @@ class TargetsSerializer(serializers.ModelSerializer):
         """
 
         if value < 0:
-            logger.error(
-                f"The user [ID: {self.context.get('request').user.pk}, "
-                f"name: {self.context.get('request').user.email}] "
-                f"can not add a target that is a negative number."
-            )
+            # logger.error(
+            #     f"The user [ID: {self.context.get('request').user.pk}, "
+            #     f"name: {self.context.get('request').user.email}] "
+            #     f"can not add a target that is a negative number."
+            # )
             raise serializers.ValidationError(
                 "A target amount cannot be negative.")
         return value
