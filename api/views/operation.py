@@ -39,20 +39,29 @@ class OperationListCreateAPI(GenericAPIView):
     @swagger_auto_schema(
         operation_id='Получение списка операций',
         operation_description='Получение списка всех операций',
-    responses = {
-        200: openapi.Response(description="Операции успешно получены", schema=OperationSerializer),
-        401: openapi.Response(description="Неавторизованный запрос",
-                              schema=ErrorSerializer),
-        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
-        409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации", schema=ErrorSerializer),
-        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
-        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
+        manual_parameters=[
+            openapi.Parameter(
+                name="type",
+                in_=openapi.IN_QUERY,
+                description="Фильтр по типу операции",
+                type=openapi.TYPE_STRING,
+                enum=["targets", "outcome", "income"]
+            ),
+        ],
+        responses = {
+            200: openapi.Response(description="Операции успешно получены", schema=OperationSerializer),
+            401: openapi.Response(description="Неавторизованный запрос",
+                                  schema=ErrorSerializer),
+            403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+            409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации", schema=ErrorSerializer),
+            500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+            503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
     })
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         operation_type = request.query_params.get("type", None)
         if operation_type:
-            if operation_type == "TARGETS":
+            if operation_type == "targets":
                 queryset = queryset.filter(type=operation_type, categories=None)
             else:
                 queryset = queryset.filter(type=operation_type)
@@ -102,7 +111,7 @@ class OperationListCreateAPI(GenericAPIView):
                 target.save()
             serializer.save(user=self.request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)\
 
 
 class OperationRetrieveUpdateDestroyAPI(GenericAPIView):
