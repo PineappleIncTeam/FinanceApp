@@ -20,7 +20,9 @@ from api.views import (
     password_reset_api_controller,
     VKOAuth2View,
     CurrencyDataView,
+    OperationAllView,
 )
+
 
 urlpatterns = [
     path(
@@ -66,6 +68,11 @@ urlpatterns = [
         name="operations-list-create",
     ),
     path(
+        "operations/all/",
+        OperationAllView.as_view(),
+        name="operations-list-create",
+    ),
+    path(
         "operations/<int:pk>/",
         OperationRetrieveUpdateDestroyAPI.as_view(),
         name="operations-detail",
@@ -81,7 +88,7 @@ urlpatterns = [
         name="profile"
     ),
     path(
-        "reports/balance/", 
+        "reports/balance/",
         ReportBalanceView.as_view(), 
         name="report-balance"
     ),

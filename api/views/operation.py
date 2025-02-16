@@ -25,8 +25,34 @@ from .errors import (ExceedingTargetAmountError,
 from ..serializers.profile import ErrorSerializer, ProfileSerializer
 
 
-class OperationListCreateAPI(GenericAPIView):
+class OperationAllView(GenericAPIView):
+    serializer_class = OperationSerializer
+    permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        return Operation.objects.filter(user=self.request.user)
+
+    @swagger_auto_schema(
+        operation_id='Получение списка операций',
+        operation_description='Получение списка всех операций',
+        responses={
+            200: openapi.Response(description="Операции успешно получены", schema=OperationSerializer),
+            401: openapi.Response(description="Неавторизованный запрос",
+                                  schema=ErrorSerializer),
+            403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+            409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации",
+                                  schema=ErrorSerializer),
+            500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+            503: openapi.Response(description="Сервер не готов обработать запрос в данный момент",
+                                  schema=ErrorSerializer),
+        })
+    def get(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class OperationListCreateAPI(GenericAPIView):
     serializer_class = OperationSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [BaseFilterBackend]
@@ -38,7 +64,7 @@ class OperationListCreateAPI(GenericAPIView):
 
     @swagger_auto_schema(
         operation_id='Получение списка операций',
-        operation_description='Получение списка всех операций',
+        operation_description='Получение 5 операций',
         manual_parameters=[
             openapi.Parameter(
                 name="type",

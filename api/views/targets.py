@@ -165,20 +165,13 @@ class TargetUpdateDestroyAPI(GenericAPIView):
 
         if target_id:
             # Если id передан, возвращаем одну запись
-            queryset = get_user_targets(user=request.user)
-            target = get_object_or_404(queryset, id=target_id)
-            serializer = TargetsSerializer(target)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            # Если id не передан, возвращаем список записей с фильтрацией
-            queryset = get_user_targets(user=request.user)
-
-            is_deleted = request.query_params.get('is_deleted')
-            if is_deleted is not None:
-                queryset = queryset.filter(is_deleted=is_deleted)
-
-            serializer = TargetsSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            queryset = self.get_object(pk=target_id)
+            if queryset:
+                return Response(queryset, status=status.HTTP_200_OK)
+        #     else:
+        #         return Response({"go": "go"})
+        # else:
+        #     return Response({"go": "go"})
 
 
 class TargetMoneyReturnAPI(GenericAPIView):
@@ -186,7 +179,6 @@ class TargetMoneyReturnAPI(GenericAPIView):
 
     def get_queryset(self):
         return get_user_targets(user=self.request.user)
-
 
     @swagger_auto_schema(
         operation_id='Удаление цели',
