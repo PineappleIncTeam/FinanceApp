@@ -168,10 +168,10 @@ class TargetUpdateDestroyAPI(GenericAPIView):
             queryset = self.get_object(pk=target_id)
             if queryset:
                 return Response(queryset, status=status.HTTP_200_OK)
-            else:
-                return Response({"go": "go"})
-        else:
-            return Response({"go": "go"})
+        #     else:
+        #         return Response({"go": "go"})
+        # else:
+        #     return Response({"go": "go"})
 
 
 class TargetMoneyReturnAPI(GenericAPIView):
