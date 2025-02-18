@@ -75,10 +75,14 @@ class TargetsListCreateAPI(GenericAPIView):
 class TargetUpdateDestroyAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = TargetsSerializer
+    lookup_field = "pk"
+
+    def get_queryset(self):
+        return get_user_targets(user=self.request.user)
 
     def get_object(self, pk):
         try:
-            return get_user_targets(self.request.user).get(pk=pk)
+            return get_user_targets(self.request.user).filter(pk=pk)
         except Target.DoesNotExist:
             raise NotFound(detail="Цель не найдена")
 
@@ -160,18 +164,10 @@ class TargetUpdateDestroyAPI(GenericAPIView):
                                   schema=ErrorSerializer),
         })
     def get(self, request, *args, **kwargs):
-        # Получаем id из kwargs (если он передан в URL)
-        target_id = kwargs.get('id')
-
-        if target_id:
-            # Если id передан, возвращаем одну запись
-            queryset = self.get_object(pk=target_id)
-            if queryset:
-                return Response(queryset, status=status.HTTP_200_OK)
-        #     else:
-        #         return Response({"go": "go"})
-        # else:
-        #     return Response({"go": "go"})
+        queryset = self.get_queryset()
+        target = get_object_or_404(queryset, pk=kwargs['pk'])
+        serializer = self.get_serializer(target)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class TargetMoneyReturnAPI(GenericAPIView):
