@@ -68,9 +68,9 @@ urlpatterns = [
         name="operations-list-create",
     ),
     path(
-        "operations/all/",
+        "operations_all/",
         OperationAllView.as_view(),
-        name="operations-list-create",
+        name="operations-list",
     ),
     path(
         "operations/<int:pk>/",
