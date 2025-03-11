@@ -61,8 +61,8 @@ class CategoriesSerializer(serializers.ModelSerializer):
         Check correct category type usage.
         """
 
-        if (data['is_income'] and data['is_outcome']) or (
-            not data['is_income'] and not data['is_outcome']
+        if (data["is_income"] and data["is_outcome"]) or (
+            not data["is_income"] and not data["is_outcome"]
         ):
             logger.error(
                 f"The user [ID: {self.context.get('request').user.pk}, "
@@ -80,11 +80,11 @@ class CategoriesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ['id', 'name', "is_income", "is_outcome", 'is_deleted']
-        read_only_fields = ['is_deleted']
+        fields = ["id", "name", "is_income", "is_outcome", "is_deleted", "is_visibility", "is_system",]
+        read_only_fields = ["is_deleted"]
 
 
 class CategoryDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['is_deleted']
+        fields = ["is_deleted"]
