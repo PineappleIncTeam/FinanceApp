@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError
 from django.db.models import QuerySet
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -97,47 +98,54 @@ class OperationRetrieveUpdateDestroyAPI(RetrieveUpdateDestroyAPIView):
     lookup_field = "pk"
 
     def get_queryset(self) -> QuerySet[Operation]:
+        if getattr(self, 'swagger_fake_view', False):
+            return Operation.objects.none()
         return Operation.objects.filter(user=self.request.user)
 
     @swagger_auto_schema(
         operation_id='Удаление операции по ее уникальному идентификатору',
         operation_description='Удаление операции по ее уникальному идентификатору',
-    responses = {
-        200: openapi.Response(description="Операция успешно удалена", schema=OperationInfoSerializer),
-        401: openapi.Response(description="Неавторизованный запрос",
-                              schema=ErrorSerializer),
-        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
-        409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации", schema=ErrorSerializer),
-        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
-        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
-    })
+        responses={
+            200: openapi.Response(description="Операция успешно удалена", schema=OperationInfoSerializer),
+            401: openapi.Response(description="Неавторизованный запрос", schema=ErrorSerializer),
+            403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+            404: openapi.Response(description="Цель для операции не найдена", schema=ErrorSerializer),
+            409: openapi.Response(description="Произошла непредвиденная ошибка", schema=ErrorSerializer),
+            500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+            503: openapi.Response(description="Сервер не готов обработать запрос", schema=ErrorSerializer),
+        }
+    )
     def delete(self, request, *args, **kwargs):
         operation_instance: Operation = self.get_object()
         if operation_instance.type == TARGETS:
             if operation_instance.categories:
                 raise ReturnMoneyCategoryOperationError()
 
-            target_instance = Target.objects.get(
-                id=operation_instance.target.pk
-            )
+            if not operation_instance.target:
+                return Response(
+                    {"detail": "Цель для операции не найдена"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            target_instance = Target.objects.get(id=operation_instance.target.pk)
             target_instance.current_sum -= operation_instance.amount
             target_instance.status = IN_PROGRESS
             target_instance.save()
         return self.destroy(request, *args, **kwargs)
 
-
     @swagger_auto_schema(
         operation_id='Обновление операции по ее уникальному идентификатору',
         operation_description='Обновление операции по ее уникальному идентификатору',
-    responses = {
-        200: openapi.Response(description="Операция успешно обновлена", schema=OperationInfoSerializer),
-        401: openapi.Response(description="Неавторизованный запрос",
-                              schema=ErrorSerializer),
-        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
-        409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации", schema=ErrorSerializer),
-        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
-        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
-    })
+        responses={
+            200: openapi.Response(description="Операция успешно обновлена", schema=OperationInfoSerializer),
+            401: openapi.Response(description="Неавторизованный запрос", schema=ErrorSerializer),
+            403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+            404: openapi.Response(description="Цель для операции не найдена", schema=ErrorSerializer),
+            409: openapi.Response(description="Произошла непредвиденная ошибка", schema=ErrorSerializer),
+            500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+            503: openapi.Response(description="Сервер не готов обработать запрос", schema=ErrorSerializer),
+        }
+    )
     def patch(self, request, *args, **kwargs):
         operation_instance: Operation = self.get_object()
         serializer = self.get_serializer(
@@ -148,25 +156,35 @@ class OperationRetrieveUpdateDestroyAPI(RetrieveUpdateDestroyAPIView):
                 if operation_instance.categories:
                     raise ReturnMoneyCategoryOperationError()
 
-                target_instance = Target.objects.get(
-                    id=operation_instance.target.pk
-                )
-                if request.data.get("amount"):
-                    target_instance.current_sum -= (
-                        operation_instance.amount - request.data['amount'])
+                if not operation_instance.target:
+                    return Response(
+                        {"detail": "Цель для операции не найдена"},
+                        status=status.HTTP_404_NOT_FOUND,
+                    )
 
-                    if target_instance.current_sum > target_instance.amount:
-                        raise ExceedingTargetAmountError()
-                    elif target_instance.current_sum == target_instance.amount:
-                        target_instance.status = ACHIEVED
-                    else:
-                        target_instance.status = IN_PROGRESS
-                    target_instance.save()
+                target_instance = Target.objects.get(id=operation_instance.target.pk)
+                try:
+                    if request.data.get("amount"):
+                        target_instance.current_sum -= (
+                            operation_instance.amount - request.data['amount'])
 
-                elif request.data.get("date"):
-                    if datetime.strptime(
-                        request.data["date"], "%Y-%m-%d"
-                    ).replace(tzinfo=None) < target_instance.created_at.replace(tzinfo=None):
-                        raise InvalidTargetOperationDateError()
+                        if target_instance.current_sum > target_instance.amount:
+                            raise ExceedingTargetAmountError()
+                        elif target_instance.current_sum == target_instance.amount:
+                            target_instance.status = ACHIEVED
+                        else:
+                            target_instance.status = IN_PROGRESS
+                        target_instance.save()
+
+                    elif request.data.get("date"):
+                        if datetime.strptime(
+                            request.data["date"], "%Y-%m-%d"
+                        ).replace(tzinfo=None) < target_instance.created_at.replace(tzinfo=None):
+                            raise InvalidTargetOperationDateError()
+                except ValidationError as e:
+                    return Response(
+                        {"detail": str(e)},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
 
         return self.partial_update(request, *args, **kwargs)
