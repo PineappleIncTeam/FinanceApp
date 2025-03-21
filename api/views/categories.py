@@ -76,7 +76,7 @@ class CategoryGetAPI(GenericAPIView):
         ],
         responses={
             200: openapi.Response(description="Список категорий успешно получен",
-                                  schema=CategoriesSerializer(many=True)),
+                                  schema=CategoriesGetSerializer(many=True)),
             401: openapi.Response(description="Неавторизованный запрос", schema=ErrorSerializer),
             403: openapi.Response(description="Доступ запрещен", schema=ErrorSerializer),
             409: openapi.Response(description="Ошибка при получении данных", schema=ErrorSerializer),
