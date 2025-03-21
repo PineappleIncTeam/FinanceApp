@@ -16,6 +16,7 @@ from rest_framework.response import Response
 
 from api.models import Category, Operation
 from api.serializers import CategoriesSerializer, CategoryDetailSerializer
+from api.serializers.category import CategoriesGetSerializer
 from api.serializers.profile import ErrorSerializer
 from api.utils import get_user_categories
 from api.views.errors import CategoryWithOperationsError
@@ -27,6 +28,34 @@ logger = logging.getLogger(__name__)
 class CategoriesListCreateAPI(GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = CategoriesSerializer
+
+    @swagger_auto_schema(
+        operation_id='Создание новой категории',
+        operation_description='Создание новой категории',
+        responses={
+            200: openapi.Response(description="Категория успешно создана", schema=CategoriesSerializer),
+            401: openapi.Response(description="Неавторизованный запрос",
+                                  schema=ErrorSerializer),
+            403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+            409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации",
+                                  schema=ErrorSerializer),
+            500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+            503: openapi.Response(description="Сервер не готов обработать запрос в данный момент",
+                                  schema=ErrorSerializer),
+        })
+    def post(self, request, *args, **kwargs):
+        serializer = CategoriesSerializer(data=request.data, context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CategoryGetAPI(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CategoriesGetSerializer
 
     @swagger_auto_schema(
         operation_id='Получение списка категорий пользователя',
@@ -46,7 +75,8 @@ class CategoriesListCreateAPI(GenericAPIView):
             )
         ],
         responses={
-            200: openapi.Response(description="Список категорий успешно получен", schema=CategoriesSerializer(many=True)),
+            200: openapi.Response(description="Список категорий успешно получен",
+                                  schema=CategoriesSerializer(many=True)),
             401: openapi.Response(description="Неавторизованный запрос", schema=ErrorSerializer),
             403: openapi.Response(description="Доступ запрещен", schema=ErrorSerializer),
             409: openapi.Response(description="Ошибка при получении данных", schema=ErrorSerializer),
@@ -75,28 +105,6 @@ class CategoriesListCreateAPI(GenericAPIView):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @swagger_auto_schema(
-        operation_id='Создание новой категории',
-        operation_description='Создание новой категории',
-        responses={
-            200: openapi.Response(description="Категория успешно создана", schema=CategoriesSerializer),
-            401: openapi.Response(description="Неавторизованный запрос",
-                                  schema=ErrorSerializer),
-            403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
-            409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации",
-                                  schema=ErrorSerializer),
-            500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
-            503: openapi.Response(description="Сервер не готов обработать запрос в данный момент",
-                                  schema=ErrorSerializer),
-        })
-    def post(self, request, *args, **kwargs):
-        serializer = CategoriesSerializer(data=request.data, context={'request': request})
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CategoryUpdateDestroyAPI(GenericAPIView):
     serializer_class = CategoryDetailSerializer
