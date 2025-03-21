@@ -2,7 +2,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path, re_path
 
-
+from api.serializers.category import CategoriesGetSerializer
 from api.views import (
     CategoriesListCreateAPI,
     CategoryUpdateDestroyAPI,
@@ -22,7 +22,7 @@ from api.views import (
     CurrencyDataView,
     OperationAllView,
 )
-
+from api.views.categories import CategoryGetAPI
 
 urlpatterns = [
     path(
@@ -57,6 +57,10 @@ urlpatterns = [
         name="categories",
     ),
     path(
+        "categories/all/",
+        CategoryGetAPI.as_view(),
+    ),
+    path(
         "categories/<int:pk>/",
         CategoryUpdateDestroyAPI.as_view(),
         name="category-info",
@@ -68,7 +72,7 @@ urlpatterns = [
         name="operations-list-create",
     ),
     path(
-        "operations_all/",
+        "operations/all/",
         OperationAllView.as_view(),
         name="operations-list",
     ),
