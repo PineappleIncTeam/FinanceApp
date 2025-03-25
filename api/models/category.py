@@ -21,7 +21,7 @@ class Category(BaseDictionary):
         default=True, verbose_name="Признак видимости категории"
     )
     is_system = models.BooleanField(
-        default=True, verbose_name="Признак системной категории"
+        default=False, verbose_name="Признак системной категории"
     )
 
     class Meta:
