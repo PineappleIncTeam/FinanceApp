@@ -21,10 +21,13 @@ from api.views import (
     VKOAuth2View,
     CurrencyDataView,
     OperationAllView,
+    CustomLogoutView,
 )
 
 
 urlpatterns = [
+    # ...
+    path('auth/logout/', CustomLogoutView.as_view(), name='custom-logout'),
     path(
         "auth/token/login/",
         CustomTokenCreateAPI.as_view(),
