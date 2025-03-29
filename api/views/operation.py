@@ -3,14 +3,11 @@ from __future__ import annotations
 from datetime import datetime
 from decimal import Decimal
 
-from django.db.models import QuerySet
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import filters, status
-from rest_framework.exceptions import NotFound
 from rest_framework.filters import BaseFilterBackend
-from rest_framework.generics import (ListCreateAPIView,
-                                     RetrieveUpdateDestroyAPIView, GenericAPIView)
+from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
