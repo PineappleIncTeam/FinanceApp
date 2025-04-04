@@ -60,7 +60,7 @@ class CategoriesSerializer(serializers.ModelSerializer):
         """
         Check correct category type usage.
         """
-
+        s_sym = "!@#$%^&*()+={}[]|\:;'<>,.?/~`"
         if (data["is_income"] and data["is_outcome"]) or (
             not data["is_income"] and not data["is_outcome"]
         ):
@@ -75,6 +75,10 @@ class CategoriesSerializer(serializers.ModelSerializer):
                 "Invalid category type (the same data for fields "
                 "is_income and is_outcome.)"
             )
+        for i in data["name"]:
+            if i in s_sym:
+                raise serializers.ValidationError(
+                    "You can't use special characters in the name.")
 
         return data
 
