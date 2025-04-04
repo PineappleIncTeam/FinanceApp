@@ -19,7 +19,7 @@ from api.serializers import CategoriesSerializer, CategoryDetailSerializer
 from api.serializers.category import CategoriesGetSerializer
 from api.serializers.profile import ErrorSerializer
 from api.utils import get_user_categories
-from api.views.errors import CategoryWithOperationsError
+from api.views.errors import CategoryWithOperationsError, SystemCategoryError
 
 
 logger = logging.getLogger(__name__)
@@ -167,6 +167,8 @@ class CategoryUpdateDestroyAPI(GenericAPIView):
     })
     def delete(self, request, *args, **kwargs):
         category = self.get_object()
+        if category.is_system is True:
+            raise SystemCategoryError()
         if category.operations.exists():
             logger.error(
                 f"The user [ID: {request.user.pk}, "
