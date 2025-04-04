@@ -1,6 +1,10 @@
 from rest_framework.exceptions import APIException
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
+class SystemCategoryError(APIException):
+    status_code = HTTP_400_BAD_REQUEST
+    default_detail = "Can not delete system category."
+    default_code = "system_category"
 
 class CategoryWithOperationsError(APIException):
     status_code = HTTP_400_BAD_REQUEST
