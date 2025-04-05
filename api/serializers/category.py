@@ -60,7 +60,10 @@ class CategoriesSerializer(serializers.ModelSerializer):
         """
         Check correct category type usage.
         """
-        s_sym = "!@#$%^&*()+={}[]|\:;'<>,.?/~`"
+        s_sym = "!@#$%^&*()+={}[]|\:;'<>,.?/~`_"
+        if len(data["name"]) > 14:
+            raise serializers.ValidationError(
+                f"the name is too long, max 14 characters (you entered {len(data['name'])})")
         if (data["is_income"] and data["is_outcome"]) or (
             not data["is_income"] and not data["is_outcome"]
         ):
