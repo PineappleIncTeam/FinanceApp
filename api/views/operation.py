@@ -30,6 +30,7 @@ class OperationAllView(GenericAPIView):
         return Operation.objects.filter(user=self.request.user)
 
     @swagger_auto_schema(
+        tags=["operations all"],
         operation_id='Получение списка операций',
         operation_description='Получение списка всех операций',
         responses={
