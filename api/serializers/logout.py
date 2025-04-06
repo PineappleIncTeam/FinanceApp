@@ -1,5 +1,7 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import Serializer
 
 
-class LogoutSerializer(ModelSerializer):
-    pass
+class LogoutSerializer(Serializer):
+    class Meta:
+        model = None
+        fields = []
