@@ -12,7 +12,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.generics import GenericAPIView, ListAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
+from unicodedata import category
 
 from api.models import Category, Operation
 from api.serializers import CategoriesSerializer, CategoryDetailSerializer
@@ -143,9 +143,13 @@ class CategoryUpdateDestroyAPI(GenericAPIView):
         if serializer.is_valid():
             serializer.save()
             logger.info(
-                f"The user [ID: {request.user.pk}, "
-                f"name: {request.user.email}] has updated a category: "
-                f"id {category.id}, name - {category.name}."
+                "The user [ID: %s, "
+                "name: %s] has updated a category: "
+                "id %s, name - %s.",
+                request.user.pk,
+                request.user.email,
+                category.id,
+                category.name
             )
             return Response(serializer.data)
 
@@ -171,9 +175,12 @@ class CategoryUpdateDestroyAPI(GenericAPIView):
             raise SystemCategoryError()
         if category.operations.exists():
             logger.error(
-                f"The user [ID: {request.user.pk}, "
-                f"name: {request.user.email}] cannot delete a category "
-                f"with existing operations: id {category.pk}."
+                "The user [ID: %s, "
+                "name: %s] cannot delete a category "
+                "with existing operations: id %s.",
+                request.user.pk,
+                request.user.email,
+                category.pk
             )
             raise CategoryWithOperationsError()
 
@@ -181,8 +188,12 @@ class CategoryUpdateDestroyAPI(GenericAPIView):
         category.save()
 
         logger.info(
-            f"The user [ID: {request.user.pk}, "
-            f"name: {request.user.email}] has archived category: "
-            f"id {category.id}, name - {category.name}."
+            "The user [ID: %s, "
+            "name: %s] has archived category: "
+            "id %s, name - %s.",
+            request.user.pk,
+            request.user.email,
+            category.id,
+            category.name
         )
         return Response({"detail": "Категория успешна удалена"},status=status.HTTP_200_OK)
