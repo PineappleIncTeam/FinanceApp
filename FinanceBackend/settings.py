@@ -243,11 +243,9 @@ LOGGING = {
             "formatter": "console",
         },
         "file": {
-            "class": "logging.handlers.TimedRotatingFileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
             "formatter": "file",
             "filename": LOG_FILE_NAME,
-            "when": "D",
-            "interval": 7,
             "backupCount": 0,
         },
     },

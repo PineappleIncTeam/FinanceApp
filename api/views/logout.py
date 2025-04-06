@@ -6,10 +6,12 @@ from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
 from rest_framework.authtoken.models import Token
 
+from api.serializers.logout import LogoutSerializer
 from api.serializers.profile import ErrorSerializer
 
 
 class CustomLogoutView(GenericAPIView):
+    serializer_class = LogoutSerializer
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(

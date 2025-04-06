@@ -137,8 +137,13 @@ class TargetUpdateDestroyAPI(GenericAPIView):
             instance.save()
 
             logger.info(
-                f"The user [ID: {request.user.pk}, name: {request.user.email}] closed a target: "
-                f"id {instance.id}, name - {instance.name}, returned amount - {returned_operation.amount}."
+                "The user [ID: %s, name: %s] closed a target: "
+                "id %s, name - %s, returned amount - %s.",
+                request.user.pk,
+                request.user.email,
+                instance.id,
+                instance.name,
+                returned_operation.amount,
             )
 
             return Response(data=TargetsSerializer(instance).data, status=status.HTTP_200_OK)
