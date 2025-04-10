@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "avatar",
-                    models.ImageField(blank=True, null=True, upload_to=api.models.users.upload_to),
+                    models.ImageField(blank=True, null=True, upload_to=api.models.profile.upload_to),
                 ),
                 (
                     "country",

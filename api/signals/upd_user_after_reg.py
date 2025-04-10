@@ -2,6 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from api.models import Category, User
+from api.models import Profile
 
 
 @receiver(post_save, sender=User)
@@ -27,3 +28,4 @@ def create_default_categories(sender, instance, created, **kwargs):
             is_visibility=False,
             is_system=True,
         )
+        Profile.objects.create(user=instance)
