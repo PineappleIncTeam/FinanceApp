@@ -1,3 +1,5 @@
+import base64
+
 from django.shortcuts import get_object_or_404
 from drf_yasg.openapi import Schema, TYPE_OBJECT
 from drf_yasg import openapi
@@ -53,8 +55,16 @@ class ProfileApiView(RetrieveUpdateAPIView):
     def patch(self, request, *args, **kwargs):
             partial = kwargs.pop('partial', True)
             profile = self.get_object()
-            serializer = self.get_serializer(profile, data=request.data, partial=partial)
 
+            uploaded_file = request.data['avatar']
+            file_bytes = uploaded_file.read()
+            base64_bytes = base64.b64encode(file_bytes)
+            base64_str = base64_bytes.decode('utf-8')
+            data = {'nickname': request.data['nickname'],
+                    'gender': request.data['gender'],
+                    'country': request.data['country'],
+                    'avatar': base64_str}
+            serializer = self.get_serializer(profile, data=data, partial=partial)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
