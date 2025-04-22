@@ -25,7 +25,6 @@ class CustomUserManager(UserManager):
         password = escape(password)
         user.set_password(password)
         user.save(using=self.db)
-        Profile.objects.create(user=user)
         return user
 
     def create_superuser(self, email, password, **extra_fields) -> User:
