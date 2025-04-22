@@ -1,27 +1,40 @@
-version: '3.11'
+version: '3.8'  # Рекомендуется явно указать версию
 
 services:
   db:
-    image: postgres
+    image: postgres:latest  # Лучше указать конкретную версию, например postgres:15
     environment:
       - POSTGRES_PASSWORD=${PG_PASSWORD}
       - POSTGRES_USER=${PG_USER}
       - POSTGRES_DB=${PG_NAME}
-    # volumes:
-    #   - pg_data:/var/lib/postgresql/data
+    volumes:
+      - pg_data:/var/lib/postgresql/data  # Раскомментируйте для сохранения данных
     ports:
       - '5432:5432'
+    restart: unless-stopped  # Добавлено для автоматического перезапуска
+    networks:  # Сеть нужна для связи между сервисами
+      - myapp-network
 
-  # app:
-  #    build: .
-  #    ports:
-  #      - '8000:8000'
-  #    command: >
-  #      sh -c 'python3 ./manage.py migrate &&
-  #      python3 ./manage.py runserver 0.0.0.0:8000'
-  #    depends_on:
-  #      - db
+  app:
+    build:
+      context: .
+    container_name: backend
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c 'python3 ./manage.py migrate &&
+      python3 ./manage.py runserver 0.0.0.0:8000'  # 127.0.0.1 → 0.0.0.0
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - myapp-network
 
-# volumes:
-#   pg_data:
-#     driver: local
+volumes:
+  pg_data:  # Объявление тома для БД
+
+networks:
+  myapp-network:  # Явное создание сети
+    driver: bridge
