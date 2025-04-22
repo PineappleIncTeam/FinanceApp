@@ -167,8 +167,7 @@ ALLOWED_HOSTS = [
     "dev.freenance.store",
     "127.0.0.1",
     "localhost",
-    "freenance-backend-service-dev.finance-dev.svc.cluster.local",
-
+    "blackbox-exporter.prometheus.svc.cluster.local"
 ]
 
 CORS_ORIGIN_WHITELIST = [
