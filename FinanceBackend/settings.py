@@ -166,7 +166,8 @@ ALLOWED_HOSTS = [
     "freenance.store",
     "dev.freenance.store",
     "127.0.0.1",
-    "localhost"
+    "localhost",
+    os.getenv("FQDN_FOR_BLACKBOX")
 ]
 
 CORS_ORIGIN_WHITELIST = [
