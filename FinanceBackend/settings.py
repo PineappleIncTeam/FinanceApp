@@ -124,6 +124,7 @@ ALLOWED_HOSTS = [
     "freenance.online",
     "back.freenance.online",
     "127.0.0.1",
+    os.getenv("FQDN_FOR_BLACKBOX"),
 ]
 
 CORS_ORIGIN_WHITELIST = [
