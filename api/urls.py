@@ -22,6 +22,8 @@ from api.views import (
     CurrencyDataView,
     OperationAllView,
     CustomLogoutView,
+    OperationPDFView,
+    OperationXLSView,
 )
 from api.views.categories import CategoryGetAPI
 
@@ -116,7 +118,18 @@ urlpatterns = [
         "currency/", 
         CurrencyDataView.as_view(),
         name="exchange-rates"
-    )  
+    ),
+    path(
+        "import/pdf/",
+        OperationPDFView.as_view(),
+        name="import_pdf"
+    ),
+    path(
+        "import/xls/",
+        OperationXLSView.as_view(),
+        name="import_xls"
+    )
+
 
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
