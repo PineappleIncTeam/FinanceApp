@@ -75,7 +75,7 @@ class OperationPDFView(GenericAPIView):
 
             elements = []
             styles = getSampleStyleSheet()
-            font_name = 'DejaVuSans'
+            font_name = 'Pdfa'
 
             styles['Title'].fontName = font_name
             styles['Normal'].fontName = font_name
