@@ -56,7 +56,7 @@ class OperationPDFView(GenericAPIView):
         #     except:
         #         # Можно использовать встроенный шрифт, если другие не доступны
         # pdfmetrics.registerFont(TTFont('Pdfa', 'pdfa.ttf'))
-        pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
+        pdfmetrics.registerFont(TTFont('Pdfa', 'pdfa.ttf'))
         operations = []
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
