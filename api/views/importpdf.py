@@ -56,7 +56,7 @@ class OperationPDFView(GenericAPIView):
         #     except:
         #         # Можно использовать встроенный шрифт, если другие не доступны
         # pdfmetrics.registerFont(TTFont('Pdfa', 'pdfa.ttf'))
-        pdfmetrics.registerFont(TTFont('Pdfa', 'pdfa.ttf'))
+        pdfmetrics.registerFont(TTFont('Arial', 'arial.ttf'))
         operations = []
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
@@ -75,7 +75,7 @@ class OperationPDFView(GenericAPIView):
 
             elements = []
             styles = getSampleStyleSheet()
-            font_name = 'Pdfa'
+            font_name = 'Arial'
 
             styles['Title'].fontName = font_name
             styles['Normal'].fontName = font_name
