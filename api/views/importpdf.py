@@ -1,7 +1,7 @@
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 from reportlab.pdfbase import pdfmetrics
@@ -30,7 +30,7 @@ class OperationPDFView(GenericAPIView):
 
         if operation_type:
             queryset = queryset.filter(type=operation_type)
-        return queryset.select_related('categories')
+        return queryset.select_related('categories').order_by('-created_at')
 
     @swagger_auto_schema(
         operation_id='Получение выписки в формате pdf',
@@ -41,30 +41,32 @@ class OperationPDFView(GenericAPIView):
                 in_=openapi.IN_QUERY,
                 description="Фильтр по типу операций",
                 type=openapi.TYPE_STRING,
-                enum=["targets", "outcome", "income"]
+                enum=["targets", "outcome", "income"],
+                required=True,
             ),
         ],
         responses = {
             200: openapi.Response(description="Файл успешно получен", schema=OperationSerializer),
     })
     def get(self, request):
-        # try:
-        #     pdfmetrics.registerFont(TTFont('Arial', 'arial.ttf'))  # Для Windows
-        # except:
-        #     try:
-        #         pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))  # Для Linux
-        #     except:
-        #         # Можно использовать встроенный шрифт, если другие не доступны
-        # pdfmetrics.registerFont(TTFont('Pdfa', 'pdfa.ttf'))
-        pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
+        pdfmetrics.registerFont(TTFont('Bold', 'font/bold.ttf'))
+        pdfmetrics.registerFont(TTFont('Regular', 'font/Regular.ttf'))
         operations = []
+        total = 0.0
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         for operation in serializer.data:
+            amount_str = str(operation['amount'])
+            amount = float(amount_str.replace(' ', '').replace(',', '.'))
+            total += amount
+
+            formatted_amount = "{:,.2f}".format(amount).replace(",", " ")
+
             operations.append({
                 "category": Category.objects.get(id=operation["categories"]).name,
-                "amount": operation["amount"],
-                "date": operation["date"]
+                "amount": formatted_amount,
+                "date": operation["date"],
+                "_raw_amount": amount
             })
         try:
             buffer = BytesIO()
@@ -75,8 +77,8 @@ class OperationPDFView(GenericAPIView):
 
             elements = []
             styles = getSampleStyleSheet()
-            font_name = 'DejaVuSans'
-
+            font_name = 'Regular'
+            bold = "Bold"
             styles['Title'].fontName = font_name
             styles['Normal'].fontName = font_name
 
@@ -93,26 +95,29 @@ class OperationPDFView(GenericAPIView):
                 table_data.append([
                     op['date'],
                     op['category'],
-                    str(op['amount'])
+                    op['amount']
                 ])
-            total = sum(float(op['amount']) for op in operations)
+            formatted_total = "{:,.2f}".format(total).replace(",", " ")
             table_data.append([
                 "",
                 "Total",
-                str(total)
+                formatted_total
             ])
-            table = Table(table_data, colWidths=[6 * cm, 4 * cm, 4 * cm])
+            table = Table(table_data, colWidths=[6 * cm, 6 * cm, 6 * cm])
             table.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3A5FCD')),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), font_name),
-                ('FONTNAME', (0, 1), (-1, -1), font_name),
+                ('FONTNAME', (0, 0), (-1, -1), font_name),
                 ('FONTSIZE', (0, 0), (-1, 0), 12),
                 ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
                 ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#F0F8FF')),
                 ('GRID', (0, 0), (-1, -1), 1, colors.black),
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+
+                ('ALIGN', (1, 1), (1, -1), 'LEFT'),
+                ('ALIGN', (2, 1), (2, -1), 'RIGHT'),
+
+                ('FONTNAME', (1, -1), (1, -1), bold),
             ]))
 
             elements.append(table)
