@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from io import BytesIO
 from django.http import HttpResponse
 from openpyxl import Workbook
-from openpyxl.styles import Font
+from openpyxl.styles import Font, Alignment
 
 from api.models import Operation, Category
 from api.serializers import OperationSerializer
@@ -117,7 +117,7 @@ class OperationPDFView(GenericAPIView):
                 ('ALIGN', (1, 1), (1, -1), 'LEFT'),
                 ('ALIGN', (2, 1), (2, -1), 'RIGHT'),
 
-                ('FONTNAME', (1, -1), (1, -1), bold),
+                ('FONTNAME', (1, -1), (3, -1), bold),
             ]))
 
             elements.append(table)
@@ -152,7 +152,7 @@ class OperationXLSView(GenericAPIView):
 
         if operation_type:
             queryset = queryset.filter(type=operation_type)
-        return queryset.select_related('categories')
+        return queryset.select_related('categories').order_by('-created_at')
 
 
     @swagger_auto_schema(
@@ -164,7 +164,8 @@ class OperationXLSView(GenericAPIView):
                 in_=openapi.IN_QUERY,
                 description="Фильтр по типу операций",
                 type=openapi.TYPE_STRING,
-                enum=["targets", "outcome", "income"]
+                enum=["targets", "outcome", "income"],
+                required=True,
             ),
         ],
         responses = {
@@ -172,13 +173,21 @@ class OperationXLSView(GenericAPIView):
     })
     def get(self, request):
         operations = []
+        total = 0.00
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         for operation in serializer.data:
+            amount_str = str(operation['amount'])
+            amount = float(amount_str.replace(' ', '').replace(',', '.'))
+            total += amount
+
+            formatted_amount = "{:,.2f}".format(amount).replace(",", " ")
+
             operations.append({
                 "category": Category.objects.get(id=operation["categories"]).name,
-                "amount": operation["amount"],
-                "date": operation["date"]
+                "amount": formatted_amount,
+                "date": operation["date"],
+                "_raw_amount": amount
             })
 
         try:
@@ -187,17 +196,29 @@ class OperationXLSView(GenericAPIView):
             ws = wb.active
             ws.title = "Freenance"
 
-            ws['A1'] = "Freenance report"
+            ws['A1'] = "Freenance"
             ws['A1'].font = Font(bold=True, size=16)
 
             headers = ["Date", "Category", "Amount"]
             ws.append(headers)
+            amount_alignment = Alignment(horizontal='right', vertical='center')
 
+            header_alignment = Alignment(horizontal='center', vertical='center')
             for cell in ws[2]:
                 cell.font = Font(bold=True)
+                cell.alignment = header_alignment
+
 
             for op in operations:
-                ws.append([op['date'], op['category'], op['amount']])
+                row = [op['date'], op['category'], op['amount']]
+                ws.append(row)
+                amount_cell = ws.cell(row=ws.max_row, column=3)
+                amount_cell.number_format = '#,##0.00'
+                amount_cell.alignment = amount_alignment
+
+            for row in ws.iter_rows(min_row=3, max_row=ws.max_row, min_col=1, max_col=1):
+                for cell in row:
+                    cell.alignment = amount_alignment
 
             for column in ws.columns:
                 max_length = 0
@@ -210,7 +231,11 @@ class OperationXLSView(GenericAPIView):
                         pass
                 adjusted_width = (max_length + 2) * 1.2
                 ws.column_dimensions[column_letter].width = adjusted_width
-
+            total_row = ws.max_row + 1
+            ws.cell(row=total_row, column=2, value="Total").font = Font(bold=True)
+            total_cell = ws.cell(row=total_row, column=3, value=float(total))
+            total_cell.font = Font(bold=True)
+            total_cell.number_format = '#,##0.00'
             wb.save(buffer)
             buffer.seek(0)
 

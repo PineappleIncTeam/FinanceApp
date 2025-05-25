@@ -9,7 +9,7 @@ from .reports import ReportBalanceView, ReportCategoriesView, ReportStatisticsVi
 from .targets import TargetMoneyReturnAPI, TargetsListCreateAPI, TargetUpdateDestroyAPI
 from .vkauth import VKOAuth2View
 from .currency import CurrencyDataView
-from .importpdf import OperationPDFView, OperationXLSView
+from .importdata import OperationPDFView, OperationXLSView
 
 __all__ = [
     "password_reset_api_controller",
