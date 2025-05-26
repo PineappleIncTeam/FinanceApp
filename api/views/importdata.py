@@ -1,3 +1,6 @@
+from datetime import timedelta
+
+from django.utils import timezone
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from reportlab.lib import colors
@@ -24,12 +27,20 @@ class OperationPDFView(GenericAPIView):
     serializer_class = OperationSerializer
 
     def get_queryset(self):
-        queryset = Operation.objects.filter(user=self.request.user)
+        days = self.request.query_params.get('days')
+        now = timezone.now()
+        date = now - timedelta(days=int(days))
+
+        queryset = Operation.objects.filter(
+            user=self.request.user,
+            created_at__gte=date
+        )
 
         operation_type = self.request.query_params.get('type')
 
         if operation_type:
             queryset = queryset.filter(type=operation_type)
+
         return queryset.select_related('categories').order_by('-created_at')
 
     @swagger_auto_schema(
@@ -42,6 +53,13 @@ class OperationPDFView(GenericAPIView):
                 description="Фильтр по типу операций",
                 type=openapi.TYPE_STRING,
                 enum=["targets", "outcome", "income"],
+                required=True,
+            ),
+            openapi.Parameter(
+                name="days",
+                in_=openapi.IN_QUERY,
+                description="Количество дней для фильтрации",
+                type=openapi.TYPE_INTEGER,
                 required=True,
             ),
         ],
@@ -146,12 +164,20 @@ class OperationXLSView(GenericAPIView):
     serializer_class = OperationSerializer
 
     def get_queryset(self):
-        queryset = Operation.objects.filter(user=self.request.user)
+        days = self.request.query_params.get('days')
+        now = timezone.now()
+        date = now - timedelta(days=int(days))
+
+        queryset = Operation.objects.filter(
+            user=self.request.user,
+            created_at__gte=date
+        )
 
         operation_type = self.request.query_params.get('type')
 
         if operation_type:
             queryset = queryset.filter(type=operation_type)
+
         return queryset.select_related('categories').order_by('-created_at')
 
 
@@ -165,6 +191,13 @@ class OperationXLSView(GenericAPIView):
                 description="Фильтр по типу операций",
                 type=openapi.TYPE_STRING,
                 enum=["targets", "outcome", "income"],
+                required=True,
+            ),
+            openapi.Parameter(
+                name="days",
+                in_=openapi.IN_QUERY,
+                description="Количество дней для фильтрации",
+                type=openapi.TYPE_INTEGER,
                 required=True,
             ),
         ],
