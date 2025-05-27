@@ -183,7 +183,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 EMAIL_HOST = os.getenv("EMAIL_HOST")
 EMAIL_PORT = os.getenv("EMAIL_PORT")
-EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS")
+#EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS")
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL")
 
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
@@ -211,6 +211,8 @@ DJOSER = {
     },
     "EMAIL": {"activation": "api.email.ActivationEmail"},
 }
+
+PASSWORD_RESET_TIMEOUT = 3600
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
