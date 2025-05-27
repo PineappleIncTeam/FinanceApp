@@ -3,8 +3,11 @@ from datetime import timedelta
 from django.utils import timezone
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from openpyxl.cell import MergedCell
+from openpyxl.chart import Reference, PieChart
+from openpyxl.utils import get_column_letter
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 from reportlab.pdfbase import pdfmetrics
@@ -21,23 +24,20 @@ from openpyxl.styles import Font, Alignment
 from api.models import Operation, Category
 from api.serializers import OperationSerializer
 
-
 class OperationPDFView(GenericAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = OperationSerializer
 
     def get_queryset(self):
-        days = self.request.query_params.get('days')
-        now = timezone.now()
-        date = now - timedelta(days=int(days))
+        days = int(self.request.query_params.get('days', 30))
+        date_from = timezone.now() - timedelta(days=days)
 
         queryset = Operation.objects.filter(
             user=self.request.user,
-            created_at__gte=date
+            created_at__gte=date_from
         )
 
         operation_type = self.request.query_params.get('type')
-
         if operation_type:
             queryset = queryset.filter(type=operation_type)
 
@@ -45,7 +45,7 @@ class OperationPDFView(GenericAPIView):
 
     @swagger_auto_schema(
         operation_id='Получение выписки в формате pdf',
-        operation_description='Получение .pdf файла',
+        operation_description='Получение PDF файла с операциями и диаграммой',
         manual_parameters=[
             openapi.Parameter(
                 name="type",
@@ -58,14 +58,16 @@ class OperationPDFView(GenericAPIView):
             openapi.Parameter(
                 name="days",
                 in_=openapi.IN_QUERY,
-                description="Количество дней для фильтрации",
+                description="Количество дней для фильтрации (по умолчанию 30)",
                 type=openapi.TYPE_INTEGER,
-                required=True,
+                required=False,
             ),
         ],
-        responses = {
-            200: openapi.Response(description="Файл успешно получен", schema=OperationSerializer),
-    })
+        responses={
+            200: openapi.Response(description="PDF файл успешно получен"),
+            500: openapi.Response(description="Ошибка генерации отчёта")
+        }
+    )
     def get(self, request):
         pdfmetrics.registerFont(TTFont('Bold', 'font/bold.ttf'))
         pdfmetrics.registerFont(TTFont('Regular', 'font/Regular.ttf'))
@@ -209,19 +211,6 @@ class OperationXLSView(GenericAPIView):
         total = 0.00
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
-        for operation in serializer.data:
-            amount_str = str(operation['amount'])
-            amount = float(amount_str.replace(' ', '').replace(',', '.'))
-            total += amount
-
-            formatted_amount = "{:,.2f}".format(amount).replace(",", " ")
-
-            operations.append({
-                "category": Category.objects.get(id=operation["categories"]).name,
-                "amount": formatted_amount,
-                "date": operation["date"],
-                "_raw_amount": amount
-            })
 
         try:
             buffer = BytesIO()
@@ -229,51 +218,111 @@ class OperationXLSView(GenericAPIView):
             ws = wb.active
             ws.title = "Freenance"
 
-            ws['A1'] = "Freenance"
-            ws['A1'].font = Font(bold=True, size=16)
+            category_data = {}
+            for operation in serializer.data:
+                amount_str = str(operation['amount'])
+                amount = float(amount_str.replace(' ', '').replace(',', '.'))
+                category_name = Category.objects.get(id=operation["categories"]).name
+
+                if category_name not in category_data:
+                    category_data[category_name] = {
+                        'total': 0.0,
+                        'operations': []
+                    }
+
+                category_data[category_name]['total'] += amount
+                category_data[category_name]['operations'].append({
+                    'date': operation["date"],
+                    'amount': amount
+                })
+                total += amount
+
+            for category, data in category_data.items():
+                for op in data['operations']:
+                    operations.append({
+                        'category': category,
+                        'date': op['date'],
+                        'amount': op['amount'],
+                        '_raw_amount': op['amount']
+                    })
+
+            ws.merge_cells('A1:C1')
+            title_cell = ws['A1']
+            title_cell.value = "Freenance"
+            title_cell.font = Font(bold=True, size=16)
+            title_cell.alignment = Alignment(horizontal='center')
 
             headers = ["Date", "Category", "Amount"]
             ws.append(headers)
+
+            header_style = Font(bold=True)
             amount_alignment = Alignment(horizontal='right', vertical='center')
+            center_alignment = Alignment(horizontal='center', vertical='center')
 
-            header_alignment = Alignment(horizontal='center', vertical='center')
-            for cell in ws[2]:
-                cell.font = Font(bold=True)
-                cell.alignment = header_alignment
+            for col in range(1, 4):
+                cell = ws.cell(row=2, column=col)
+                cell.font = header_style
+                cell.alignment = center_alignment
 
-
-            for op in operations:
-                row = [op['date'], op['category'], op['amount']]
-                ws.append(row)
-                amount_cell = ws.cell(row=ws.max_row, column=3)
+            start_data_row = 3
+            for i, op in enumerate(operations, start=start_data_row):
+                ws.cell(row=i, column=1, value=op['date']).alignment = center_alignment
+                ws.cell(row=i, column=2, value=op['category'])
+                amount_cell = ws.cell(row=i, column=3, value=op['amount'])
                 amount_cell.number_format = '#,##0.00'
                 amount_cell.alignment = amount_alignment
 
-            for row in ws.iter_rows(min_row=3, max_row=ws.max_row, min_col=1, max_col=1):
-                for cell in row:
-                    cell.alignment = amount_alignment
+            total_row = len(operations) + start_data_row
+            ws.cell(row=total_row, column=2, value="Итого:").font = header_style
+            total_cell = ws.cell(row=total_row, column=3, value=total)
+            total_cell.font = header_style
+            total_cell.number_format = '#,##0.00'
+            total_cell.alignment = amount_alignment
 
-            for column in ws.columns:
+            for col_idx in range(1, 4):
+                column_letter = get_column_letter(col_idx)
                 max_length = 0
-                column_letter = column[0].column_letter
-                for cell in column:
-                    try:
-                        if len(str(cell.value)) > max_length:
-                            max_length = len(str(cell.value))
-                    except:
-                        pass
+                for cell in ws.iter_cols(min_col=col_idx, max_col=col_idx):
+                    for c in cell:
+                        try:
+                            if not isinstance(c, MergedCell):
+                                if len(str(c.value)) > max_length:
+                                    max_length = len(str(c.value))
+                        except:
+                            pass
                 adjusted_width = (max_length + 2) * 1.2
                 ws.column_dimensions[column_letter].width = adjusted_width
-            total_row = ws.max_row + 1
-            ws.cell(row=total_row, column=2, value="Total").font = Font(bold=True)
-            total_cell = ws.cell(row=total_row, column=3, value=float(total))
-            total_cell.font = Font(bold=True)
-            total_cell.number_format = '#,##0.00'
+
+            pie_chart = PieChart()
+
+            chart_data_row = total_row + 2
+            ws.cell(row=chart_data_row, column=5, value="Category").font = header_style
+            ws.cell(row=chart_data_row, column=6, value="Amount").font = header_style
+
+            for i, (category, data) in enumerate(category_data.items(), start=chart_data_row + 1):
+                ws.cell(row=i, column=5, value=category)
+                ws.cell(row=i, column=6, value=data['total']).number_format = '#,##0.00'
+
+            data = Reference(ws,
+                             min_col=6,
+                             min_row=chart_data_row + 1,
+                             max_row=chart_data_row + len(category_data))
+
+            categories = Reference(ws,
+                                   min_col=5,
+                                   min_row=chart_data_row + 1,
+                                   max_row=chart_data_row + len(category_data))
+
+            pie_chart.add_data(data, titles_from_data=False)
+            pie_chart.set_categories(categories)
+            pie_chart.title = "Categories"
+            pie_chart.style = 10
+            pie_chart.legend.position = 'r'
+
+            ws.add_chart(pie_chart, "E2")
+
             wb.save(buffer)
             buffer.seek(0)
-
-            if buffer.getbuffer().nbytes < 100:
-                raise ValueError("Generated Excel file is empty")
 
             response = HttpResponse(
                 buffer.getvalue(),
@@ -284,7 +333,6 @@ class OperationXLSView(GenericAPIView):
 
         except Exception as e:
             return HttpResponse(
-                f"Error generating Excel: {str(e)}",
+                f"Ошибка при создании отчёта: {str(e)}",
                 status=500,
-                content_type='text/plain'
-            )
+                content_type='text/plain')
