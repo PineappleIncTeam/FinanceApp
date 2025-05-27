@@ -6,9 +6,15 @@ WORKDIR /opt/FinanceApp
 
 COPY . /opt/FinanceApp
 
+RUN pip install poetry
 
-RUN pip install -r /opt/FinanceApp/requirements.txt
+COPY pyproject.toml poetry.lock ./
 
+RUN poetry config virtualenvs.create false && \
+    poetry install --no-root --no-interaction --no-ansi
+
+
+ENV PYTHONPATH=/app
 CMD ["python3", "/manage.py", "runserver", "0.0.0.0:8000"]
 
 
