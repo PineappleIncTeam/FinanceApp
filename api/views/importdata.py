@@ -235,7 +235,7 @@ class OperationXLSView(GenericAPIView):
         wb = Workbook()
         ws = wb.active
         ws.title = "Freenance"
-
+        headers = ["Date", "Category", "Amount"]
         data = {}
         for operation in serializer.data:
             if query == "income" or query == "outcome":
@@ -264,7 +264,6 @@ class OperationXLSView(GenericAPIView):
                             'amount': op['amount'],
                             '_raw_amount': op['amount']
                         })
-                headers = ["Date", "Category", "Amount"]
             elif query == "targets":
                 amount_str = str(operation['amount'])
                 amount = float(amount_str.replace(' ', '').replace(',', '.'))
