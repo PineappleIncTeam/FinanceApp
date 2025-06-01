@@ -1,10 +1,10 @@
 from datetime import timedelta
 
+import openpyxl
 from django.utils import timezone
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from openpyxl.cell import MergedCell
-from openpyxl.chart import Reference, PieChart
+
 from openpyxl.utils import get_column_letter
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
@@ -18,8 +18,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from io import BytesIO
 from django.http import HttpResponse
-from openpyxl import Workbook
-from openpyxl.styles import Font, Alignment
+from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 
 from api.models import Operation, Category, Target
 from api.serializers import OperationSerializer
@@ -184,26 +183,23 @@ class OperationXLSView(GenericAPIView):
     serializer_class = OperationSerializer
 
     def get_queryset(self):
-        days = self.request.query_params.get('days')
-        now = timezone.now()
-        date = now - timedelta(days=int(days))
+        days = int(self.request.query_params.get('days', 30))
+        date_from = timezone.now() - timedelta(days=days)
 
         queryset = Operation.objects.filter(
             user=self.request.user,
-            created_at__gte=date
+            created_at__gte=date_from
         )
 
         operation_type = self.request.query_params.get('type')
-
         if operation_type:
             queryset = queryset.filter(type=operation_type)
 
-        return queryset.order_by('-created_at')
-
+        return queryset.select_related('categories').order_by('-created_at')
 
     @swagger_auto_schema(
-        operation_id='Получение выписки в формате xls',
-        operation_description='Получение .xls файла',
+        operation_id='Получение выписки в формате XLS',
+        operation_description='Получение Excel файла с операциями',
         manual_parameters=[
             openapi.Parameter(
                 name="type",
@@ -221,164 +217,125 @@ class OperationXLSView(GenericAPIView):
                 required=True,
             ),
         ],
-        responses = {
-            200: openapi.Response(description="Файл успешно получен", schema=OperationSerializer),
-    })
+        responses={
+            200: openapi.Response(description="XLS файл успешно получен"),
+            500: openapi.Response(description="Ошибка генерации отчёта")
+        }
+    )
     def get(self, request):
-        operations = []
-        total = 0.00
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        query = self.request.query_params.get('type')
-        # try:
-        buffer = BytesIO()
-        wb = Workbook()
-        ws = wb.active
-        ws.title = "Freenance"
-        headers = ["Date", "Category", "Amount"]
-        data = {}
-        for operation in serializer.data:
+        try:
+            operations = []
+            total = 0.0
+            queryset = self.get_queryset()
+            serializer = self.get_serializer(queryset, many=True)
+            query = self.request.query_params.get('type')
+
+            for operation in serializer.data:
+                amount_str = str(operation['amount'])
+                amount = float(amount_str.replace(' ', '').replace(',', '.'))
+                total += amount
+
+                formatted_amount = "{:,.2f}".format(amount).replace(",", " ")
+                if query == "income" or query == "outcome":
+                    operations.append({
+                        "category": Category.objects.get(id=operation["categories"]).name,
+                        "amount": formatted_amount,
+                        "date": operation["date"],
+                        "_raw_amount": amount
+                    })
+                elif query == "targets":
+                    operations.append({
+                        "target": Target.objects.get(id=operation["target"]).name,
+                        "amount": formatted_amount,
+                        "date": operation["date"],
+                        "_raw_amount": amount
+                    })
+
+            # Create Excel workbook
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.title = "Freenance Report"
+
+            # Styles
+            header_font = Font(name='Arial', bold=True, size=12, color='FFFFFF')
+            header_fill = PatternFill(start_color='3A5FCD', end_color='3A5FCD', fill_type='solid')
+            normal_font = Font(name='Arial', size=11)
+            total_font = Font(name='Arial', bold=True, size=11)
+            alignment_center = Alignment(horizontal='center', vertical='center')
+            alignment_left = Alignment(horizontal='left', vertical='center')
+            alignment_right = Alignment(horizontal='right', vertical='center')
+            thin_border = Border(left=Side(style='thin'),
+                                 right=Side(style='thin'),
+                                 top=Side(style='thin'),
+                                 bottom=Side(style='thin'))
+
+            # Title
+            ws['A1'] = "Freenance"
+            ws['A1'].font = Font(name='Arial', size=14)
+            ws.merge_cells('A1:C1')
+            ws.row_dimensions[1].height = 30
+
+            # Headers
             if query == "income" or query == "outcome":
-                amount_str = str(operation['amount'])
-                amount = float(amount_str.replace(' ', '').replace(',', '.'))
-                category_name = Category.objects.get(id=operation["categories"]).name
-
-                if category_name not in data:
-                    data[category_name] = {
-                        'total': 0.0,
-                        'operations': []
-                    }
-
-                data[category_name]['total'] += amount
-                data[category_name]['operations'].append({
-                    'date': operation["date"],
-                    'amount': amount
-                })
-                total += amount
-
-                for category, data in data.items():
-                    for op in str(data['operations']):
-                        operations.append({
-                            'category': category,
-                            'date': op['date'],
-                            'amount': op['amount'],
-                            '_raw_amount': op['amount']
-                        })
+                headers = ["Date", "Category", "Amount"]
             elif query == "targets":
-                amount_str = str(operation['amount'])
-                amount = float(amount_str.replace(' ', '').replace(',', '.'))
-                target_name = Target.objects.get(id=operation["target"]).name
-
-                if target_name not in data:
-                    data[target_name] = {
-                        'total': 0.0,
-                        'operations': []
-                    }
-
-                data[target_name]['total'] += amount
-                data[target_name]['operations'].append({
-                    'date': operation["date"],
-                    'amount': amount
-                })
-                total += amount
-
-                for category, data in data.items():
-                    for op in data['operations']:
-                        operations.append({
-                            'category': category,
-                            'date': op['date'],
-                            'amount': op['amount'],
-                            '_raw_amount': op['amount']
-                        })
                 headers = ["Date", "Target", "Amount"]
 
-        ws.merge_cells('A1:C1')
-        title_cell = ws['A1']
-        title_cell.value = "Freenance"
-        title_cell.font = Font(bold=True, size=16)
-        title_cell.alignment = Alignment(horizontal='center')
+            for col_num, header in enumerate(headers, 1):
+                cell = ws.cell(row=3, column=col_num, value=header)
+                cell.font = header_font
+                cell.fill = header_fill
+                cell.alignment = alignment_center
+                cell.border = thin_border
 
+            # Data rows
+            for row_num, op in enumerate(operations, 4):
+                if query == "income" or query == "outcome":
+                    ws.cell(row=row_num, column=1, value=op['date']).alignment = alignment_center
+                    ws.cell(row=row_num, column=2, value=op['category']).alignment = alignment_left
+                    ws.cell(row=row_num, column=3, value=op['amount']).alignment = alignment_right
+                elif query == "targets":
+                    ws.cell(row=row_num, column=1, value=op['date']).alignment = alignment_center
+                    ws.cell(row=row_num, column=2, value=op['target']).alignment = alignment_left
+                    ws.cell(row=row_num, column=3, value=op['amount']).alignment = alignment_right
 
-        ws.append(headers)
+                for col_num in range(1, 4):
+                    ws.cell(row=row_num, column=col_num).font = normal_font
+                    ws.cell(row=row_num, column=col_num).border = thin_border
+                    ws.cell(row=row_num, column=col_num).fill = PatternFill(
+                        start_color='F0F8FF', end_color='F0F8FF', fill_type='solid')
 
-        header_style = Font(bold=True)
-        amount_alignment = Alignment(horizontal='right', vertical='center')
-        center_alignment = Alignment(horizontal='center', vertical='center')
+            # Total row
+            total_row = len(operations) + 4
+            formatted_total = "{:,.2f}".format(total).replace(",", " ")
 
-        for col in range(1, 4):
-            cell = ws.cell(row=2, column=col)
-            cell.font = header_style
-            cell.alignment = center_alignment
+            ws.cell(row=total_row, column=1, value="").border = thin_border
+            ws.cell(row=total_row, column=2, value="Total").font = total_font
+            ws.cell(row=total_row, column=2).alignment = alignment_left
+            ws.cell(row=total_row, column=2).border = thin_border
+            ws.cell(row=total_row, column=3, value=formatted_total).font = total_font
+            ws.cell(row=total_row, column=3).alignment = alignment_right
+            ws.cell(row=total_row, column=3).border = thin_border
 
-        start_data_row = 3
-        for i, op in enumerate(operations, start=start_data_row):
-            ws.cell(row=i, column=1, value=op['date']).alignment = center_alignment
-            ws.cell(row=i, column=2, value=op['category'])
-            amount_cell = ws.cell(row=i, column=3, value=op['amount'])
-            amount_cell.number_format = '#,##0.00'
-            amount_cell.alignment = amount_alignment
+            # Column widths
+            for col_num in range(1, 4):
+                ws.column_dimensions[get_column_letter(col_num)].width = 20
 
-        total_row = len(operations) + start_data_row
-        ws.cell(row=total_row, column=2, value="Итого:").font = header_style
-        total_cell = ws.cell(row=total_row, column=3, value=total)
-        total_cell.font = header_style
-        total_cell.number_format = '#,##0.00'
-        total_cell.alignment = amount_alignment
+            # Save to buffer
+            buffer = BytesIO()
+            wb.save(buffer)
+            buffer.seek(0)
 
-        for col_idx in range(1, 4):
-            column_letter = get_column_letter(col_idx)
-            max_length = 0
-            for cell in ws.iter_cols(min_col=col_idx, max_col=col_idx):
-                for c in cell:
-                    try:
-                        if not isinstance(c, MergedCell):
-                            if len(str(c.value)) > max_length:
-                                max_length = len(str(c.value))
-                    except:
-                        pass
-            adjusted_width = (max_length + 2) * 1.2
-            ws.column_dimensions[column_letter].width = adjusted_width
+            response = HttpResponse(
+                buffer.getvalue(),
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            response['Content-Disposition'] = 'attachment; filename="freenance_report.xlsx"'
+            return response
 
-        pie_chart = PieChart()
-
-        chart_data_row = total_row + 2
-        ws.cell(row=chart_data_row, column=5, value="Category").font = header_style
-        ws.cell(row=chart_data_row, column=6, value="Amount").font = header_style
-
-        for i, (category, data) in enumerate(data.items(), start=chart_data_row + 1):
-            ws.cell(row=i, column=5, value=category)
-            ws.cell(row=i, column=6, value=total).number_format = '#,##0.00'
-
-        data = Reference(ws,
-                         min_col=6,
-                         min_row=chart_data_row + 1,
-                         max_row=chart_data_row + len(data))
-
-        categories = Reference(ws,
-                               min_col=5,
-                               min_row=chart_data_row + 1,
-                               max_row=chart_data_row + len(data))
-
-        pie_chart.add_data(data, titles_from_data=False)
-        pie_chart.set_categories(categories)
-        pie_chart.title = "Categories"
-        pie_chart.style = 10
-        pie_chart.legend.position = 'r'
-
-        ws.add_chart(pie_chart, "E2")
-
-        wb.save(buffer)
-        buffer.seek(0)
-
-        response = HttpResponse(
-            buffer.getvalue(),
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
-        response['Content-Disposition'] = 'attachment; filename="financial_report.xlsx"'
-        return response
-
-        # except Exception as e:
-        #     return HttpResponse(
-        #         f"Ошибка при создании отчёта: {str(e)}",
-        #         status=500,
-        #         content_type='text/plain')
+        except Exception as e:
+            return HttpResponse(
+                f"Error generating XLS: {str(e)}",
+                status=500,
+                content_type='text/plain'
+            )
