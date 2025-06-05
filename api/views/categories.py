@@ -143,11 +143,9 @@ class CategoryUpdateDestroyAPI(GenericAPIView):
         if serializer.is_valid():
             serializer.save()
             logger.info(
-                "The user [ID: %s, "
-                "name: %s] has updated a category: "
+                "The user [ID: %s] has updated a category: "
                 "id %s, name - %s.",
                 request.user.pk,
-                request.user.email,
                 category.id,
                 category.name
             )
@@ -175,11 +173,9 @@ class CategoryUpdateDestroyAPI(GenericAPIView):
             raise SystemCategoryError()
         if category.operations.exists():
             logger.error(
-                "The user [ID: %s, "
-                "name: %s] cannot delete a category "
+                "The user [ID: %s] cannot delete a category "
                 "with existing operations: id %s.",
                 request.user.pk,
-                request.user.email,
                 category.pk
             )
             raise CategoryWithOperationsError()
@@ -188,11 +184,9 @@ class CategoryUpdateDestroyAPI(GenericAPIView):
         category.save()
 
         logger.info(
-            "The user [ID: %s, "
-            "name: %s] has archived category: "
+            "The user [ID: %s] has archived category: "
             "id %s, name - %s.",
             request.user.pk,
-            request.user.email,
             category.id,
             category.name
         )
