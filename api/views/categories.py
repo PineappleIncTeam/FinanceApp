@@ -143,11 +143,9 @@ class CategoryUpdateDestroyAPI(GenericAPIView):
         if serializer.is_valid():
             serializer.save()
             logger.info(
-                "The user [ID: %s, "
-                "user_id: %s] has updated a category: "
+                "The user [ID: %s] has updated a category: "
                 "id %s, name - %s.",
                 request.user.pk,
-                request.user.id,
                 category.id,
                 category.name
             )
