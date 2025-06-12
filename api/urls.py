@@ -113,7 +113,8 @@ urlpatterns = [
     path(
         "vkauth/", 
         VKOAuth2View.as_view(), 
-        name="vkauth"),
+        name="vkauth"
+    ),
     path(
         "currency/", 
         CurrencyDataView.as_view(),

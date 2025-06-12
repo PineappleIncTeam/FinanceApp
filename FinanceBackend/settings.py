@@ -289,3 +289,5 @@ CACHES = {
         }
     }
 }
+
+APPEND_SLASH=False
