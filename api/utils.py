@@ -24,22 +24,16 @@ def get_user_categories(
     Retrieve user's categories.
     """
 
-    query_result = Category.objects.filter(user=user.pk)
-
+    filters = {"user": user.pk}
     if is_income is not None:
-        query_result = query_result.filter(
-            is_income=is_income
-        )
-
+        filters["is_income"] = is_income
     if is_outcome is not None:
-        query_result = query_result.filter(
-            is_outcome=is_outcome
-        )
-
+        filters["is_outcome"] = is_outcome
     if is_deleted is not None:
-        query_result = query_result.filter(
-            is_deleted=is_deleted
-        )
+        filters["is_deleted"] = is_deleted
+
+
+    query_result = Category.objects.filter(**filters)
 
     logger.info(
         "The user [ID: %s, name: %s] successfully received a list of the users's categories.",
