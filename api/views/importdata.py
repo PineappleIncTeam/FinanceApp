@@ -119,7 +119,7 @@ class OperationPDFView(GenericAPIView):
                 for op in operations:
                     table_data.append([
                         op['date'],
-                        op['target'],
+                        op['category'],
                         op['amount']
                     ])
             elif query == "targets":
@@ -251,7 +251,6 @@ class OperationXLSView(GenericAPIView):
                         "_raw_amount": amount
                     })
 
-            # Create Excel workbook
             wb = openpyxl.Workbook()
             ws = wb.active
             ws.title = "Freenance Report"
@@ -269,13 +268,11 @@ class OperationXLSView(GenericAPIView):
                                  top=Side(style='thin'),
                                  bottom=Side(style='thin'))
 
-            # Title
             ws['A1'] = "Freenance"
             ws['A1'].font = Font(name='Arial', size=14)
             ws.merge_cells('A1:C1')
             ws.row_dimensions[1].height = 30
 
-            # Headers
             if query == "income" or query == "outcome":
                 headers = ["Date", "Category", "Amount"]
             elif query == "targets":
@@ -288,7 +285,6 @@ class OperationXLSView(GenericAPIView):
                 cell.alignment = alignment_center
                 cell.border = thin_border
 
-            # Data rows
             for row_num, op in enumerate(operations, 4):
                 if query == "income" or query == "outcome":
                     ws.cell(row=row_num, column=1, value=op['date']).alignment = alignment_center
@@ -305,7 +301,6 @@ class OperationXLSView(GenericAPIView):
                     ws.cell(row=row_num, column=col_num).fill = PatternFill(
                         start_color='F0F8FF', end_color='F0F8FF', fill_type='solid')
 
-            # Total row
             total_row = len(operations) + 4
             formatted_total = "{:,.2f}".format(total).replace(",", " ")
 
@@ -317,11 +312,9 @@ class OperationXLSView(GenericAPIView):
             ws.cell(row=total_row, column=3).alignment = alignment_right
             ws.cell(row=total_row, column=3).border = thin_border
 
-            # Column widths
             for col_num in range(1, 4):
                 ws.column_dimensions[get_column_letter(col_num)].width = 20
 
-            # Save to buffer
             buffer = BytesIO()
             wb.save(buffer)
             buffer.seek(0)
