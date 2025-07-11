@@ -2,7 +2,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path, re_path
 
-from api.serializers.category import CategoriesGetSerializer
 from api.views import (
     CategoriesListCreateAPI,
     CategoryUpdateDestroyAPI,
@@ -24,8 +23,9 @@ from api.views import (
     CustomLogoutView,
     OperationPDFView,
     OperationXLSView,
+    ChequeView,
+    CategoryGetAPI,
 )
-from api.views.categories import CategoryGetAPI
 
 urlpatterns = [
     # ...
@@ -129,8 +129,12 @@ urlpatterns = [
         "import/xls/",
         OperationXLSView.as_view(),
         name="import_xls"
-    )
-
+    ),
+    path(
+        "cheque",
+        ChequeView.as_view(),
+        name="cheque info"
+    ),
 
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

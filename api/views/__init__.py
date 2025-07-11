@@ -1,4 +1,5 @@
-from .categories import CategoriesListCreateAPI, CategoryUpdateDestroyAPI
+from .categories import CategoriesListCreateAPI, CategoryUpdateDestroyAPI, CategoryGetAPI
+from .cheque import ChequeView
 from .countries import CountriesApiView
 from .generate_token import CustomTokenCreateAPI
 from .logout import CustomLogoutView
@@ -33,4 +34,6 @@ __all__ = [
     "CustomLogoutView",
     "OperationPDFView",
     "OperationXLSView",
+    "ChequeView",
+    "CategoryGetAPI",
 ]
