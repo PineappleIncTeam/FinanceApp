@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 
@@ -8,13 +9,15 @@ import requests
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 
+from FinanceBackend.settings import CHEQUE_API_KEY
+
 
 class ChequeView(GenericAPIView):
     parser_classes = [MultiPartParser]
     
     @swagger_auto_schema(
-        operation_id='Получение выписки в формате pdf',
-        operation_description='Получение PDF файла с операциями и диаграммой',
+        operation_id='Получение информации по чеку',
+        operation_description='Получение информации по фото чека',
         manual_parameters=[
             openapi.Parameter(
                 name="photo",
@@ -25,8 +28,8 @@ class ChequeView(GenericAPIView):
             ),
         ],
         responses={
-            200: openapi.Response(description="PDF файл успешно получен"),
-            500: openapi.Response(description="Ошибка генерации отчёта")
+            200: openapi.Response(description="информация успешно получена"),
+            500: openapi.Response(description="Ошибка обработки чека")
         }
     )
     def post(self, request):
@@ -36,7 +39,7 @@ class ChequeView(GenericAPIView):
             return Response({"error": "Файл 'photo' не передан"}, status=status.HTTP_400_BAD_REQUEST)
         url = 'https://proverkacheka.com/api/v1/check/get'
 
-        data = {'token': '34462.juLaZk5Pfgsw4khiA'}
+        data = {'token': settings.CHEQUE_API_KEY}
 
         files = {'qrfile': cheque_file}
 
