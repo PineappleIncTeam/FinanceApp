@@ -291,3 +291,5 @@ CACHES = {
 }
 
 APPEND_SLASH=False
+
+CHEQUE_API_KEY = os.getenv("CHEQUE_API_KEY")
