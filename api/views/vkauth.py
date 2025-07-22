@@ -17,14 +17,16 @@ class VKOAuth2View(APIView):
             type=openapi.TYPE_OBJECT,
             required=["code", "code_verifier", "device_id"],
             properties={
-                "code": openapi.Schema(type=openapi.TYPE_STRING),
-                "code_verifier": openapi.Schema(type=openapi.TYPE_STRING),
-                "device_id": openapi.Schema(type=openapi.TYPE_STRING),
+                "code": openapi.Schema(type=openapi.TYPE_STRING, description="Код авторизации, полученный от VK"),
+                "code_verifier": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="Строка, использованная для защиты PKCE"
+                ),
+                "device_id": openapi.Schema(type=openapi.TYPE_STRING, description="Идентификатор устройства"),
             },
         ),
         responses={
             200: openapi.Response(
-                description="Успешный ответ (токены в куки)",
+                description="Успешный ответ",
                 examples={
                     "application/json": {
                         "id_token": "id_token_example",
@@ -32,11 +34,11 @@ class VKOAuth2View(APIView):
                             "user_id": "1234567890",
                             "first_name": "Ivan",
                             "last_name": "Ivanov",
-                            "avatar": "...",
+                            "avatar": "https://pp.userapi.com/60tZWMo4SmwcploUVl9XEt8ufnTTvDUmQ6Bj1g/mmv1pcj63C4.png",
                             "sex": 2,
                             "verified": False,
-                            "birthday": "01.01.2000",
-                        },
+                            "birthday": "01.01.2000"
+                        }
                     }
                 },
             ),
@@ -46,24 +48,24 @@ class VKOAuth2View(APIView):
     )
     def post(self, request):
         code = request.data.get("code")
-        verifier = request.data.get("code_verifier")
-        device = request.data.get("device_id")
+        code_verifier = request.data.get("code_verifier")
+        device_id = request.data.get("device_id")
 
-        if not all([code, verifier, device]):
+        if not code or not code_verifier or not device_id:
             return Response({"error": "Missing parameters"}, status=status.HTTP_400_BAD_REQUEST)
 
-        token_resp = requests.post(
-            "https://id.vk.com/oauth2/auth",
-            data={
-                "grant_type": "authorization_code",
-                "code": code,
-                "code_verifier": verifier,
-                "device_id": device,
-                "client_id": os.getenv("CLIENT_ID"),
-                "client_secret": os.getenv("CL_SECRET"),
-                "redirect_uri": os.getenv("REDIRECT_URI"),
-            },
-        )
+        # Обмен кода на токены
+        vk_api_url = "https://id.vk.com/oauth2/auth"
+        payload = {
+            "grant_type": "authorization_code",
+            "code": code,
+            "code_verifier": code_verifier,
+            "device_id": device_id,
+            "client_id": os.getenv("CLIENT_ID"),
+            "client_secret": os.getenv("CL_SECRET"),
+            "redirect_uri": os.getenv("REDIRECT_URI"),
+        }
+        token_resp = requests.post(vk_api_url, data=payload)
 
         if token_resp.status_code != 200:
             return Response({"error": "Failed to exchange code"}, status=token_resp.status_code)
@@ -74,30 +76,42 @@ class VKOAuth2View(APIView):
         id_token = tokens.get("id_token")
 
         if not access_token or not refresh_token:
-            return Response({"error": "No tokens received"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": "No access or refresh token received"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        user_resp = requests.post(
-            "https://id.vk.com/oauth2/user_info",
-            data={"access_token": access_token, "client_id": os.getenv("CLIENT_ID")},
+        # Запрашиваем данные пользователя
+        user_info_url = "https://id.vk.com/oauth2/user_info"
+        user_info_resp = requests.post(user_info_url, data={
+            "access_token": access_token,
+            "client_id": os.getenv("CLIENT_ID")
+        })
+        if user_info_resp.status_code != 200:
+            return Response({"error": "Failed to fetch user info"},
+                            status=user_info_resp.status_code)
+
+        user_info = user_info_resp.json()
+
+        # Формируем ответ без токенов в теле
+        response_data = {
+            "id_token": id_token,
+            "user_info": user_info,
+        }
+        response = Response(response_data, status=status.HTTP_200_OK)
+
+        
+        response.set_cookie(
+            key="access_token",
+            value=access_token,
+            httponly=True,
+            secure=True,
+            samesite='Lax',
         )
-
-        if user_resp.status_code != 200:
-            return Response({"error": "Failed to fetch user info"}, status=user_resp.status_code)
-
-        user_info = user_resp.json()
-
-        resp = Response({"id_token": id_token, "user_info": user_info}, status=status.HTTP_200_OK)
-
-        resp.set_cookie(
-            key="access_token", value=access_token, httponly=True, secure=True, samesite="Strict", max_age=3600  # 1 час
-        )
-        resp.set_cookie(
+        response.set_cookie(
             key="refresh_token",
             value=refresh_token,
             httponly=True,
             secure=True,
-            samesite="Strict",
-            max_age=60 * 60 * 24 * 30,  # 30 дней
+            samesite='Lax',
         )
 
-        return resp
+        return response
