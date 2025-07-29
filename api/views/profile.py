@@ -63,7 +63,8 @@ class ProfileApiView(RetrieveUpdateAPIView):
         data = {
             'nickname': request.data.get('nickname'),
             'gender': request.data.get('gender'),
-            'country': request.data.get('country')
+            'country': request.data.get('country'),
+            'default': request.data.get('default')
         }
 
         uploaded_file = request.data.get('avatar')
