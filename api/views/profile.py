@@ -62,8 +62,9 @@ class ProfileApiView(RetrieveUpdateAPIView):
             'country': request.data.get('country'),
             'default': request.data.get('default')
         }
-        uploaded_file = request.data.get('avatar')
-        if data.get('default') == 0 and uploaded_file:
+        uploaded_file = request.FILES.get('avatar')
+        default_value = int(request.data.get('default', 0))
+        if default_value != 0 and uploaded_file:
             return Response(
                 {"error_code": 400, "error_message": "avatar is not default"},
                 status=status.HTTP_400_BAD_REQUEST
