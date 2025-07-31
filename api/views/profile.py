@@ -53,10 +53,6 @@ class ProfileApiView(RetrieveUpdateAPIView):
         503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
     })
     def patch(self, request, *args, **kwargs):
-        import base64
-        from rest_framework.response import Response
-        from rest_framework import status
-
         partial = kwargs.pop('partial', True)
         profile = self.get_object()
 
@@ -66,8 +62,13 @@ class ProfileApiView(RetrieveUpdateAPIView):
             'country': request.data.get('country'),
             'default': request.data.get('default')
         }
-
         uploaded_file = request.data.get('avatar')
+        if data.get('default') == 0 and uploaded_file:
+            return Response(
+                {"error_code": 400, "error_message": "avatar is not default"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         if uploaded_file:
             file_bytes = uploaded_file.read()
             base64_bytes = base64.b64encode(file_bytes)
