@@ -24,8 +24,9 @@ from api.views import (
     OperationXLSView,
     TokenRefreshView,
     LoginView,
+    ChequeView,
+    CategoryGetAPI,
 )
-from api.views.categories import CategoryGetAPI
 
 urlpatterns = [
     path("auth/", include("djoser.urls")),
@@ -38,7 +39,6 @@ urlpatterns = [
     path("targets/", TargetsListCreateAPI.as_view(), name="targets"),
     path("targets/<int:pk>/", TargetUpdateDestroyAPI.as_view(), name="target-info"),
     path("targets/<int:pk>/return_money/", TargetMoneyReturnAPI.as_view(), name="target-money-return"),
-
     path("categories/", CategoriesListCreateAPI.as_view(), name="categories"),
     path("categories/all/", CategoryGetAPI.as_view()),
     path("categories/<int:pk>/", CategoryUpdateDestroyAPI.as_view(), name="category-info"),
@@ -50,17 +50,19 @@ urlpatterns = [
     path("countries/", CountriesApiView.as_view(), name="countries"),
 
     path("profile/", ProfileApiView.as_view(), name="profile"),
-
+    
     path("reports/balance/", ReportBalanceView.as_view(), name="report-balance"),
     path("reports/categories/", ReportCategoriesView.as_view(), name="report-categories"),
     path("reports/statistics/", ReportStatisticsView.as_view(), name="report-statistics"),
-
+  
     path("vkauth/", VKOAuth2View.as_view(), name="vkauth"),
-
+  
     path("currency/", CurrencyDataView.as_view(), name="exchange-rates"),
-
+  
     path("import/pdf/", OperationPDFView.as_view(), name="import_pdf"),
     path("import/xls/", OperationXLSView.as_view(), name="import_xls"),
+  
+    path("cheque", ChequeView.as_view(), name="cheque info"),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
