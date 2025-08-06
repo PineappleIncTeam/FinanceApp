@@ -1,3 +1,5 @@
+from os import error
+
 import requests
 from django.http import HttpResponse
 from django.utils.deprecation import MiddlewareMixin
@@ -50,6 +52,8 @@ class RefreshTokenMiddleware(MiddlewareMixin):
                             max_age=5 * 60
                         )
                         return django_response
+                    else:
+                        return Response({"error": "refresh error"})
                 except Exception as e:
                     return Response({"error": f"error {e}"})
 
