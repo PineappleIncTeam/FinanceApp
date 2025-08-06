@@ -1,15 +1,12 @@
-from os import error
-
 import requests
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.utils.deprecation import MiddlewareMixin
-from rest_framework.response import Response
-
 
 class RefreshTokenMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
         if response.status_code == 401:
             refresh_token = request.COOKIES.get('refresh_token')
+
             if refresh_token:
                 try:
                     refresh_url = 'https://dev.freenance.store/api/v1/auth/refresh/'
@@ -21,13 +18,13 @@ class RefreshTokenMiddleware(MiddlewareMixin):
 
                     if refresh_response.status_code == 200:
                         new_access = refresh_response.json().get('access')
+
                         original_url = request.build_absolute_uri()
-                        method = request.method
+                        method = request.method.upper()
                         headers = {
                             'Authorization': f'Bearer {new_access}',
                             'Content-Type': request.headers.get('Content-Type', 'application/json')
                         }
-
                         body = request.body if method in ['POST', 'PUT', 'PATCH', 'DELETE'] else None
 
                         retry_response = requests.request(
@@ -43,18 +40,24 @@ class RefreshTokenMiddleware(MiddlewareMixin):
                             status=retry_response.status_code,
                             content_type=retry_response.headers.get('Content-Type', 'application/json')
                         )
+
                         django_response.set_cookie(
                             key='access_token',
                             value=new_access,
                             httponly=True,
                             secure=True,
                             samesite='Strict',
-                            max_age=5 * 60
+                            max_age=300
                         )
+
                         return django_response
                     else:
-                        return Response({"error": "refresh error"})
+                        print("⚠️ Ответ от refresh: ", refresh_response.status_code)
+                        print("📦 Тело: ", refresh_response.text)
+                        return JsonResponse({"error": "Token refresh failed"}, status=refresh_response.status_code)
+
+
                 except Exception as e:
-                    return Response({"error": f"error {e}"})
+                    return JsonResponse({"error": str(e)}, status=500)
 
         return response
