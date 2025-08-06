@@ -54,7 +54,7 @@ class RefreshTokenMiddleware(MiddlewareMixin):
                     else:
                         print("⚠️ Ответ от refresh: ", refresh_response.status_code)
                         print("📦 Тело: ", refresh_response.text)
-                        return JsonResponse({"error": "Token refresh failed"}, status=refresh_response.status_code)
+                        return JsonResponse({"error": "Token refresh failed", "тело": refresh_response.text}, status=refresh_response.status_code)
 
 
                 except Exception as e:
