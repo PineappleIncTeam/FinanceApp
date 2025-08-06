@@ -2,19 +2,17 @@ from __future__ import annotations
 
 import logging
 
-from django.db.models import QuerySet
-from django_filters.rest_framework import DjangoFilterBackend
+
 from drf_yasg import openapi
 
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import GenericAPIView, ListAPIView, ListCreateAPIView
+from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from unicodedata import category
 
-from api.models import Category, Operation
+from api.models import Category
 from api.serializers import CategoriesSerializer, CategoryDetailSerializer
 from api.serializers.category import CategoriesGetSerializer
 from api.serializers.profile import ErrorSerializer
