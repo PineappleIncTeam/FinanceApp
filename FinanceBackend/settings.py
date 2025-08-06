@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -22,6 +23,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "djoser",
+    "rest_framework_simplejwt",
     "api.apps.ApiConfig",
     "drf_spectacular",
     "drf_spectacular_sidecar",
@@ -130,7 +132,7 @@ AUTH_USER_MODEL = "api.User"
 REST_FRAMEWORK = {
     "COERCE_DECIMAL_TO_STRING": False,
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "api.authentication.CustomTokenAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",  # ✅ заменено
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
@@ -264,6 +266,30 @@ LOGGING = {
         },
     },
 }
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+}
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+        },
+    },
+    'USE_SESSION_AUTH': False,
+    'PERSIST_AUTHORIZATION': True,
+}
+
 
 MAX_OPERATIONS_COUNT = 5
 DEFAULT_DATE_FORMAT_STR = "%Y-%m-%d"
