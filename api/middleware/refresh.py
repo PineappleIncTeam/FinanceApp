@@ -8,7 +8,7 @@ class RefreshTokenMiddleware(MiddlewareMixin):
             refresh_token = request.COOKIES.get('refresh_token')
 
             if refresh_token:
-                refresh_url = 'http://127.0.0.1:8000/api/v1/auth/refresh/'
+                refresh_url = 'https://dev.freenance.store/api/v1/auth/refresh/'
                 refresh_response = requests.post(
                     refresh_url,
                     cookies={'refresh_token': refresh_token},
