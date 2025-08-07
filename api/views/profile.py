@@ -53,19 +53,34 @@ class ProfileApiView(RetrieveUpdateAPIView):
         503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
     })
     def patch(self, request, *args, **kwargs):
-            partial = kwargs.pop('partial', True)
-            profile = self.get_object()
+        partial = kwargs.pop('partial', True)
+        profile = self.get_object()
 
-            uploaded_file = request.data['avatar']
+        data = {
+            'nickname': request.data.get('nickname'),
+            'gender': request.data.get('gender'),
+            'country': request.data.get('country'),
+            'default': request.data.get('default')
+        }
+        uploaded_file = request.FILES.get('avatar')
+        default_value = int(request.data.get('default', 0))
+        if default_value != 0 and uploaded_file:
+            return Response(
+                {"error_code": 400, "error_message": "avatar is not default"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if uploaded_file:
             file_bytes = uploaded_file.read()
             base64_bytes = base64.b64encode(file_bytes)
-            base64_str = base64_bytes.decode('utf-8')
-            data = {'nickname': request.data['nickname'],
-                    'gender': request.data['gender'],
-                    'country': request.data['country'],
-                    'avatar': base64_str}
-            serializer = self.get_serializer(profile, data=data, partial=partial)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response({"error_code": 400, "error_message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            data['avatar'] = base64_bytes.decode('utf-8')
+
+        serializer = self.get_serializer(profile, data=data, partial=partial)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(
+            {"error_code": 400, "error_message": serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST
+        )

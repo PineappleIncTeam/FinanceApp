@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
+from django.http import JsonResponse
+
 
 load_dotenv()
 
@@ -42,8 +44,8 @@ class VKOAuth2View(APIView):
                             "avatar": "https://pp.userapi.com/60tZWMo4SmwcploUVl9XEt8ufnTTvDUmQ6Bj1g/mmv1pcj63C4.png",
                             "sex": 2,
                             "verified": False,
-                            "birthday": "01.01.2000"
-                        }
+                            "birthday": "01.01.2000",
+                        },
                     }
                 },
             ),
@@ -72,10 +74,13 @@ class VKOAuth2View(APIView):
 
         response = requests.post(vk_api_url, data=payload)
 
+        print(response)
+
         if response.status_code != 200:
             return Response({"error": "Failed to exchange code"}, status=response.status_code)
 
         tokens = response.json()
+
         access_token = tokens.get("access_token")
 
         if not access_token:
@@ -83,10 +88,7 @@ class VKOAuth2View(APIView):
 
         # Получение личных данных пользователя
         user_info_url = "https://id.vk.com/oauth2/user_info"
-        user_info_payload = {
-            "access_token": access_token,
-            "client_id": os.getenv("CLIENT_ID")
-        }
+        user_info_payload = {"access_token": access_token, "client_id": os.getenv("CLIENT_ID")}
         user_info_response = requests.post(user_info_url, data=user_info_payload)
 
         if user_info_response.status_code != 200:
@@ -94,12 +96,31 @@ class VKOAuth2View(APIView):
 
         user_info = user_info_response.json()
 
-        return Response(
-            {
-                "access_token": access_token,
-                "refresh_token": tokens["refresh_token"],
-                "id_token": tokens["id_token"],
-                "user_info": user_info,
-            },
-            status=status.HTTP_200_OK,
+        response = JsonResponse({"user_info": user_info}, status=status.HTTP_200_OK)
+
+        response.set_cookie(
+            key="access_token",
+            value=tokens["access_token"],
+            httponly=True,
+            secure=True,
+            samesite="Lax",
+            max_age=3600,
         )
+        response.set_cookie(
+            key="refresh_token",
+            value=tokens["refresh_token"],
+            httponly=True,
+            secure=True,
+            samesite="Lax",
+            max_age=7 * 24 * 3600,
+        )
+        response.set_cookie(
+            key="id_token",
+            value=tokens["id_token"],
+            httponly=True,
+            secure=True,
+            samesite="Lax",
+            max_age=3600,
+        )
+
+        return response
