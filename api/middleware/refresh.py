@@ -9,7 +9,8 @@ class RefreshTokenMiddleware(MiddlewareMixin):
 
             if refresh_token:
                 try:
-                    refresh_url = 'https://dev.freenance.store/api/v1/auth/refresh/'
+                    # http://127.0.0.1:8000/api/v1/auth/refresh/
+                    refresh_url = 'http://127.0.0.1:8000/api/v1/auth/refresh/'
                     refresh_response = requests.post(
                         refresh_url,
                         cookies={'refresh_token': refresh_token},
@@ -49,7 +50,6 @@ class RefreshTokenMiddleware(MiddlewareMixin):
                             samesite='Strict',
                             max_age=300
                         )
-
                         return django_response
                     else:
                         print("⚠️ Ответ от refresh: ", refresh_response.status_code)
