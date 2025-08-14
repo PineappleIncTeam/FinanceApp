@@ -10,6 +10,9 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from django.http import JsonResponse
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 load_dotenv()
@@ -74,7 +77,8 @@ class VKOAuth2View(APIView):
 
         response = requests.post(vk_api_url, data=payload)
 
-        print(response)
+        logger.debug(f"VK token exchange response status: {response.status_code}")
+        logger.debug(f"VK token exchange response body: {response.text}")
 
         if response.status_code != 200:
             return Response({"error": "Failed to exchange code"}, status=response.status_code)
@@ -82,6 +86,7 @@ class VKOAuth2View(APIView):
         tokens = response.json()
 
         access_token = tokens.get("access_token")
+        print(tokens)
 
         if not access_token:
             return Response({"error": "No access token received"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
