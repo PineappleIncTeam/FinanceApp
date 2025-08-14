@@ -11,6 +11,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 DEBUG = True
 
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -262,6 +263,12 @@ LOGGING = {
             "level": "INFO",
             "handlers": ["console", "file"],
         },
+        "your_app.vkoauth2": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+
     },
 }
 
