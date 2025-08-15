@@ -77,8 +77,8 @@ class VKOAuth2View(APIView):
 
         response = requests.post(vk_api_url, data=payload)
 
-        logger.debug(f"VK token exchange response status: {response.status_code}")
-        logger.debug(f"VK token exchange response body: {response.text}")
+        logger.info(f"VK token exchange response status: {response.status_code}")
+        logger.info(f"VK token exchange response body: {response.text}")
 
         if response.status_code != 200:
             return Response({"error": "Failed to exchange code"}, status=response.status_code)
