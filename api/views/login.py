@@ -14,7 +14,6 @@ from api.serializers import LoginSerializer
 from api.serializers.profile import ErrorSerializer
 
 
-
 class LoginView(GenericAPIView):
     permission_classes = [AllowAny]
 
@@ -57,11 +56,12 @@ class LoginView(GenericAPIView):
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class TokenRefreshView(GenericAPIView):
+    permission_classes = [AllowAny]
     @swagger_auto_schema(
         operation_id='Обновление токена',
         operation_description='Обновление токена',
         responses={
-            200: openapi.Response(description="Список категорий успешно получен"),
+            200: openapi.Response(description="Новый access-токен успешно выдан"),
             500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
             401: openapi.Response(description="Ошибка токена", schema=ErrorSerializer),
         }

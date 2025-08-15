@@ -60,10 +60,10 @@ class ProfileApiView(RetrieveUpdateAPIView):
             'nickname': request.data.get('nickname'),
             'gender': request.data.get('gender'),
             'country': request.data.get('country'),
-            'default': request.data.get('default')
+            'defaultAvatar': request.data.get('defaultAvatar')
         }
         uploaded_file = request.FILES.get('avatar')
-        default_value = int(request.data.get('default', 0))
+        default_value = int(request.data.get('defaultAvatar', 0))
         if default_value != 0 and uploaded_file:
             return Response(
                 {"error_code": 400, "error_message": "avatar is not default"},
