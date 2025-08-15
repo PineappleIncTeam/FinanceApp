@@ -12,7 +12,6 @@ from rest_framework.permissions import AllowAny
 
 from api.serializers import LoginSerializer
 from api.serializers.profile import ErrorSerializer
-from api.validators.refresh import NoOpAuthentication
 
 
 class LoginView(GenericAPIView):
@@ -57,7 +56,6 @@ class LoginView(GenericAPIView):
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class TokenRefreshView(GenericAPIView):
-    authentication_classes = [NoOpAuthentication]
     permission_classes = [AllowAny]
     @swagger_auto_schema(
         operation_id='Обновление токена',
