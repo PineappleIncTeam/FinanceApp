@@ -1,3 +1,5 @@
+import logging
+
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.exceptions import AuthenticationFailed
@@ -13,6 +15,7 @@ from rest_framework.permissions import AllowAny
 from api.serializers import LoginSerializer
 from api.serializers.profile import ErrorSerializer
 
+logger = logging.getLogger(__name__)
 
 class LoginView(GenericAPIView):
     permission_classes = [AllowAny]
@@ -31,7 +34,9 @@ class LoginView(GenericAPIView):
         password = request.data.get('password')
 
         User = get_user_model()
-
+        logger.info(
+            "PASS: %s, EMAIL: %s", password, email
+        )
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
