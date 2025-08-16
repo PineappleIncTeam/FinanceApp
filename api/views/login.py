@@ -4,7 +4,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth import authenticate
+from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.http import JsonResponse
@@ -29,31 +29,39 @@ class LoginView(GenericAPIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
-        user = authenticate(request, email=email, password=password)
 
-        if user is not None:
-            refresh = RefreshToken.for_user(user)
-            access = str(refresh.access_token)
-            response = JsonResponse({'access': access})
-            response.set_cookie(
-                key='refresh_token',
-                value=str(refresh),
-                httponly=True,
-                secure=True,
-                samesite='Strict',
-                max_age=7 * 24 * 60 * 60
-            )
-            response.set_cookie(
-                key='access_token',
-                value=access,
-                httponly=True,
-                secure=True,
-                samesite='Strict',
-                max_age=5 * 60
-            )
-            return response
+        User = get_user_model()
 
-        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'error': 'Пользователь не найден'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if not user.check_password(password):
+            return Response({'error': 'Неверный пароль'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        refresh = RefreshToken.for_user(user)
+        access = str(refresh.access_token)
+
+        response = JsonResponse({'access': access})
+        response.set_cookie(
+            key='refresh_token',
+            value=str(refresh),
+            httponly=True,
+            secure=True,
+            samesite='Strict',
+            max_age=7 * 24 * 60 * 60
+        )
+        response.set_cookie(
+            key='access_token',
+            value=access,
+            httponly=True,
+            secure=True,
+            samesite='Strict',
+            max_age=5 * 60
+        )
+        return response
+
 
 class TokenRefreshView(GenericAPIView):
     permission_classes = [AllowAny]
