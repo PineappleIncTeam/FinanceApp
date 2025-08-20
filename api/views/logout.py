@@ -12,7 +12,6 @@ from api.serializers.profile import ErrorSerializer
 
 class CustomLogoutView(GenericAPIView):
     serializer_class = LogoutSerializer
-    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_id='Выход из аккаунта',
