@@ -79,8 +79,8 @@ class VKOAuth2View(APIView):
 
         logger.error(f"VK token exchange response status: {response.status_code}")
         logger.error(f"VK token exchange response body: {response.text}")
-        logger.error(f"Client id: {client_id}")
-        print(client_id)
+        logger.error(f"{payload}")
+        print(payload)
 
         if response.status_code != 200:
             return Response({"error": "Failed to exchange code"}, status=response.status_code)
