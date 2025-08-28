@@ -14,7 +14,7 @@ from api.models import User
 
 
 class TokenInvalidException(APIException):
-    status_code = 407
+    status_code = 403
     default_detail = "Token is invalid or expired."
     default_code = "token_invalid"
 
