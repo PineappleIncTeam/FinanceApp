@@ -1,5 +1,3 @@
-from random import choices
-
 from django.db import models
 from django.db.models import SET_NULL
 
@@ -8,18 +6,6 @@ import uuid
 
 from .countries import Country
 from .users import User
-
-DEFAULT_TYPES = [
-    (0, "not default"),
-    (1, "default 1"),
-    (2, "default 2"),
-    (3, "default 3"),
-    (4, "default 4"),
-    (5, "default 5"),
-    (6, "default 6"),
-    (7, "default 7"),
-    (8, "default 8"),
-]
 
 def upload_to(instance, filename):
     ext = filename.split(".")[-1]
@@ -32,7 +18,6 @@ class Profile(models.Model):
     gender = models.CharField(max_length=10, choices=[("M", "Male"), ("F", "Female")], null=True)
     country = models.ForeignKey(Country, on_delete=SET_NULL, null=True)
     avatar = models.ImageField(upload_to=upload_to, null=True, blank=True)
-    defaultAvatar = models.IntegerField(choices=DEFAULT_TYPES, null=False, default=0)
 
     def __str__(self):
         return f"{self.nick_name} Profile"

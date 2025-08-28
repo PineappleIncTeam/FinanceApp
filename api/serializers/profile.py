@@ -11,7 +11,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ["nickname", "gender", "country", "country_name", "avatar", "defaultAvatar"]
+        fields = ["nickname", "gender", "country", "country_name", "avatar"]
         read_only_fields = ["country_name"]
 
     @extend_schema_field(serializers.CharField())
