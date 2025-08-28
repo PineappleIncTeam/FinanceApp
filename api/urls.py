@@ -15,7 +15,7 @@ from api.views import (
     TargetMoneyReturnAPI,
     TargetsListCreateAPI,
     TargetUpdateDestroyAPI,
-    password_reset_api_controller,
+    PasswordResetConfirmView,
     VKOAuth2View,
     CurrencyDataView,
     OperationAllView,
@@ -34,7 +34,7 @@ urlpatterns = [
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     path("auth/logout/", CustomLogoutView.as_view(), name="custom-logout"),
-    path("password/reset/confirm/", password_reset_api_controller, name="reset-password"),
+    path("password/reset/confirm/", PasswordResetConfirmView.as_view(), name="reset-password"),
 
     path("targets/", TargetsListCreateAPI.as_view(), name="targets"),
     path("targets/<int:pk>/", TargetUpdateDestroyAPI.as_view(), name="target-info"),
