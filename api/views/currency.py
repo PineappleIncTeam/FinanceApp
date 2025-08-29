@@ -1,6 +1,7 @@
 from django.core.cache import cache
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -9,6 +10,8 @@ from api.serializers import CurrencyDataSerializer
 
 
 class CurrencyDataView(APIView):
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         operation_id="Получение данных о валютах",
         operation_description="Получить данные о валютах из кэша или базы данных",

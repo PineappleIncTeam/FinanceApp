@@ -7,6 +7,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 import requests
 from rest_framework.parsers import MultiPartParser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from FinanceBackend.settings import CHEQUE_API_KEY
@@ -14,6 +15,7 @@ from FinanceBackend.settings import CHEQUE_API_KEY
 
 class ChequeView(GenericAPIView):
     parser_classes = [MultiPartParser]
+    permission_classes = [IsAuthenticated]
     
     @swagger_auto_schema(
         operation_id='Получение информации по чеку',
