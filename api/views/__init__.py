@@ -2,7 +2,7 @@ from .categories import CategoriesListCreateAPI, CategoryUpdateDestroyAPI, Categ
 from .cheque import ChequeView
 from .countries import CountriesApiView
 from .generate_token import CustomTokenCreateAPI
-from .login import LoginView, TokenRefreshView
+from .login import LoginView, TokenRefreshView, TokenVerifyView
 from .logout import CustomLogoutView
 from .operation import OperationListCreateAPI, OperationRetrieveUpdateDestroyAPI, OperationAllView
 from .password_reset import PasswordResetConfirmView
@@ -38,5 +38,6 @@ __all__ = [
     "ChequeView",
     "CategoryGetAPI",
     "LoginView",
-    "TokenRefreshView"
+    "TokenRefreshView",
+    "TokenVerifyView"
 ]

@@ -6,12 +6,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.exceptions import TokenError
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.http import JsonResponse
 from rest_framework.permissions import AllowAny
 
 from api.serializers import LoginSerializer
 from api.serializers.profile import ErrorSerializer
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 
 
 class LoginView(GenericAPIView):
@@ -88,4 +89,28 @@ class TokenRefreshView(GenericAPIView):
             return response
 
         except TokenError:
-            raise AuthenticationFailed('Недействительный или просроченный refresh-токен')
+            raise AuthenticationFailed('Недействительный или просроченный refresh-токен')\
+
+class TokenVerifyView(GenericAPIView):
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(
+        operation_id="Проверка токена",
+        operation_description="Проверка валидности access-токена из cookies",
+        responses={
+            200: openapi.Response(description="Токен валиден"),
+            401: openapi.Response(description="Недействительный токен", schema=ErrorSerializer),
+        }
+    )
+    def get(self, request):
+        access_token = request.COOKIES.get('access_token')
+
+        if not access_token:
+            return Response({'error': 'Access-токен отсутствует в cookies'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            token = AccessToken(access_token)
+            return Response({'detail': 'Access-токен валиден'}, status=status.HTTP_200_OK)
+
+        except (TokenError, InvalidToken):
+            return Response({'error': 'Недействительный или просроченный access-токен'}, status=status.HTTP_401_UNAUTHORIZED)

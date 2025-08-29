@@ -26,12 +26,14 @@ from api.views import (
     LoginView,
     ChequeView,
     CategoryGetAPI,
+    TokenVerifyView,
 )
 
 urlpatterns = [
     path("auth/", include("djoser.urls")),
     path('auth/login/', LoginView.as_view(), name='login'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/check/', TokenVerifyView.as_view(), name='token_refresh'),
 
     path("auth/logout/", CustomLogoutView.as_view(), name="custom-logout"),
     path("password/reset/confirm/", PasswordResetConfirmView.as_view(), name="reset-password"),
