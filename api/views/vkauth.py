@@ -94,7 +94,7 @@ class VKOAuth2View(APIView):
         print(tokens)
 
         if not access_token:
-            return Response({"error": "No access token received"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": "No access token received"}, status=status.HTTP_403_FORBIDDEN)
 
         # Получение личных данных пользователя
         user_info_url = "https://id.vk.com/oauth2/user_info"
