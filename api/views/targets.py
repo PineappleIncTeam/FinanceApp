@@ -100,7 +100,7 @@ class TargetUpdateDestroyAPI(GenericAPIView):
         503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
     })
     def put(self, request, *args, **kwargs):
-        instance = self.get_object(kwargs['pk'])
+        instance = Target.objects.get(pk=kwargs['pk'])
         serializer = TargetsSerializer(instance, data=request.data, partial=True)
 
         if serializer.is_valid():
@@ -122,7 +122,7 @@ class TargetUpdateDestroyAPI(GenericAPIView):
         503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
     })
     def delete(self, request, *args, **kwargs):
-        instance = self.get_object(kwargs['pk'])
+        instance = Target.objects.get(pk=kwargs['pk'])
 
         if instance.is_deleted:
             return Response({"detail": "Цель уже закрыта."}, status=status.HTTP_404_NOT_FOUND)
