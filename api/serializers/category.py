@@ -32,27 +32,39 @@ class CategoriesSerializer(serializers.ModelSerializer):
                     category.is_deleted = False
                     category.save()
                     logger.info(
-                        f"The user [ID: {self.context.get('request').user.pk},"
-                        f" name: {self.context.get('request').user.email}] "
-                        f"has retrieved a category {validated_data['name']} "
-                        f"from the archive."
+                        "The user [ID: %s,"
+                        " name: %s "
+                        "has retrieved a category %s "
+                        "from the archive.",
+                        self.context.get('request').user.pk,
+                        self.context.get('request').user.name,
+                        validated_data['name']
                     )
                     return category
 
                 else:
                     logger.error(
-                        f"The user [ID: {self.context.get('request').user.pk},"
-                        f" name: {self.context.get('request').user.email}] "
-                        f"can not add a new category {validated_data['name']} "
-                        f"because of category existance."
+                        "The user [ID: %s,"
+                        " name: %s] "
+                        "can not add a new category %s "
+                        "because of category existance.",
+                        self.context.get('request').user.pk,
+                        self.context.get('request').user.name,
+                        validated_data['name']
+
                     )
+
+
 
                     raise CategoryExistsError()
 
         logger.info(
-            f"The user [ID: {self.context.get('request').user.pk}, "
-            f"name: {self.context.get('request').user.email}] "
-            f"successfully added a new category {validated_data['name']}."
+            "The user [ID: %s, "
+            "name: %s] "
+            "successfully added a new category %s.",
+            self.context.get('request').user.pk,
+            self.context.get('request').user.name,
+            validated_data['name']
         )
         return super().create(validated_data)
 
@@ -68,11 +80,14 @@ class CategoriesSerializer(serializers.ModelSerializer):
             not data["is_income"] and not data["is_outcome"]
         ):
             logger.error(
-                f"The user [ID: {self.context.get('request').user.pk}, "
-                f"name: {self.context.get('request').user.email}] "
-                f"can not define a category {data['name']} "
-                f"as both types (income, outcome) at the same time or can not "
-                f"add a category without type (both of types is False)."
+                "The user [ID: %s, "
+                "name: %s] "
+                "can not define a category %s "
+                "as both types (income, outcome) at the same time or can not "
+                "add a category without type (both of types is False).",
+                self.context.get('request').user.pk,
+                self.context.get('request').user.name,
+                data['name']
             )
             raise serializers.ValidationError(
                 "Invalid category type (the same data for fields "
