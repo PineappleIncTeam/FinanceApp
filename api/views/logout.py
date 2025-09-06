@@ -28,8 +28,13 @@ class CustomLogoutView(GenericAPIView):
             {"detail": "Successfully logged out."},
             status=status.HTTP_200_OK
         )
+
+        access_token = request.COOKIES.get('access_token')
+        response.delete_cookie(access_token)
+
         cookies = request.COOKIES
         for i in cookies:
+
             response.delete_cookie(i)
 
         return response
