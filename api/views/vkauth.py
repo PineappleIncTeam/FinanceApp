@@ -53,7 +53,7 @@ class VKOAuth2View(APIView):
                 },
             ),
             400: openapi.Response(description="Неверные параметры запроса"),
-            500: openapi.Response(description="Ошибка сервера"),
+            403: openapi.Response(description="Токен не получен"),
         },
     )
     def post(self, request):
@@ -81,9 +81,6 @@ class VKOAuth2View(APIView):
         logger.error(f"VK token exchange response body: {response.text}")
         logger.error(f"{payload}")
 
-        email = os.getenv("EMAIL_HOST")
-        print(email)
-        print(payload)
 
         if response.status_code != 200:
             return Response({"error": "Failed to exchange code"}, status=response.status_code)
@@ -91,7 +88,6 @@ class VKOAuth2View(APIView):
         tokens = response.json()
 
         access_token = tokens.get("access_token")
-        print(tokens)
 
         if not access_token:
             return Response({"error": "No access token received"}, status=status.HTTP_403_FORBIDDEN)
