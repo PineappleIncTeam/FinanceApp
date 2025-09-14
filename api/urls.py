@@ -27,6 +27,7 @@ from api.views import (
     ChequeView,
     CategoryGetAPI,
     TokenVerifyView,
+    LogoutView
 )
 
 urlpatterns = [
@@ -65,6 +66,7 @@ urlpatterns = [
     path("import/xls/", OperationXLSView.as_view(), name="import_xls"),
   
     path("cheque", ChequeView.as_view(), name="cheque info"),
+    path("vklogout/", LogoutView.as_view(), name="vklogout"),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
