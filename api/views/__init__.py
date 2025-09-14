@@ -12,6 +12,7 @@ from .targets import TargetMoneyReturnAPI, TargetsListCreateAPI, TargetUpdateDes
 from .vkauth import VKOAuth2View
 from .currency import CurrencyDataView
 from .importdata import OperationPDFView, OperationXLSView
+from .vklogout import LogoutView
 
 __all__ = [
     "PasswordResetConfirmView",
@@ -39,5 +40,6 @@ __all__ = [
     "CategoryGetAPI",
     "LoginView",
     "TokenRefreshView",
-    "TokenVerifyView"
+    "TokenVerifyView",
+    "LogoutView"
 ]
