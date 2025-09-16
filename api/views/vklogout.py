@@ -7,8 +7,8 @@ from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from api.serializers import LogoutResponseSerializer, ErrorSerializer
-
+from api.serializers.vklogout import LogoutResponseSerializer
+from api.serializers.profile import ErrorSerializer
 
 class LogoutView(GenericAPIView):
 
