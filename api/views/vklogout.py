@@ -7,16 +7,16 @@ from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from api.serializers.vklogout import LogoutResponseSerializer
+from api.serializers.vklogout import LogoutRequestSerializer, LogoutResponseSerializer
 from api.serializers.profile import ErrorSerializer
 
 class LogoutView(GenericAPIView):
-
     serializer_class = LogoutResponseSerializer
 
     @swagger_auto_schema(
         operation_id='Выход из аккаунта пользователя',
         operation_description='Метод завершает сессию пользователя через VK API и инвалидирует токен',
+        request_body=LogoutRequestSerializer,
         responses={
             200: openapi.Response(description="Сессия успешно завершена", schema=LogoutResponseSerializer),
             400: openapi.Response(description="Некорректный запрос", schema=ErrorSerializer),
@@ -45,7 +45,6 @@ class LogoutView(GenericAPIView):
                 "error_description": "Access token не передан"
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # Запрос к VK API для завершения сессии
         try:
             vk_response = requests.post(
                 "https://id.vk.ru/oauth2/logout",
@@ -61,7 +60,6 @@ class LogoutView(GenericAPIView):
                 "error_description": "Не удалось связаться с сервером авторизации VK"
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # Обработка ответа VK
         if vk_response.status_code == 200:
             data = vk_response.json()
             if data.get("response") == 1:
