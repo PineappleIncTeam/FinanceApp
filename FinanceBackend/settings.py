@@ -214,6 +214,15 @@ DJOSER = {
         "token_create": "api.serializers.CustomTokenCreateSerializer",
     },
     "EMAIL": {"activation": "api.email.ActivationEmail"},
+
+    "DISABLED_ENDPOINTS": [
+        "users",             # отключает GET /auth/users/
+        "users_delete",      # отключает DELETE /auth/users/me/
+        "user",              # отключает GET /auth/users/{id}/
+        "user_delete",       # отключает DELETE /auth/users/{id}/
+        "user_update",       # отключает PUT /auth/users/{id}/
+        "user_partial_update",  # отключает PATCH /auth/users/{id}/
+    ],
 }
 
 PASSWORD_RESET_TIMEOUT = 3600
