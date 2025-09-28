@@ -13,6 +13,7 @@ from .vkauth import VKOAuth2View
 from .currency import CurrencyDataView
 from .importdata import OperationPDFView, OperationXLSView
 from .vklogout import LogoutView
+from .vkchecktoken import VKCheckTokenView
 
 __all__ = [
     "PasswordResetConfirmView",
@@ -41,5 +42,6 @@ __all__ = [
     "LoginView",
     "TokenRefreshView",
     "TokenVerifyView",
-    "LogoutView"
+    "LogoutView",
+    "VKCheckTokenView"
 ]
