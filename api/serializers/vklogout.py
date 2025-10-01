@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+
 class LogoutRequestSerializer(serializers.Serializer):
     client_id = serializers.CharField(help_text="Идентификатор приложения")
     access_token = serializers.CharField(help_text="Access token пользователя")
