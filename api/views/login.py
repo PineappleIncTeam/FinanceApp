@@ -5,19 +5,18 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
-from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.http import JsonResponse
 from rest_framework.permissions import AllowAny
 
-from api.serializers import LoginSerializer
+from api.serializers import LoginSerializer, TokenRefreshSerializer, TokenVerifySerializer
 from api.serializers.profile import ErrorSerializer
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 
 
 class LoginView(GenericAPIView):
     permission_classes = [AllowAny]
-
+    serializer_class = LoginSerializer
     @swagger_auto_schema(
         operation_id="Авторизация",
         operation_description="Авторизация пользователя",
@@ -57,10 +56,11 @@ class LoginView(GenericAPIView):
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class TokenRefreshView(GenericAPIView):
+    serializer_class = TokenRefreshSerializer
     permission_classes = [AllowAny]
     @swagger_auto_schema(
         operation_id='Обновление токена',
-        operation_description='Обновление токена',
+        operation_description='Обновление токенаааа',
         responses={
             200: openapi.Response(description="Новый access-токен успешно выдан"),
             500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
@@ -92,6 +92,7 @@ class TokenRefreshView(GenericAPIView):
             raise AuthenticationFailed('Недействительный или просроченный refresh-токен')\
 
 class TokenVerifyView(GenericAPIView):
+    serializer_class = TokenVerifySerializer
     permission_classes = [AllowAny]
 
     @swagger_auto_schema(

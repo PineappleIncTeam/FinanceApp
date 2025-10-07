@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     "api.apps.ApiConfig",
     "drf_spectacular",
     "drf_spectacular_sidecar",
-    "drf_yasg",
+    # "drf_yasg",
     "whitenoise.runserver_nostatic",
     "django_filters",
     "django_celery_beat",
@@ -148,6 +148,9 @@ SPECTACULAR_SETTINGS = {
     "SWAGGER_UI_DIST": "SIDECAR",
     "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
     "REDOC_DIST": "SIDECAR",
+    "EXTENSIONS": [
+        "api.validators.spectacular_extensions.CookieJWTAuthenticationScheme",
+    ],
 }
 
 CSP_DEFAULT_SRC = ("'self'", "'unsafe-inline'")

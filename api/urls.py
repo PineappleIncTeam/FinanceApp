@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path
+from djoser.views import UserViewSet
 
 from api.views import (
     CategoriesListCreateAPI,
@@ -28,6 +29,9 @@ from api.views import (
     CategoryGetAPI,
     TokenVerifyView,
 )
+from rest_framework.routers import DefaultRouter
+router = DefaultRouter()
+router.register("users", UserViewSet, basename="user")
 
 urlpatterns = [
     path("auth/", include("djoser.urls")),
