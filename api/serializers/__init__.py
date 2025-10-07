@@ -6,6 +6,8 @@ from .target import TargetsSerializer
 from .user import CustomTokenCreateSerializer, CustomUserCreateSerializer
 from .profile import ProfileSerializer
 from .currency import CurrencyDataSerializer
+from .vklogout import LogoutResponseSerializer
+from .vkchecktoken import VKCheckTokenRequestSerializer, VKCheckTokenResponseSerializer
 
 __all__ = [
     "CustomTokenCreateSerializer",
@@ -19,4 +21,7 @@ __all__ = [
     "CountrySerializer",
     "CurrencyDataSerializer",
     "LoginSerializer",
+    "LogoutResponseSerializer",
+    "VKCheckTokenRequestSerializer",
+    "VKCheckTokenResponseSerializer",
 ]
