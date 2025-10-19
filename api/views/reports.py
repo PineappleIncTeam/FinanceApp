@@ -42,11 +42,12 @@ class ReportStatisticsView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = StatisticsSerializer
 
+
     @swagger_auto_schema(
-        operation_id='Расходы/доходы/акопленияпользователя',
-        operation_description='Получение расходов, доходов и накоплений пользователя',
+        operation_id='Получение статистики по категориям',
+        operation_description='Получение статистики по категориям',
     responses = {
-        200: openapi.Response(description="информация о расходах, доходах и накоплениях пользователя испешно получена", schema=ReportCategorySerializer),
+        200: openapi.Response(description="Статистика успешно получена", schema=StatisticsSerializer),
         401: openapi.Response(description="Неавторизованный запрос",
                               schema=ErrorSerializer),
         403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
@@ -74,10 +75,10 @@ class ReportCategoriesView(GenericAPIView):
     serializer_class = ReportCategorySerializer
 
     @swagger_auto_schema(
-        operation_id='Получение статистики по категориям',
-        operation_description='Получение статистики по категориям',
+        operation_id='Расходы/доходы/накопления пользователя',
+        operation_description='Получение расходов, доходов и накоплений пользователя',
     responses = {
-        200: openapi.Response(description="Статистика успешно получена", schema=StatisticsSerializer),
+        200: openapi.Response(description="информация о расходах, доходах и накоплениях пользователя испешно получена", schema=ReportCategorySerializer),
         401: openapi.Response(description="Неавторизованный запрос",
                               schema=ErrorSerializer),
         403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
