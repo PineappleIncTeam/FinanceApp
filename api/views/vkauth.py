@@ -13,7 +13,8 @@ import os
 from dotenv import load_dotenv
 import logging
 
-from api.views import VKCheckTokenView, LogoutView
+from api.views.vkchecktoken import VKCheckTokenView
+from api.views.vklogout import LogoutView
 
 logger = logging.getLogger(__name__)
 load_dotenv()
@@ -183,30 +184,21 @@ class VKOAuth2View(APIView):
             path="/",
         )
 
-        revoke_req = factory.post("/api/v1/vk/check-token/", {"token": access_token, "revoke": True}, format="json")
         try:
-            revoke_response = check_view(revoke_req)
-            revoke_status = getattr(revoke_response, "status_code", None)
-            revoke_data = getattr(revoke_response, "data", None) or {}
-            if revoke_status is None or revoke_status >= 400:
-                logger.warning(
-                    "VKCheckTokenView revoke returned non-2xx status: %s, data=%s", revoke_status, revoke_data
-                )
-        except Exception as exc:
-            logger.exception("VKCheckTokenView revoke call failed: %s", exc)
-
-        try:
-            vk_revoke = requests.post(
-                "https://api.vk.com/method/auth.revokeAuthorization",
-                params={"access_token": access_token, "v": "5.131"},
-                timeout=5,
+            logout_req = factory.post(
+                "/api/v1/vk/logout/",
+                {"client_id": os.getenv("CLIENT_ID"), "access_token": access_token},
+                format="json",
             )
-            if vk_revoke.status_code != 200:
-                try:
-                    logger.warning("VK API revoke returned non-200: %s", vk_revoke.json())
-                except ValueError:
-                    logger.warning("VK API revoke returned non-200 and non-json response")
-        except requests.RequestException:
-            logger.exception("VK API revoke request failed")
+            logout_view = LogoutView.as_view()
+            logout_resp = logout_view(logout_req)
+            logout_status = getattr(logout_resp, "status_code", None)
+            logout_data = getattr(logout_resp, "data", None) or {}
+            if logout_status is None or logout_status >= 400:
+                logger.warning("LogoutView returned non-2xx: %s, data=%s", logout_status, logout_data)
+            else:
+                logger.info("LogoutView succeeded: %s", logout_data)
+        except Exception as exc:
+            logger.exception("LogoutView call failed: %s", exc)
 
         return resp
