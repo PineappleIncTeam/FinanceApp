@@ -157,8 +157,8 @@ CSP_IMG_SRC = ("'self'", "data:")
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 CORS_ALLOWED_ORIGINS = [
-    "https://freenance.store",
-    "https://dev.freenance.store",
+    "https://freenance.space",
+    "https://dev.freenance.space",
     "http://localhost",
 ]
 
@@ -167,22 +167,22 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 ALLOWED_HOSTS = [
-    "freenance.store",
-    "dev.freenance.store",
+    "freenance.space",
+    "dev.freenance.space",
     "127.0.0.1",
     "localhost",
     os.getenv("FQDN_FOR_BLACKBOX")
 ]
 
 CORS_ORIGIN_WHITELIST = [
-    "https://freenance.store",
-    "https://dev.freenance.store",
+    "https://freenance.space",
+    "https://dev.freenance.space",
     "http://localhost",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://freenance.store",
-    "https://dev.freenance.store" "http://localhost",
+    "https://freenance.space",
+    "https://dev.freenance.space" "http://localhost",
 ]
 
 EMAIL_HOST = os.getenv("EMAIL_HOST")
