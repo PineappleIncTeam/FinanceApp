@@ -38,7 +38,7 @@ def get_user_categories(
     logger.info(
         "The user [ID: %s, name: %s] successfully received a list of the users's categories.",
         user.pk,
-        user.email
+        user.username
     )
 
     return query_result
@@ -58,7 +58,7 @@ def get_user_targets(
     logger.info(
         "The user [ID: %s, name: %s] successfully received a list of the users's targets.",
         user.pk,
-        user.email
+        user.username
     )
 
     return query_result

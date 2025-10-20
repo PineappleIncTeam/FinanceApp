@@ -37,7 +37,7 @@ class CategoriesSerializer(serializers.ModelSerializer):
                         "has retrieved a category %s "
                         "from the archive.",
                         self.context.get('request').user.pk,
-                        self.context.get('request').user.name,
+                        self.context.get('request').user.username,
                         validated_data['name']
                     )
                     return category
@@ -49,7 +49,7 @@ class CategoriesSerializer(serializers.ModelSerializer):
                         "can not add a new category %s "
                         "because of category existance.",
                         self.context.get('request').user.pk,
-                        self.context.get('request').user.name,
+                        self.context.get('request').user.username,
                         validated_data['name']
 
                     )
@@ -63,7 +63,7 @@ class CategoriesSerializer(serializers.ModelSerializer):
             "name: %s] "
             "successfully added a new category %s.",
             self.context.get('request').user.pk,
-            self.context.get('request').user.name,
+            self.context.get('request').user.username,
             validated_data['name']
         )
         return super().create(validated_data)
@@ -86,7 +86,7 @@ class CategoriesSerializer(serializers.ModelSerializer):
                 "as both types (income, outcome) at the same time or can not "
                 "add a category without type (both of types is False).",
                 self.context.get('request').user.pk,
-                self.context.get('request').user.name,
+                self.context.get('request').user.username,
                 data['name']
             )
             raise serializers.ValidationError(
