@@ -8,7 +8,7 @@
 FinanceApp is an API that implements a service for financial accounting.
 
 ___
-
+ 
 
 ## Contents:
 
