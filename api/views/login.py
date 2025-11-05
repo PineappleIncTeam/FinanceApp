@@ -11,6 +11,7 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.http import JsonResponse
 from rest_framework.permissions import AllowAny
 
+from api.models import User
 from api.serializers import LoginSerializer
 from api.serializers.profile import ErrorSerializer
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
@@ -18,6 +19,7 @@ from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 
 class LoginView(GenericAPIView):
     permission_classes = [AllowAny]
+    serializer_class = LoginSerializer
 
     @swagger_auto_schema(
         operation_id="Авторизация",
@@ -29,28 +31,45 @@ class LoginView(GenericAPIView):
         },
     )
     def post(self, request):
-        email = request.data.get("email")
-        password = request.data.get("password")
-        user = authenticate(request, email=email, password=password)
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        if user is not None:
-            refresh = RefreshToken.for_user(user)
-            access = str(refresh.access_token)
-            response = JsonResponse({"access": access})
-            response.set_cookie(
-                key="refresh_token",
-                value=str(refresh),
-                httponly=True,
-                secure=True,
-                samesite="Strict",
-                max_age=7 * 24 * 60 * 60,
-            )
-            response.set_cookie(
-                key="access_token", value=access, httponly=True, secure=True, samesite="Strict", max_age=5 * 60
-            )
-            return response
+        email = serializer.validated_data["email"]
+        password = serializer.validated_data["password"]
 
-        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if not user.check_password(password):
+            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if not user.is_active:
+            return Response({"error": "User account is not active"}, status=status.HTTP_400_BAD_REQUEST)
+
+        refresh = RefreshToken.for_user(user)
+        access = str(refresh.access_token)
+
+        response = JsonResponse({"access": access})
+        response.set_cookie(
+            key="refresh_token",
+            value=str(refresh),
+            httponly=True,
+            secure=True,
+            samesite="Strict",
+            max_age=7 * 24 * 60 * 60,
+        )
+        response.set_cookie(
+            key="access_token",
+            value=access,
+            httponly=True,
+            secure=True,
+            samesite="Strict",
+            max_age=5 * 60,
+        )
+        return response
 
 
 class TokenRefreshView(GenericAPIView):
