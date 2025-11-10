@@ -151,7 +151,7 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-DOMAIN = 'freenance.online'
+DOMAIN = 'freenance.space'
 SITE_NAME = 'Freenance App'
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL':
