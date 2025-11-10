@@ -112,29 +112,32 @@ REST_FRAMEWORK = {
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CORS_ALLOWED_ORIGINS = [
-    "https://freenance.online",
-    "https://back.freenance.online"
+    "https://freenance.space",
+    "https://dev.freenance.space",
+    "http://localhost",
 ]
+
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 ALLOWED_HOSTS = [
-    "92.255.79.239",
-    "freenance.online",
-    "back.freenance.online",
+    "freenance.space",
+    "dev.freenance.space",
     "127.0.0.1",
-    os.getenv("FQDN_FOR_BLACKBOX"),
+    "localhost",
+    os.getenv("FQDN_FOR_BLACKBOX")
 ]
 
 CORS_ORIGIN_WHITELIST = [
-    "https://freenance.online",
-    "https://back.freenance.online"
+    "https://freenance.space",
+    "https://dev.freenance.space",
+    "http://localhost",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://freenance.online",
-    "https://back.freenance.online"
+    "https://freenance.space",
+    "https://dev.freenance.space" "http://localhost",
 ]
 
 EMAIL_HOST = os.getenv('EMAIL_HOST')
