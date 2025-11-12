@@ -44,10 +44,10 @@ class LoginView(GenericAPIView):
             return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
         if not user.check_password(password):
-            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not user.is_active:
-            return Response({"error": "User account is not active"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "User account is not active"}, status=status.HTTP_401_UNAUTHORIZED)
 
         refresh = RefreshToken.for_user(user)
         access = str(refresh.access_token)
