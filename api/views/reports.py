@@ -89,11 +89,15 @@ class ReportCategoriesView(GenericAPIView):
     def get(self, request):
         operation_type = request.query_params.get("type", "outcome")
 
-        start_date, end_date = get_and_check_date_params(
+        start_date, end_date, tyoe = get_and_check_date_params(
             request.query_params.get("start_date"),
-            request.query_params.get("end_date")
+            request.query_params.get("end_date"),
         )
 
-        results = get_category_report_data(operation_type, end_date, start_date)
+        results = get_category_report_data(operation_type, start_date, end_date)
 
-        return Response(ReportCategorySerializer(list(results.values()), many=True).data)
+        serialized = ReportCategorySerializer(list(results.values()), many=True).data
+        return Response({
+            "categoryType": operation_type,
+            "results": serialized
+        })
