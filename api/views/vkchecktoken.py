@@ -6,6 +6,7 @@ from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
+
 from api.serializers.vkchecktoken import (
     VKCheckTokenRequestSerializer,
     VKCheckTokenResponseSerializer,
@@ -42,7 +43,8 @@ class VKCheckTokenView(GenericAPIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        params = {"token": token, "access_token": settings.VK_SERVICE_KEY, "v": "5.131"}  # сервисный ключ доступа
+        params = {"token": token, "access_token": settings.VK_SERVICE_KEY, "v": "5.199"}  # сервисный ключ доступа
+        print(params)
         if ip:
             params["ip"] = ip
 

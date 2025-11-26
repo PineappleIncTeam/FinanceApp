@@ -77,23 +77,43 @@ class ReportCategoriesView(GenericAPIView):
     @swagger_auto_schema(
         operation_id='Расходы/доходы/накопления пользователя',
         operation_description='Получение расходов, доходов и накоплений пользователя',
-    responses = {
-        200: openapi.Response(description="информация о расходах, доходах и накоплениях пользователя испешно получена", schema=ReportCategorySerializer),
-        401: openapi.Response(description="Неавторизованный запрос",
-                              schema=ErrorSerializer),
-        403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
-        409: openapi.Response(description="Произошла непредвиденная ошибка при получении информации", schema=ErrorSerializer),
-        500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
-        503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
-    })
-    def get(self, request):
+        responses={
+            200: openapi.Response(
+                description="Информация о расходах, доходах и накоплениях пользователя успешно получена",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "is_income": openapi.Schema(type=openapi.TYPE_BOOLEAN, description="Флаг: это доходы"),
+                        "is_outcome": openapi.Schema(type=openapi.TYPE_BOOLEAN, description="Флаг: это расходы"),
+                        "is_target": openapi.Schema(type=openapi.TYPE_BOOLEAN, description="Флаг: это накопления/цели"),
+                        "results": openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Items(type=openapi.TYPE_OBJECT)
+                        ),
+                    },
+                ),
+            ),
+            401: openapi.Response(description="Неавторизованный запрос", schema=ErrorSerializer),
+            403: openapi.Response(description="Доступ запрещен/не хватает прав", schema=ErrorSerializer),
+            409: openapi.Response(description="Непредвиденная ошибка при получении информации", schema=ErrorSerializer),
+            500: openapi.Response(description="Ошибка сервера", schema=ErrorSerializer),
+            503: openapi.Response(description="Сервер не готов обработать запрос в данный момент", schema=ErrorSerializer),
+        },
+    )
+    def get(self, request: Request) -> Response:
         operation_type = request.query_params.get("type", "outcome")
 
         start_date, end_date = get_and_check_date_params(
             request.query_params.get("start_date"),
-            request.query_params.get("end_date")
+            request.query_params.get("end_date"),
         )
 
-        results = get_category_report_data(operation_type, end_date, start_date)
+        results = get_category_report_data(operation_type, start_date, end_date)
+        serialized = ReportCategorySerializer(list(results.values()), many=True).data
 
-        return Response(ReportCategorySerializer(list(results.values()), many=True).data)
+        return Response({
+            "is_income": operation_type == "income",
+            "is_outcome": operation_type == "outcome",
+            "is_target": operation_type == "target",
+            "results": serialized,
+        })
