@@ -3,7 +3,6 @@ from typing import Optional
 from pydantic import (
     Field,
     SecretStr,
-    AnyHttpUrl,
     field_validator,
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -50,12 +49,12 @@ class Settings(BaseSettings):
         return ssl
 
 
-    REDIS_ADR: AnyHttpUrl = "http://localhost:6379"
+    REDIS_ADR: str = "http://localhost:6379"
 
 
     CLIENT_ID: str
-    CL_SECRET: SecretStr = Field(..., alias="CLIENT_SECRET")
-    REDIRECT_URI: AnyHttpUrl
+    CL_SECRET: Optional[SecretStr] = Field(None, alias="CLIENT_SECRET")
+    REDIRECT_URI: str
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
