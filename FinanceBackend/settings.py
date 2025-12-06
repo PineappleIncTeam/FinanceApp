@@ -2,13 +2,11 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
-from dotenv import load_dotenv
-
-load_dotenv()
+from FinanceBackend.config import settings
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = settings.SECRET_KEY
 
 DEBUG = True
 
@@ -71,11 +69,11 @@ WSGI_APPLICATION = "FinanceBackend.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.getenv("PG_NAME"),
-        "USER": os.getenv("PG_USER"),
-        "PASSWORD": os.getenv("PG_PASSWORD"),
-        "HOST": os.getenv("PG_HOST"),
-        "PORT": os.getenv("PG_PORT"),
+        "NAME": settings.PG_NAME,
+        "USER": settings.PG_USER,
+        "PASSWORD": settings.PG_PASSWORD,
+        "HOST": settings.PG_HOST,
+        "PORT": settings.PG_PORT,
     }
 }
 
@@ -171,7 +169,7 @@ ALLOWED_HOSTS = [
     "dev.freenance.space",
     "127.0.0.1",
     "localhost",
-    os.getenv("FQDN_FOR_BLACKBOX")
+    settings.FQDN_FOR_BLACKBOX
 ]
 
 CORS_ORIGIN_WHITELIST = [
@@ -185,18 +183,18 @@ CSRF_TRUSTED_ORIGINS = [
     "https://dev.freenance.space" "http://localhost",
 ]
 
-EMAIL_HOST = os.getenv("EMAIL_HOST")
-EMAIL_PORT = os.getenv("EMAIL_PORT")
-EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS")
-#EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL")
+EMAIL_HOST = settings.EMAIL_HOST
+EMAIL_PORT = settings.EMAIL_PORT
+EMAIL_USE_TLS = settings.EMAIL_USE_TLS
+# EMAIL_USE_SSL = settings.EMAIL_USE_SSL
 
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
+EMAIL_HOST_USER = settings.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
+DEFAULT_FROM_EMAIL = settings.DEFAULT_FROM_EMAIL
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-DOMAIN = os.getenv("DOMAIN", "127.0.0.1:8000")
+DOMAIN = settings.DOMAIN
 
 SITE_NAME = "Freenance App"
 
@@ -303,7 +301,7 @@ MAX_OPERATIONS_COUNT = 5
 DEFAULT_DATE_FORMAT_STR = "%Y-%m-%d"
 DEFAULT_MONTH_FORMAT_STR = "%Y-%m"
 
-redis_address = os.getenv("REDIS_ADR")
+redis_address = settings.REDIS_ADR
 
 CELERY_BROKER_URL = f'redis://{redis_address}:6379/1'
 CELERY_RESULT_BACKEND = f'redis://{redis_address}:6379/2'
@@ -326,4 +324,4 @@ CACHES = {
 
 APPEND_SLASH=False
 
-CHEQUE_API_KEY = os.getenv("CHEQUE_API_KEY")
+CHEQUE_API_KEY = settings.CHEQUE_API_KEY
