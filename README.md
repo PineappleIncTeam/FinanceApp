@@ -133,6 +133,6 @@ The project will be hosted in two docker containers (db, app) at `http://localho
 docker-compose -f docker-compose.dev.yml down
 ```
 add flag -v to delete volumes ```docker-compose -f docker-compose.dev.yml down -v```
-</details><h1></h1>  
+</details><h1></h1>   
 
 [⬆️Contents](#contents)
