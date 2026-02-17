@@ -14,6 +14,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.settings import api_settings as jwt_settings
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+import json
 
 from api.views.vkchecktoken import VKCheckTokenView
 
@@ -82,7 +83,7 @@ class VKOAuth2View(APIView):
         refresh_token_vk = tokens.get("refresh_token")
 
         if not access_token:
-            logger.error(f"No access_token in VK response. Full response: {tokens}")
+            logger.error("No access_token in VK response. Full response: %s", json.dumps(tokens))
             return Response({"error": "No access token received"}, status=status.HTTP_403_FORBIDDEN)
 
         if refresh_token_vk:
