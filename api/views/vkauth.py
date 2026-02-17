@@ -81,9 +81,13 @@ class VKOAuth2View(APIView):
         tokens = vk_response.json()
         access_token = tokens.get("access_token")
         refresh_token_vk = tokens.get("refresh_token")
+        raw_text = vk_response.text
 
         if not access_token:
             logger.error("No access_token in VK response. Full response: %s", json.dumps(tokens))
+            logger.error(f"VK raw response length: {len(raw_text)}")
+            for i in range(0, len(raw_text), 1000):
+                logger.error(f"VK raw response part {i // 1000}: {raw_text[i:i + 1000]}")
             return Response({"error": "No access token received"}, status=status.HTTP_403_FORBIDDEN)
 
         if refresh_token_vk:
