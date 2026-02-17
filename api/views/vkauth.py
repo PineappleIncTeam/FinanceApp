@@ -89,7 +89,7 @@ class VKOAuth2View(APIView):
             logger.error(f"VK raw response length: {len(raw_text)}, total parts: {total_parts}")
             for i in range(0, len(raw_text), 10):
                 part_num = i // 10
-                logger.error(f"VK raw response part {part_num + 1}/{total_parts}: {raw_text[i:i + 10]}")
+                logger.error(f"{part_num + 1}/{total_parts}: {raw_text[i:i + 10]}")
             return Response({"error": "No access token received"}, status=status.HTTP_403_FORBIDDEN)
 
         if refresh_token_vk:
