@@ -232,46 +232,48 @@ AUTHENTICATION_BACKENDS = [
 LOG_FILE_NAME = "freenance.log" if DEBUG else "/var/log/freenance.log"
 
 LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "console": {
-            "format": "{asctime} {name} {levelname} {module} {message}",
-            "style": "{",
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            # Формат, который выводит всё в одну строку
+            'format': '{asctime} {levelname} {name} {message}',
+            'style': '{',
         },
-        "file": {
-            "format": "{asctime} {name} {levelname} {module} {message}",
-            "style": "{",
-        },
-    },
-    "handlers": {
-        "console": {
-            "class": "rich.logging.RichHandler",
-            "formatter": "console",
-        },
-        "file": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "formatter": "file",
-            "filename": LOG_FILE_NAME,
-            "backupCount": 0,
+        'file': {
+            'format': '{asctime} {levelname} {name} {message}',
+            'style': '{',
         },
     },
-    "loggers": {
-        "root": {
-            "handlers": ["console", "file"],
-            "level": "DEBUG",
-            "propagate": True,
+    'handlers': {
+        'console': {
+            # Вместо RichHandler используем обычный StreamHandler
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
         },
-        "django.request": {
-            "level": "INFO",
-            "handlers": ["console", "file"],
+        'file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'file',
+            'filename': LOG_FILE_NAME,
+            'backupCount': 0,
         },
-        "your_app.vkoauth2": {
-            "handlers": ["console"],
-            "level": "DEBUG",
-            "propagate": False,
+    },
+    'loggers': {
+        'root': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
-
+        'django.request': {
+            'level': 'INFO',
+            'handlers': ['console', 'file'],
+        },
+        'api.views.vkauth': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        # добавьте другие логгеры по необходимости
     },
 }
 
