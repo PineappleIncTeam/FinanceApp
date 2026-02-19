@@ -43,18 +43,18 @@ class VKOAuth2View(APIView):
         },
     )
     def post(self, request):
-        request_id = str(uuid.uuid4())[:8]  # короткий ID для трейсинга
+        request_id = str(uuid.uuid4())[:8]
         start_time = time.time()
         logger.info(f"[{request_id}] VKOAuth2View: request started")
 
-        # Логируем IP (опционально)
-        # logger.info(f"[{request_id}] Request from IP: {request.META.get('REMOTE_ADDR')}")
-
-        # Общий обработчик исключений
         try:
             code = request.data.get("code")
             code_verifier = request.data.get("code_verifier")
             device_id = request.data.get("device_id")
+
+            logger.info(f"[{request_id}] Received code: {'present' if code else 'missing'}, "
+                        f"code_verifier: {'present' if code_verifier else 'missing'}, "
+                        f"device_id: {device_id}")
 
             if not code or not code_verifier or not device_id:
                 missing = [k for k, v in [('code', code), ('code_verifier', code_verifier), ('device_id', device_id)] if not v]
@@ -64,6 +64,12 @@ class VKOAuth2View(APIView):
 
             logger.info(f"[{request_id}] All required parameters present")
 
+
+            redirect_uri = os.getenv("REDIRECT_URI")
+            if not redirect_uri:
+                redirect_uri = "https://dev.freenance.space/api/v1/vkauth/"
+                logger.warning(f"[{request_id}] REDIRECT_URI not set, using default: {redirect_uri}")
+
             vk_token_url = "https://id.vk.com/oauth2/auth"
             payload = {
                 "grant_type": "authorization_code",
@@ -72,8 +78,16 @@ class VKOAuth2View(APIView):
                 "device_id": device_id,
                 "client_id": os.getenv("CLIENT_ID"),
                 "client_secret": os.getenv("CL_SECRET"),
-                "redirect_uri": "https://dev.freenance.space",  # временно захардкожено
+                "redirect_uri": redirect_uri,
             }
+
+
+            logger.info(f"[{request_id}] VK token request params: "
+                        f"grant_type={payload['grant_type']}, "
+                        f"redirect_uri={payload['redirect_uri']}, "
+                        f"client_id={payload['client_id']}, "
+                        f"code_verifier_length={len(code_verifier) if code_verifier else 0}, "
+                        f"code_verifier_prefix={code_verifier[:5] if code_verifier and len(code_verifier) > 5 else code_verifier}")
 
             logger.info(f"[{request_id}] Requesting VK token endpoint (code exchange)")
             start_vk = time.time()
@@ -91,7 +105,6 @@ class VKOAuth2View(APIView):
                 logger.info(f"[{request_id}] Returning {vk_response.status_code} from VK")
                 return Response(vk_response.json(), status=vk_response.status_code)
 
-            # Парсим JSON с обработкой ошибки
             try:
                 tokens = vk_response.json()
             except ValueError as e:
@@ -114,142 +127,8 @@ class VKOAuth2View(APIView):
             else:
                 logger.info(f"[{request_id}] No VK refresh token")
 
-            logger.info(f"[{request_id}] Validating access_token via VKCheckTokenView")
-            factory = APIRequestFactory()
-            check_req = factory.post("/api/v1/vk/check-token/", {"token": access_token}, format="json")
-            check_view = VKCheckTokenView.as_view()
-
-            try:
-                start_check = time.time()
-                check_response = check_view(check_req)
-                check_duration = time.time() - start_check
-                logger.info(f"[{request_id}] VKCheckTokenView took {check_duration:.2f}s")
-            except Exception as exc:
-                logger.exception(f"[{request_id}] VKCheckTokenView check failed: {exc}")
-                logger.info(f"[{request_id}] Returning 500: Token validation failed")
-                return Response({"error": "server_error", "error_description": "Token validation failed"},
-                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-            if getattr(check_response, "status_code", None) != 200:
-                logger.error(f"[{request_id}] Token validation failed: {getattr(check_response, 'data', None)}")
-                logger.info(f"[{request_id}] Returning 403: Invalid token")
-                return Response({"error": "invalid_token", "detail": getattr(check_response, "data", None)},
-                                status=status.HTTP_403_FORBIDDEN)
-
-            logger.info(f"[{request_id}] Token validation successful")
-
-            # Запрос информации о пользователе
-            user_info_url = "https://id.vk.com/oauth2/user_info"
-            user_info_payload = {"access_token": access_token, "client_id": os.getenv("CLIENT_ID")}
-
-            logger.info(f"[{request_id}] Requesting user info from VK")
-            start_user = time.time()
-            try:
-                user_info_response = requests.post(user_info_url, data=user_info_payload, timeout=5)
-            except requests.RequestException as e:
-                logger.error(f"[{request_id}] Failed to fetch user info", exc_info=True)
-                logger.info(f"[{request_id}] Returning 500: User info fetch failed")
-                return Response({"error": "Failed to fetch user info"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            user_duration = time.time() - start_user
-            logger.info(f"[{request_id}] User info request took {user_duration:.2f}s")
-
-            if user_info_response.status_code != 200:
-                logger.error(f"[{request_id}] User info endpoint returned {user_info_response.status_code}: {user_info_response.text}")
-                logger.info(f"[{request_id}] Returning {user_info_response.status_code} from VK user info")
-                return Response(user_info_response.json(), status=user_info_response.status_code)
-
-            try:
-                vk_user = user_info_response.json()
-            except ValueError as e:
-                logger.error(f"[{request_id}] Failed to parse user info JSON: {user_info_response.text}", exc_info=True)
-                logger.info(f"[{request_id}] Returning 500: Invalid user info JSON")
-                return Response({"error": "Invalid user info JSON"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-            vk_id = vk_user.get("sub") or vk_user.get("id")
-            logger.info(f"[{request_id}] User info received, VK ID: {vk_id}")
-
-            username = f"vk_{vk_id}" if vk_id else None
-            email = vk_user.get("email") or f"{vk_id}@vk.local"
-
-            # Создание/обновление пользователя
-            try:
-                user, created = User.objects.get_or_create(
-                    username=username,
-                    defaults={
-                        "first_name": vk_user.get("first_name", ""),
-                        "last_name": vk_user.get("last_name", ""),
-                        "email": email,
-                    },
-                )
-                if created:
-                    logger.info(f"[{request_id}] New user created: id={user.id}, vk_id={vk_id}")
-                else:
-                    logger.info(f"[{request_id}] Existing user updated: id={user.id}, vk_id={vk_id}")
-            except Exception as e:
-                logger.error(f"[{request_id}] Failed to create/update user for vk_id={vk_id}", exc_info=True)
-                logger.info(f"[{request_id}] Returning 500: User creation failed")
-                return Response({"error": "user_creation_failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-            # Генерация JWT
-            refresh = RefreshToken.for_user(user)
-            access_token_jwt = str(refresh.access_token)
-            refresh_token_jwt = str(refresh)
-            logger.info(f"[{request_id}] JWT tokens generated for user {user.id}")
-
-            response_data = {
-                "user": {
-                    "id": user.id,
-                    "username": user.username,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                    "avatar": vk_user.get("picture"),
-                }
-            }
-            resp = Response(response_data, status=status.HTTP_200_OK)
-
-            # Время жизни кук
-            try:
-                access_lifetime = jwt_settings.ACCESS_TOKEN_LIFETIME
-                refresh_lifetime = jwt_settings.REFRESH_TOKEN_LIFETIME
-                access_max_age = int(access_lifetime.total_seconds())
-                refresh_max_age = int(refresh_lifetime.total_seconds())
-            except Exception:
-                access_max_age = 3600
-                refresh_max_age = 60 * 60 * 24 * 7
-                logger.warning(f"[{request_id}] Failed to get JWT lifetimes, using defaults")
-
-            secure_flag = not getattr(settings, "DEBUG", False)
-
-            # Установка кук
-            resp.set_cookie("jwt_access", access_token_jwt, httponly=True, secure=secure_flag,
-                            samesite="Lax", max_age=access_max_age, path="/")
-            resp.set_cookie("jwt_refresh", refresh_token_jwt, httponly=True, secure=secure_flag,
-                            samesite="Lax", max_age=refresh_max_age, path="/")
-            resp.set_cookie("vk_access", access_token, httponly=True, secure=secure_flag,
-                            samesite="Lax", max_age=int(tokens.get("expires_in", access_max_age)), path="/")
-            if refresh_token_vk:
-                resp.set_cookie("vk_refresh", refresh_token_vk, httponly=True, secure=secure_flag,
-                                samesite="Lax", max_age=int(tokens.get("expires_in", refresh_max_age)), path="/")
-
-            logger.info(f"[{request_id}] Cookies set for user {user.id}")
-
-            # Кэширование
-            try:
-                vk_ttl = tokens.get("expires_in") or access_max_age
-                cache.set(f"vk_tokens:{vk_id}", tokens, timeout=int(vk_ttl))
-                cache.set(f"jwt_tokens:{user.id}", {"access": access_token_jwt, "refresh": refresh_token_jwt},
-                          timeout=refresh_max_age)
-                logger.info(f"[{request_id}] Tokens cached for user {user.id}")
-            except Exception as e:
-                logger.warning(f"[{request_id}] Failed to cache tokens: {e}", exc_info=True)
-
-            duration = time.time() - start_time
-            logger.info(f"[{request_id}] VK OAuth successful for user {user.id}, total time: {duration:.2f}s")
-            logger.info(f"[{request_id}] Returning 200 OK")
-            return resp
 
         except Exception as e:
-            # Любое необработанное исключение
             logger.exception(f"[{request_id}] Unhandled exception in VKOAuth2View")
             logger.info(f"[{request_id}] Returning 500 due to unhandled exception")
             return Response({"error": "internal_server_error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
