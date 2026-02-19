@@ -65,7 +65,7 @@ class VKOAuth2View(APIView):
             "device_id": device_id,
             "client_id": os.getenv("CLIENT_ID"),
             "client_secret": os.getenv("CL_SECRET"),
-            "redirect_uri": os.getenv("REDIRECT_URI"),
+            "redirect_uri": "https://dev.freenance.store" #os.getenv("REDIRECT_URI"),
         }
 
         logger.info("Requesting VK token endpoint (code exchange)")
