@@ -66,7 +66,8 @@ class VKOAuth2View(APIView):
             logger.info(f"[{request_id}] All required parameters present")
 
             # Определяем redirect_uri: сначала из окружения, если нет — используем полный путь по умолчанию
-            redirect_uri = os.getenv("REDIRECT_URI")
+            #redirect_uri = os.getenv("REDIRECT_URI")
+            redirect_uri = "https://dev.freenance.space/profitMoney"
             if not redirect_uri:
                 redirect_uri = "https://dev.freenance.space/api/v1/vkauth/"
                 logger.warning(f"[{request_id}] REDIRECT_URI not set, using default: {redirect_uri}")
