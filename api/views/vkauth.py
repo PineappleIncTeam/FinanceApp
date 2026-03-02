@@ -4,6 +4,7 @@ import time
 import requests
 import json
 import uuid
+import hashlib  # NEW: для хеширования
 from dotenv import load_dotenv
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -53,10 +54,12 @@ class VKOAuth2View(APIView):
             code_verifier = request.data.get("code_verifier")
             device_id = request.data.get("device_id")
 
-            # Безопасное логирование: показываем только начало code_verifier
-            log_code_verifier = code_verifier[:5] + "..." if code_verifier and len(code_verifier) > 5 else str(code_verifier)
-            logger.info(f"[{request_id}] Получены параметры: code={'присутствует' if code else 'отсутствует'}, "
-                        f"code_verifier={log_code_verifier}, device_id={device_id}")
+            # NEW LOG: безопасное хеширование code и code_verifier
+            code_hash = hashlib.sha256(code.encode()).hexdigest() if code else None
+            verifier_hash = hashlib.sha256(code_verifier.encode()).hexdigest() if code_verifier else None
+
+            logger.info(f"[{request_id}] Получены параметры: code_hash={code_hash}, "
+                        f"code_verifier_hash={verifier_hash}, device_id={device_id}")
 
             if not code or not code_verifier or not device_id:
                 missing = [k for k, v in [('code', code), ('code_verifier', code_verifier), ('device_id', device_id)] if not v]
@@ -88,10 +91,10 @@ class VKOAuth2View(APIView):
                 "redirect_uri": redirect_uri,
             }
 
-            # Логируем параметры запроса (без client_secret)
-            logger.info(f"[{request_id}] Параметры запроса к VK: grant_type={payload['grant_type']}, "
-                        f"redirect_uri={payload['redirect_uri']}, client_id={payload['client_id']}, "
-                        f"code_verifier_length={len(code_verifier)}, code_verifier_prefix={code_verifier[:5] if code_verifier else ''}")
+            # NEW LOG: полные параметры запроса (без client_secret)
+            log_payload = payload.copy()
+            log_payload.pop("client_secret", None)
+            logger.info(f"[{request_id}] Параметры запроса к VK: {json.dumps(log_payload, ensure_ascii=False)}")
 
             start_vk = time.time()
             try:
@@ -104,26 +107,27 @@ class VKOAuth2View(APIView):
             vk_duration = time.time() - start_vk
             logger.info(f"[{request_id}] Запрос к VK выполнен за {vk_duration:.2f} сек, статус ответа: {vk_response.status_code}")
 
+            # NEW LOG: полный ответ VK (включая тело)
+            try:
+                response_json = vk_response.json()
+            except ValueError:
+                response_json = vk_response.text
+            logger.info(f"[{request_id}] Ответ VK: {json.dumps(response_json, ensure_ascii=False)}")
+
             if vk_response.status_code != 200:
                 logger.error(f"[{request_id}] VK вернул ошибку: {vk_response.status_code}, тело: {vk_response.text}")
                 logger.info(f"[{request_id}] Проксируем ответ VK клиенту с кодом {vk_response.status_code}")
-                return Response(vk_response.json(), status=vk_response.status_code)
+                return Response(response_json, status=vk_response.status_code)
 
-            # Парсинг JSON ответа
-            try:
-                tokens = vk_response.json()
-                logger.info(f"[{request_id}] JSON ответа от VK успешно разобран")
-            except ValueError as e:
-                logger.error(f"[{request_id}] Не удалось разобрать JSON ответа VK: {vk_response.text}", exc_info=True)
-                logger.info(f"[{request_id}] Ответ 500: некорректный JSON от VK")
-                return Response({"error": "Invalid JSON from VK"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # Парсинг JSON ответа (уже сделано выше)
+            tokens = response_json
 
             access_token = tokens.get("access_token")
             refresh_token_vk = tokens.get("refresh_token")
             expires_in = tokens.get("expires_in")
 
             if not access_token:
-                logger.error(f"[{request_id}] В ответе VK отсутствует access_token. Полный ответ: {json.dumps(tokens, separators=(',', ':'))}")
+                logger.error(f"[{request_id}] В ответе VK отсутствует access_token. Полный ответ: {json.dumps(tokens, ensure_ascii=False)}")
                 logger.info(f"[{request_id}] Ответ 403: токен доступа не получен")
                 return Response({"error": "No access token received"}, status=status.HTTP_403_FORBIDDEN)
 
