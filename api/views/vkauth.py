@@ -4,7 +4,8 @@ import time
 import requests
 import json
 import uuid
-import hashlib  # NEW: для хеширования
+import hashlib
+import re
 from dotenv import load_dotenv
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -48,18 +49,37 @@ class VKOAuth2View(APIView):
         start_time = time.time()
         logger.info(f"[{request_id}] === НАЧАЛО ОБРАБОТКИ ЗАПРОСА VK OAuth ===")
 
+        # Логирование IP клиента
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            client_ip = x_forwarded_for.split(',')[0]
+        else:
+            client_ip = request.META.get('REMOTE_ADDR')
+        logger.info(f"[{request_id}] IP клиента: {client_ip}")
+
         try:
             # --- Шаг 1: Получение и проверка входных параметров ---
             code = request.data.get("code")
             code_verifier = request.data.get("code_verifier")
             device_id = request.data.get("device_id")
 
-            # NEW LOG: безопасное хеширование code и code_verifier
+            # Безопасное хеширование code и code_verifier
             code_hash = hashlib.sha256(code.encode()).hexdigest() if code else None
             verifier_hash = hashlib.sha256(code_verifier.encode()).hexdigest() if code_verifier else None
 
             logger.info(f"[{request_id}] Получены параметры: code_hash={code_hash}, "
                         f"code_verifier_hash={verifier_hash}, device_id={device_id}")
+
+            # Проверка формата code_verifier
+            if code_verifier and not re.match(r'^[A-Za-z0-9-._~]{43,128}$', code_verifier):
+                logger.warning(f"[{request_id}] code_verifier не соответствует требованиям: длина={len(code_verifier)}")
+
+            # Проверка на повторное использование кода
+            if code_hash and cache.get(f"used_code:{code_hash}"):
+                logger.warning(f"[{request_id}] Обнаружен повторный запрос с тем же code (hash={code_hash})")
+            else:
+                # Сохраняем код в кэш на 60 секунд для предотвращения повторного использования
+                cache.set(f"used_code:{code_hash}", True, timeout=60)
 
             if not code or not code_verifier or not device_id:
                 missing = [k for k, v in [('code', code), ('code_verifier', code_verifier), ('device_id', device_id)] if not v]
@@ -70,7 +90,7 @@ class VKOAuth2View(APIView):
             logger.info(f"[{request_id}] Все обязательные параметры присутствуют")
 
             # --- Шаг 2: Определение redirect_uri ---
-            #redirect_uri = os.getenv("REDIRECT_URI")
+            # redirect_uri = os.getenv("REDIRECT_URI")
             redirect_uri = "https://dev.freenance.space/profitMoney"
             if not redirect_uri:
                 redirect_uri = "https://dev.freenance.space/api/v1/vkauth/"
@@ -81,6 +101,8 @@ class VKOAuth2View(APIView):
             # --- Шаг 3: Обмен кода на токены через VK ---
             logger.info(f"[{request_id}] ЭТАП 1: Запрос токена у VK (обмен кода)")
             vk_token_url = "https://id.vk.com/oauth2/auth"
+            logger.info(f"[{request_id}] URL запроса к VK: {vk_token_url}")
+
             payload = {
                 "grant_type": "authorization_code",
                 "code": code,
@@ -91,7 +113,7 @@ class VKOAuth2View(APIView):
                 "redirect_uri": redirect_uri,
             }
 
-            # NEW LOG: полные параметры запроса (без client_secret)
+            # Логируем параметры запроса (без client_secret)
             log_payload = payload.copy()
             log_payload.pop("client_secret", None)
             logger.info(f"[{request_id}] Параметры запроса к VK: {json.dumps(log_payload, ensure_ascii=False)}")
@@ -107,11 +129,19 @@ class VKOAuth2View(APIView):
             vk_duration = time.time() - start_vk
             logger.info(f"[{request_id}] Запрос к VK выполнен за {vk_duration:.2f} сек, статус ответа: {vk_response.status_code}")
 
-            # NEW LOG: полный ответ VK (включая тело)
+            # Логируем заголовки ответа VK
+            logger.info(f"[{request_id}] Заголовки ответа VK: {dict(vk_response.headers)}")
+
+            # Пытаемся распарсить JSON ответа, при ошибке логируем текст
             try:
                 response_json = vk_response.json()
+                logger.info(f"[{request_id}] JSON ответа от VK успешно разобран")
             except ValueError:
-                response_json = vk_response.text
+                logger.error(f"[{request_id}] Не удалось разобрать JSON ответа VK. Тело ответа: {vk_response.text}")
+                logger.info(f"[{request_id}] Ответ 500: некорректный JSON от VK")
+                return Response({"error": "Invalid JSON from VK"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            # Логируем полный ответ VK (даже если это ошибка)
             logger.info(f"[{request_id}] Ответ VK: {json.dumps(response_json, ensure_ascii=False)}")
 
             if vk_response.status_code != 200:
@@ -119,9 +149,7 @@ class VKOAuth2View(APIView):
                 logger.info(f"[{request_id}] Проксируем ответ VK клиенту с кодом {vk_response.status_code}")
                 return Response(response_json, status=vk_response.status_code)
 
-            # Парсинг JSON ответа (уже сделано выше)
             tokens = response_json
-
             access_token = tokens.get("access_token")
             refresh_token_vk = tokens.get("refresh_token")
             expires_in = tokens.get("expires_in")
