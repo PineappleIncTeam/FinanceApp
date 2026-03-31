@@ -47,7 +47,6 @@ class VKOAuth2View(APIView):
     def post(self, request):
         request_id = str(uuid.uuid4())[:8]
         start_time = time.time()
-        logger.info(f"[{request_id}] === НАЧАЛО ОБРАБОТКИ ЗАПРОСА VK OAuth ===")
 
         # Логирование IP клиента
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -55,31 +54,17 @@ class VKOAuth2View(APIView):
             client_ip = x_forwarded_for.split(',')[0]
         else:
             client_ip = request.META.get('REMOTE_ADDR')
-        logger.info(f"[{request_id}] IP клиента: {client_ip}")
 
         try:
-            # --- Шаг 1: Получение и проверка входных параметров ---
             code = request.data.get("code")
             code_verifier = request.data.get("code_verifier")
             device_id = request.data.get("device_id")
 
-            # Безопасное хеширование code и code_verifier
             code_hash = hashlib.sha256(code.encode()).hexdigest() if code else None
             verifier_hash = hashlib.sha256(code_verifier.encode()).hexdigest() if code_verifier else None
 
             logger.info(f"[{request_id}] Получены параметры: code_hash={code_hash}, "
                         f"code_verifier_hash={verifier_hash}, device_id={device_id}")
-
-            # Проверка формата code_verifier
-            if code_verifier and not re.match(r'^[A-Za-z0-9-._~]{43,128}$', code_verifier):
-                logger.warning(f"[{request_id}] code_verifier не соответствует требованиям: длина={len(code_verifier)}")
-
-            # Проверка на повторное использование кода
-            if code_hash and cache.get(f"used_code:{code_hash}"):
-                logger.warning(f"[{request_id}] Обнаружен повторный запрос с тем же code (hash={code_hash})")
-            else:
-                # Сохраняем код в кэш на 60 секунд для предотвращения повторного использования
-                cache.set(f"used_code:{code_hash}", True, timeout=60)
 
             if not code or not code_verifier or not device_id:
                 missing = [k for k, v in [('code', code), ('code_verifier', code_verifier), ('device_id', device_id)] if not v]
@@ -89,17 +74,13 @@ class VKOAuth2View(APIView):
 
             logger.info(f"[{request_id}] Все обязательные параметры присутствуют")
 
-            # --- Шаг 2: Определение redirect_uri ---
-            # redirect_uri = os.getenv("REDIRECT_URI")
-            redirect_uri = "https://dev.freenance.space/profitMoney"
+            redirect_uri = os.getenv("REDIRECT_URI")
             if not redirect_uri:
-                redirect_uri = "https://dev.freenance.space/api/v1/vkauth/"
+                redirect_uri = "https://dev.freenance.space/profitMoney"
                 logger.warning(f"[{request_id}] REDIRECT_URI не задан, используется значение по умолчанию: {redirect_uri}")
             else:
                 logger.info(f"[{request_id}] Используется redirect_uri: {redirect_uri}")
 
-            # --- Шаг 3: Обмен кода на токены через VK ---
-            logger.info(f"[{request_id}] ЭТАП 1: Запрос токена у VK (обмен кода)")
             vk_token_url = "https://id.vk.com/oauth2/auth"
             logger.info(f"[{request_id}] URL запроса к VK: {vk_token_url}")
 
@@ -165,8 +146,7 @@ class VKOAuth2View(APIView):
             else:
                 logger.info(f"[{request_id}] Refresh_token VK отсутствует")
 
-            # --- Шаг 4: Валидация токена через VKCheckTokenView ---
-            logger.info(f"[{request_id}] ЭТАП 2: Валидация токена через VKCheckTokenView")
+            # Валидация токена через VKCheckTokenView
             factory = APIRequestFactory()
             check_req = factory.post("/api/v1/vk/check-token/", {"token": access_token}, format="json")
             check_view = VKCheckTokenView.as_view()
@@ -190,8 +170,7 @@ class VKOAuth2View(APIView):
 
             logger.info(f"[{request_id}] Токен успешно валидирован")
 
-            # --- Шаг 5: Получение информации о пользователе ---
-            logger.info(f"[{request_id}] ЭТАП 3: Запрос информации о пользователе")
+            # Получение информации о пользователе
             user_info_url = "https://id.vk.com/oauth2/user_info"
             user_info_payload = {"access_token": access_token, "client_id": os.getenv("CLIENT_ID")}
 
@@ -227,8 +206,7 @@ class VKOAuth2View(APIView):
 
             logger.info(f"[{request_id}] Получены данные пользователя: VK ID={vk_id}, имя={first_name}, фамилия={last_name}, email={email}, аватар={'есть' if avatar else 'нет'}")
 
-            # --- Шаг 6: Создание или обновление пользователя в БД ---
-            logger.info(f"[{request_id}] ЭТАП 4: Создание/обновление пользователя")
+
             username = f"vk_{vk_id}" if vk_id else None
 
             try:
@@ -264,15 +242,13 @@ class VKOAuth2View(APIView):
                 logger.info(f"[{request_id}] Ответ 500: не удалось создать/обновить пользователя")
                 return Response({"error": "user_creation_failed"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            # --- Шаг 7: Генерация JWT токенов ---
-            logger.info(f"[{request_id}] ЭТАП 5: Генерация JWT токенов")
+
             refresh = RefreshToken.for_user(user)
             access_token_jwt = str(refresh.access_token)
             refresh_token_jwt = str(refresh)
             logger.info(f"[{request_id}] JWT токены сгенерированы для пользователя id={user.id}")
 
-            # --- Шаг 8: Формирование ответа и установка кук ---
-            logger.info(f"[{request_id}] ЭТАП 6: Установка cookie")
+
             response_data = {
                 "user": {
                     "id": user.id,
@@ -310,8 +286,6 @@ class VKOAuth2View(APIView):
             logger.info(f"[{request_id}] Установлены cookie: jwt_access, jwt_refresh, vk_access" +
                         (", vk_refresh" if refresh_token_vk else ""))
 
-            # --- Шаг 9: Кэширование токенов ---
-            logger.info(f"[{request_id}] ЭТАП 7: Кэширование токенов")
             try:
                 vk_ttl = tokens.get("expires_in") or access_max_age
                 cache.set(f"vk_tokens:{vk_id}", tokens, timeout=int(vk_ttl))
@@ -321,7 +295,6 @@ class VKOAuth2View(APIView):
             except Exception as e:
                 logger.warning(f"[{request_id}] Не удалось закэшировать токены: {e}", exc_info=True)
 
-            # --- Шаг 10: Завершение ---
             duration = time.time() - start_time
             logger.info(f"[{request_id}] === УСПЕШНОЕ ЗАВЕРШЕНИЕ OAuth для пользователя id={user.id}, общее время: {duration:.2f} сек ===")
             return resp
